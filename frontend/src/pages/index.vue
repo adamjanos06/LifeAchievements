@@ -4,8 +4,6 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
 
 <template>
   <LandingNavbar />
-
-  <!-- 🔽 EZ ALATT KELL LENNIE A HERO SZEKCIÓDNAK -->
 <section class="max-w-7xl mx-auto px-10 pt-10 pb-28 flex flex-col-reverse lg:flex-row items-center justify-between gap-20">
     <!-- BAL OLDAL -->
     <div class="w-full lg:w-[620px] text-center lg:text-left flex flex-col items-center lg:items-start">
@@ -33,7 +31,7 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
 
     </div>
 
-    <!-- JOBB OLDAL – PIPA (DESKTOP) -->
+    <!-- JOBB OLDAL – PIPA (csak dekstop-on) -->
 <div class="hidden lg:flex w-[360px] justify-end">
   <div class="w-56 h-56 bg-blue-700 rounded-full flex items-center justify-center shadow-2xl">
     <svg

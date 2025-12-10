@@ -3,13 +3,10 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
 </script>
 <template>
   <LandingNavbar />
-    <!-- INTRO TITLE + CONTENT -->
     <section class="max-w-6xl xl:max-w-7xl mx-auto px-8 lg:px-12 pt-16 pb-24">
       <h1 class="text-center text-4xl md:text-5xl font-extrabold tracking-wide">
         INTRODUCTION
       </h1>
-
-      <!-- TWO COLUMN GRID -->
       <div
         class="grid grid-cols-1 md:grid-cols-2 gap-20 xl:gap-32 mt-16 items-stretch"
       >

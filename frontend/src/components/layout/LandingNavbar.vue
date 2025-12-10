@@ -8,26 +8,25 @@ const isOpen = ref(false)
   <header class="w-full border-b border-black/20 bg-white">
     <nav class="w-full px-12 h-16 flex items-center justify-between">
 
-      <!-- LEFT: LOGO + TITLE -->
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 border-7 border-blue-700 rounded-full"></div>
         <span class="font-bold text-lg tracking-wide">LIFE ACHIEVEMENTS</span>
       </div>
 
-      <!-- RIGHT: DESKTOP MENU -->
       <div class="hidden md:flex items-center gap-6">
         <button class="text-black hover:underline">
-          Log In
+            <RouterLink to="/login" class="text-sm font-semibold hover:underline">
+              Log In
+            </RouterLink>
         </button>
 
-        <button
-          class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-5 py-2 rounded-full transition"
-        >
-          Sign Up
+         <button class="text-lg font-medium">
+            <RouterLink to="/signup" class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
+              Sign Up
+            </RouterLink>
         </button>
       </div>
 
-      <!-- MOBILE HAMBURGER -->
       <button
         class="md:hidden"
         @click="isOpen = !isOpen"
@@ -40,21 +39,20 @@ const isOpen = ref(false)
       </button>
 
     </nav>
-
-    <!-- MOBILE DROPDOWN -->
+    <!-- MOBILE MENU -->
     <div v-if="isOpen" class="md:hidden border-t border-black/10 bg-white">
       <div class="flex flex-col items-center gap-4 py-6">
 
         <button class="text-lg font-medium">
-          Log In
+            <RouterLink to="/login" class="text-sm font-semibold hover:underline">
+              Log In
+            </RouterLink>
         </button>
-
-        <button
-          class="w-44 bg-blue-700 text-white font-bold py-3 rounded-xl"
-        >
-          Sign Up
+         <button class="text-lg font-medium">
+            <RouterLink to="/signup" class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
+              Sign Up
+            </RouterLink>
         </button>
-
       </div>
     </div>
   </header>

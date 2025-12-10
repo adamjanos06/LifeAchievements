@@ -20,6 +20,18 @@ export const router = createRouter({
       meta: {
         title: 'Introduction'
       }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/pages/login.vue'),
+      meta: { title: 'Login' }
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: () => import('@/pages/signup.vue'),
+      meta: { title: 'Sign Up' }
     }
   ]
 })

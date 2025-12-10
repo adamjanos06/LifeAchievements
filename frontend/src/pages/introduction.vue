@@ -10,7 +10,6 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
       <div
         class="grid grid-cols-1 md:grid-cols-2 gap-20 xl:gap-32 mt-16 items-stretch"
       >
-        <!-- LEFT COLUMN -->
         <div class="flex flex-col justify-between h-full">
           <div class="space-y-6">
             <h3 class="text-2xl font-bold">
@@ -43,14 +42,13 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
             </p>
           </div>
 
-          <button
-            class="mt-10 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-4 text-lg font-semibold transition"
-          >
+          <RouterLink
+            to="/signup"
+            class="mt-10 inline-block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-4 text-lg font-semibold">
             SIGN UP
-          </button>
+          </RouterLink>
         </div>
 
-        <!-- RIGHT COLUMN -->
         <div class="flex flex-col justify-between h-full">
           <div class="space-y-6">
             <h3 class="text-2xl font-bold">

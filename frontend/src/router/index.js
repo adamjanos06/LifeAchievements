@@ -4,7 +4,25 @@ import { routes } from 'vue-router/auto-routes'
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes:[
+    {
+      path: '/',
+      name: 'index',
+      component: () => import('@/pages/index.vue'),
+      meta: {
+        title: 'Landing'
+      }
+    },
+    {
+      path: '/introduction',
+      name: 'introduction',
+      component: () => import('@/pages/introduction.vue'),
+      meta: {
+        title: 'Introduction'
+      }
+    }
+  ]
 })
+
 
 router.beforeEach(setTitle)

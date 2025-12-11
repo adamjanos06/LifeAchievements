@@ -1,5 +1,10 @@
 <script setup>
+import { useRouter } from "vue-router";
+const router = useRouter();
 import LandingNavbar from '@/components/layout/LandingNavbar.vue'
+function goToCatalog() {
+  router.push("/catalog");
+}
 </script>
 <template>
   <LandingNavbar />
@@ -88,11 +93,11 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
             </ol>
           </div>
 
-          <button
-            class="mt-10 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-4 text-lg font-semibold transition"
-          >
-            VIEW ACHIEVEMENTS
-          </button>
+            <button @click="goToCatalog"
+              class="mt-10 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-4 text-lg font-semibold transition"
+            >
+              VIEW ACHIEVEMENTS
+            </button>
         </div>
       </div>
     </section>

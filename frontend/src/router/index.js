@@ -32,7 +32,20 @@ export const router = createRouter({
       name: 'signup',
       component: () => import('@/pages/signup.vue'),
       meta: { title: 'Sign Up' }
+    },
+    {
+      path: "/catalog",
+      name: "catalogIndex",
+      component: () => import("@/pages/catalog/index.vue"),
+      meta: { title: 'Catalog Index' }
+    },
+    {
+      path: "/catalog/:id",
+      name: "Catalog",
+      component: () => import("@/pages/catalog/[id].vue"),
+      meta: { title: 'Catalog' }
     }
+
   ]
 })
 

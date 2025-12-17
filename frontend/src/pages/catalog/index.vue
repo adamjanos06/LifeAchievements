@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import MainNavbar from '@/components/layout/MainNavbar.vue'
 
 const router = useRouter();
 
@@ -42,6 +43,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <MainNavbar />
   <div>
     <!-- Category Cards for Quick Filter -->
     <div>

@@ -1,23 +1,44 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import axios from 'axios'
 
-const username = ref('')
-const email = ref('')
-const password = ref('')
-const password2 = ref('')
+const router = useRouter()
 
-const handleSignup = () => {
-  if (password.value !== password2.value) {
-    alert('Passwords do not match!')
+const name = ref("")
+const email = ref("")
+const password = ref("")
+const password_confirmation = ref("")
+const error = ref("")
+
+
+async function register() {
+  error.value = ""
+
+  if (password.value !== password_confirmation.value) {
+    error.value = "Passwords do not match"
     return
   }
 
-  console.log('Signup:', {
-    username: username.value,
-    email: email.value,
-    password: password.value
-  })
+  try {
+    const res = await axios.post("/api/register", {
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: password_confirmation.value,
+    })
 
+    localStorage.setItem("token", res.data.token)
+
+    axios.defaults.headers.common["Authorization"] =
+      `Bearer ${res.data.token}`
+
+    router.push("/catalog")
+  } catch (err) {
+    error.value =
+      err.response?.data?.message ||
+      "Registration failed."
+  }
 }
 </script>
 
@@ -33,7 +54,7 @@ const handleSignup = () => {
         <div>
           <label class="block text-sm font-semibold mb-1">Username</label>
           <input
-            v-model="username"
+            v-model="name"
             type="text"
             placeholder="Your name"
             class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -66,7 +87,7 @@ const handleSignup = () => {
         <div>
           <label class="block text-sm font-semibold mb-1">Confirm Password</label>
           <input
-            v-model="password2"
+            v-model="password_confirmation"
             type="password"
             placeholder="••••••••"
             class="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"

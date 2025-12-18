@@ -1,12 +1,34 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import axios from 'axios'
 
-const email = ref('')
-const password = ref('')
+const router = useRouter()
 
-const handleLogin = () => {
-  console.log('Login attempt:', email.value, password.value)
-  // Később ide jön majd az API hívás
+const email = ref("")
+const password = ref("")
+const error = ref("")
+
+async function login() {
+  error.value = ""
+
+  try {
+    const res = await axios.post("/api/login", {
+      email: email.value,
+      password: password.value,
+    })
+
+    localStorage.setItem("token", res.data.token)
+
+    axios.defaults.headers.common["Authorization"] =
+      `Bearer ${res.data.token}`
+
+    router.push("/catalog")
+  } catch (err) {
+    error.value =
+      err.response?.data?.message ||
+      "Login failed. Check your credentials."
+  }
 }
 </script>
 

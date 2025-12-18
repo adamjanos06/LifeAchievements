@@ -7,6 +7,7 @@ use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompletedAchievementController;
+use App\Http\Controllers\AuthController;
 
 // ----------------------
 // Public Routes
@@ -24,6 +25,14 @@ Route::get('/badges/{badge}', [BadgeController::class, 'show']);
 // Completed achievements list by category or global
 Route::get('/completed-achievements', [CompletedAchievementController::class, 'index']);
 
+// AUTH
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+});
 
 // ----------------------
 // Protected Routes (admin/user actions)
@@ -47,7 +56,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/badges/{badge}', [BadgeController::class, 'destroy']);
 
     // --- Completed Achievements ---
-    Route::post('/completed-achievements', [CompletedAchievementController::class, 'store']);
+    Route::post('/completed-achievements', [CompletedAchievementController::class, 'store'])
+    ->middleware('auth:sanctum');
     Route::get('/completed-achievements/user', [CompletedAchievementController::class, 'userCompleted']);
     Route::delete('/completed-achievements/{completedAchievement}', [CompletedAchievementController::class, 'destroy']);
 });

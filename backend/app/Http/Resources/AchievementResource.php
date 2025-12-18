@@ -11,6 +11,7 @@ class AchievementResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'category_id' =>$this->category_id,
             'name' => $this->name,
             'description' => $this->description,
             'xp' => $this->xp,

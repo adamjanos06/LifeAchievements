@@ -13,7 +13,7 @@ async function login() {
   error.value = ""
 
   try {
-    const res = await axios.post("/api/login", {
+    const res = await axios.post("http://backend.vm1.test/api/login", {
       email: email.value,
       password: password.value,
     })

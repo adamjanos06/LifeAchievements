@@ -21,7 +21,13 @@ async function register() {
   }
 
   try {
-    const res = await axios.post("/api/register", {
+    console.log("Attempting to register with:", {
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: password_confirmation.value,
+    })
+    const res = await axios.post("http://backend.vm1.test/api/register", {
       name: name.value,
       email: email.value,
       password: password.value,
@@ -98,6 +104,7 @@ async function register() {
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition"
+          onclick="register()"
         >
           Create Account
         </button>

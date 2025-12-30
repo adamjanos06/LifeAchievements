@@ -23,40 +23,37 @@ onMounted(() => loadCategories());
 <template>
   <MainNavbar />
 
-  <div class="max-w-7xl mx-auto px-6 py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14">
 
-    <!-- Title -->
-    <h2 class="text-center text-2xl font-bold tracking-wide mb-12">
-      CATEGORIES
-    </h2>
+  <h2 class="text-center text-2xl font-bold tracking-wide mb-14">
+    CATEGORIES
+  </h2>
 
-    <!-- GRID -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+              gap-x-6 gap-y-6
+              sm:gap-x-10 sm:gap-y-10
+              lg:gap-x-14 lg:gap-y-12">
 
-      <div
-        v-for="cat in categories"
-        :key="cat.id"
-        @click="goToCategory(cat.id)"
-        class="flex items-center gap-5 border rounded-2xl px-8 py-5 cursor-pointer 
-               hover:shadow-lg transition bg-white"
-      >
-
-        <!-- ICON -->
-        <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-          <span class="text-lg font-bold text-gray-600">
-            {{ cat.name.charAt(0) }}
-          </span>
-        </div>
-
-        <!-- TEXT -->
-        <span class="text-xl font-semibold">
-          {{ cat.name }}
+    <div
+      v-for="cat in categories"
+      :key="cat.id"
+      @click="goToCategory(cat.id)"
+      class="flex items-center gap-5 border rounded-2xl px-7 py-6 cursor-pointer bg-white hover:shadow-lg transition"
+    >
+      <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
+        <span class="text-lg font-bold text-gray-600">
+          {{ cat.name.charAt(0) }}
         </span>
-
       </div>
 
+      <span class="text-lg font-semibold">
+        {{ cat.name }}
+      </span>
     </div>
 
   </div>
+
+</div>
+
 </template>
 

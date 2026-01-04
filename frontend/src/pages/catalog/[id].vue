@@ -1,36 +1,35 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
+import MainNavbar from "@/components/layout/MainNavbar.vue";
 
 const route = useRoute();
 
 const categories = ref([]);
 const achievements = ref([]);
 const filtered = ref([]);
-const selectedCategory = ref(route.params.id || "");
-const viewMode = ref("grid");
+
+const categoryId = Number(route.params.id);
 
 async function loadCategories() {
   const res = await fetch("http://backend.vm1.test/api/categories");
-  categories.value = await res.json();
-  categories.value = categories.value.data;
-  console.log(categories.value)
+  const json = await res.json();
+  categories.value = json.data;
 }
 
 async function loadAchievements() {
   const res = await fetch("http://backend.vm1.test/api/achievements");
-  achievements.value = await res.json();
-  achievements.value = achievements.value.data;
-  
-  console.log(achievements.value)
-  applyFilter();
-}
-
-function applyFilter() {
+  const json = await res.json();
+  achievements.value = json.data;
   filtered.value = achievements.value.filter(
-    a => a.category_id === Number(selectedCategory.value)
+    a => a.category_id === categoryId
   );
 }
+
+const categoryName = computed(() => {
+  const cat = categories.value.find(c => c.id === categoryId);
+  return cat ? cat.name.toUpperCase() : "";
+});
 
 onMounted(() => {
   loadCategories();
@@ -39,39 +38,61 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <!-- Filter Bar -->
-    <div>
-      <select v-model="selectedCategory" @change="filterByCategory">
-        <option value="">All Categories</option>
-        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-          {{ cat.name }}
-        </option>
-      </select>
+  <MainNavbar />
 
-      <!-- Placeholder for future filters -->
-      <select>
-        <option>Sort by</option>
-        <option value="name">Name</option>
-      </select>
+  <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14">
 
-      <!-- Grid/List Toggle -->
-      <button @click="viewMode = 'grid'">Grid</button>
-      <button @click="viewMode = 'list'">List</button>
+    <h2 class="text-center text-3xl font-bold tracking-wide mb-16">
+      {{ categoryName }}
+    </h2>
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+             gap-x-6 gap-y-6
+             sm:gap-x-10 sm:gap-y-10
+             lg:gap-x-14 lg:gap-y-12"
+    >
+
+      <div
+        v-for="a in filtered"
+        :key="a.id"
+        class="border rounded-2xl px-7 py-6 bg-white flex gap-5"
+      >
+        <div
+          class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center shrink-0"
+        >
+          <span class="text-lg font-bold text-gray-600">
+            {{ categoryName.charAt(0) }}
+          </span>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-1">
+            {{ a.name }}
+          </h3>
+          <p class="text-sm text-gray-600 leading-snug">
+            {{ a.description }}
+          </p>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Achievements -->
-    <div v-if="viewMode === 'grid'">
-      <div v-for="a in filtered" :key="a.id">
-        {{ a.name }}
+    <div class="flex justify-center gap-4 mt-16">
+      <div
+        class="w-10 h-10 rounded-full bg-blue-700 text-white
+               flex items-center justify-center font-semibold cursor-default"
+      >
+        1
+      </div>
+      <div
+        class="w-10 h-10 rounded-full bg-gray-300 text-gray-700
+               flex items-center justify-center font-semibold cursor-default"
+      >
+        2
       </div>
     </div>
 
-    <div v-else>
-      <div v-for="a in filtered" :key="a.id">
-        <strong>{{ a.name }}</strong>
-        <p>{{ a.description }}</p>
-      </div>
-    </div>
   </div>
 </template>
+

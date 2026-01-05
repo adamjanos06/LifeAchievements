@@ -45,7 +45,6 @@ export const router = createRouter({
       component: () => import("@/pages/catalog/[id].vue"),
       meta: { title: 'Catalog' }
     }
-
   ]
 })
 

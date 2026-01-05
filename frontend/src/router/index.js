@@ -44,7 +44,20 @@ export const router = createRouter({
       name: "Catalog",
       component: () => import("@/pages/catalog/[id].vue"),
       meta: { title: 'Catalog' }
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/pages/profile.vue'),
+      meta: { title: 'Profile' }
+    },
+    {
+      path: '/logout',
+      name: 'logout',
+      component: () => import('@/pages/logout.vue'),
+      meta: { title: 'Logout' }
     }
+ 
   ]
 })
 

@@ -142,7 +142,7 @@ onMounted(() => {
                bg-white dark:bg-gray-800
                transition
                hover:shadow-lg
-               dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.08)]"
+               dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]"
       >
         <!-- COMPLETED CHECK -->
         <div
@@ -176,7 +176,8 @@ onMounted(() => {
         v-for="page in totalPages"
         :key="page"
         @click="goToPage(page)"
-        class="w-10 h-10 rounded-full flex items-center justify-center
+        class="w-10 h-10 rounded-full
+               flex items-center justify-center
                font-semibold transition"
         :class="page === currentPage
           ? 'bg-blue-700 text-white'
@@ -190,14 +191,14 @@ onMounted(() => {
   <!-- MODAL -->
   <div
     v-if="showModal"
-    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
   >
     <div
       class="bg-white dark:bg-gray-800
-             rounded-2xl shadow-xl p-8
-             w-full max-w-md relative mx-4
+             rounded-2xl p-8 w-full max-w-md relative mx-4
              text-gray-900 dark:text-gray-100
-             transition-colors"
+             transition-colors
+             dark:shadow-[0_0_40px_rgba(255,255,255,0.25)]"
     >
       <button @click="closeModal" class="absolute top-4 right-4 text-2xl">
         ×

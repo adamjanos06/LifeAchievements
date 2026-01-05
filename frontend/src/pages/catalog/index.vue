@@ -47,7 +47,7 @@ onMounted(loadCategories);
                bg-white dark:bg-gray-800
                transition
                hover:shadow-lg
-               dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.08)]"
+               dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]"
       >
         <div class="w-16 h-16 rounded-full flex items-center justify-center">
           <img

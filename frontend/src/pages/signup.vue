@@ -55,7 +55,7 @@ async function register() {
       <h1 class="text-3xl font-bold text-center mb-6">
         Sign Up
       </h1>
-      <form @submit.prevent="handleSignup" class="space-y-5">
+      <form @submit.prevent="register" class="space-y-5">
 
         <div>
           <label class="block text-sm font-semibold mb-1">Username</label>
@@ -104,7 +104,6 @@ async function register() {
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition"
-          onclick="register()"
         >
           Create Account
         </button>

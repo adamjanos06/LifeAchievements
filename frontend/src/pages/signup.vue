@@ -57,8 +57,14 @@ async function register() {
       </h1>
       <form @submit.prevent="register" class="space-y-5">
 
+        <div v-if="error" class="text-red-600 text-sm text-center">
+          {{ error }}
+        </div>
+        
         <div>
-          <label class="block text-sm font-semibold mb-1">Username</label>
+          <label class="block text-sm font-semibold mb-1">
+            Username
+          </label>
           <input
             v-model="name"
             type="text"
@@ -69,7 +75,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Email</label>
+          <label class="block text-sm font-semibold mb-1">
+            Email
+          </label>
           <input
             v-model="email"
             type="email"
@@ -80,7 +88,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Password</label>
+          <label class="block text-sm font-semibold mb-1">
+            Password
+          </label>
           <input
             v-model="password"
             type="password"
@@ -91,7 +101,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Confirm Password</label>
+          <label class="block text-sm font-semibold mb-1">
+            Confirm Password
+          </label>
           <input
             v-model="password_confirmation"
             type="password"
@@ -107,7 +119,6 @@ async function register() {
         >
           Create Account
         </button>
-
       </form>
 
       <div class="text-center mt-6 text-sm text-gray-600">

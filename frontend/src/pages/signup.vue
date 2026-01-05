@@ -57,6 +57,10 @@ async function register() {
       </h1>
       <form @submit.prevent="register" class="space-y-5">
 
+        <div v-if="error" class="text-red-600 text-sm text-center">
+          {{ error }}
+        </div>
+        
         <div>
           <label class="block text-sm font-semibold mb-1">
             Username

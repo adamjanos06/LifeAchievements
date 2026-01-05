@@ -10,17 +10,15 @@ import '@assets/main.css'
 
 import axios from 'axios'
 
-// 🔹 BACKEND API URL (FONTOS: legyen benne /api is!)
 axios.defaults.baseURL = "http://backend.vm1.test/api"
 
-// 🔹 TOKEN BETÖLTÉSE LOCALSTORAGE-BÓL
 const token = localStorage.getItem("token")
 
 if (token) {
   axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-  console.log("Auth header set from stored token ✔")
+  console.log("Auth header set from stored token")
 } else {
-  console.log("No token found in storage ❌")
+  console.log("No token found in storage")
 }
 
 createApp(App)

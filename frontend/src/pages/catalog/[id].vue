@@ -67,6 +67,7 @@ function goToPage(page) {
     currentPage.value = page;
   }
 }
+const isLoggedIn = computed(() => !!localStorage.getItem("token"));
 
 onMounted(() => {
   loadCategories();
@@ -143,57 +144,74 @@ onMounted(() => {
 
 
   <div
-    v-if="showModal"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-  >
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+  v-if="showModal"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+>
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
 
-      <button
-        @click="closeModal"
-        class="absolute top-4 right-4 text-2xl leading-none"
+    <button
+      @click="closeModal"
+      class="absolute top-4 right-4 text-2xl leading-none"
+    >
+      ×
+    </button>
+
+    <div v-if="!isLoggedIn" class="text-center space-y-4">
+      <h2 class="text-xl font-bold">
+        You must be logged in
+      </h2>
+
+      <p class="text-gray-600">
+        Please log in to view this achievement’s details.
+      </p>
+
+      <RouterLink
+        to="/login"
+        class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold"
       >
-        x
-      </button>
+        Go to Login
+      </RouterLink>
+    </div>
 
-      <div class="flex flex-col items-center text-center gap-4">
+    <div v-else class="flex flex-col items-center text-center gap-4">
 
-        <img
-          v-if="icon"
-          :src="icon"
-          class="w-20 h-20 object-contain"
-        />
+      <img
+        v-if="icon"
+        :src="icon"
+        class="w-20 h-20 object-contain"
+      />
 
-        <h2 class="text-2xl font-bold">
-          {{ selected?.name }}
-        </h2>
+      <h2 class="text-2xl font-bold">
+        {{ selected?.name }}
+      </h2>
 
-        <p class="text-gray-600">
-          {{ selected?.description }}
-        </p>
+      <p class="text-gray-600">
+        {{ selected?.description }}
+      </p>
 
-        <div class="w-full flex gap-3 mt-3">
-          <button
-            class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold"
-          >
-            MARK AS COMPLETED
-          </button>
+      <div class="w-full flex gap-3 mt-3">
+        <button
+          class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold"
+        >
+          MARK AS COMPLETED
+        </button>
 
-          <button
-            class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold"
-          >
-            SAVE TO GOALS
-          </button>
-        </div>
+        <button
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold"
+        >
+          SAVE TO GOALS
+        </button>
+      </div>
 
-        <div class="text-left w-full mt-3">
-          <p class="font-semibold">Reward:</p>
-          <p>{{ selected?.xp }} XP</p>
-          <p>{{ selected?.badge }}</p>
-        </div>
-
+      <div class="text-left w-full mt-3">
+        <p class="font-semibold">Reward:</p>
+        <p>{{ selected?.xp }} XP</p>
+        <p>{{ selected?.badge }}</p>
       </div>
 
     </div>
+
   </div>
+</div>
 
 </template>

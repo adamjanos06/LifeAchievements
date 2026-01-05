@@ -12,7 +12,7 @@ const isOpen = ref(false)
       <div class="flex items-center gap-4">
         <div class="w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 border-[5px] md:border-[6px] lg:border-[7px] border-blue-700 rounded-full"></div>
         <RouterLink
-          to="/"
+          to="/catalog"
           class="font-bold text-xl md:text-2xl tracking-wide"
         >
           LIFE ACHIEVEMENTS

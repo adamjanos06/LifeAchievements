@@ -21,12 +21,12 @@ function goToCatalog() {
               What is Life Achievements?
             </h3>
 
-            <p class="text-base md:text-lg leading-loose text-gray-700">
+            <p class="text-base md:text-lg leading-loose text-gray-700 dark:text-gray-400">
               Life Achievements is a personal goal-tracking system that turns
               real-life progress into a fun, gamified experience.
             </p>
 
-            <p class="text-base md:text-lg leading-loose text-gray-700">
+            <p class="text-base md:text-lg leading-loose text-gray-700 dark:text-gray-400">
               You can create goals, unlock achievements, earn points, and build
               streaks across different areas of your life.
             </p>
@@ -35,12 +35,12 @@ function goToCatalog() {
               Honor-based system:
             </h4>
 
-            <p class="text-base md:text-lg leading-loose text-gray-700">
+            <p class="text-base md:text-lg leading-loose text-gray-700 dark:text-gray-400">
               The app does not verify real-life activity — your progress is
               based on your honesty and self-discipline.
             </p>
 
-            <p class="text-base md:text-lg leading-loose text-gray-700">
+            <p class="text-base md:text-lg leading-loose text-gray-700 dark:text-gray-400">
               You decide what matters.<br />
               You define your progress.<br />
               You build your own achievement story.
@@ -61,7 +61,7 @@ function goToCatalog() {
             </h3>
 
             <ol
-              class="list-decimal pl-5 space-y-4 text-base md:text-lg text-gray-700 leading-loose"
+              class="list-decimal pl-5 space-y-4 text-base md:text-lg text-gray-700 dark:text-gray-400 leading-loose"
             >
               <li>
                 <span class="font-semibold">Choose or create achievements</span

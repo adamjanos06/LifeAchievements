@@ -36,14 +36,12 @@ async function loadAchievements() {
   });
 
   const json = await res.json();
-
   achievements.value = json.data;
 
   filtered.value = achievements.value.filter(
     a => Number(a.category_id) === categoryId
   );
 }
-
 
 /* ---------------- UI HELPERS ---------------- */
 
@@ -118,8 +116,11 @@ onMounted(() => {
 <template>
   <MainNavbar />
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14">
-
+  <div
+    class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14
+           text-gray-900 dark:text-gray-100
+           transition-colors"
+  >
     <h2 class="text-center text-3xl font-bold tracking-wide mb-16">
       {{ categoryName }}
     </h2>
@@ -134,32 +135,35 @@ onMounted(() => {
       <div
         v-for="a in paginatedAchievements"
         :key="a.id"
-        class="relative border rounded-2xl px-7 py-6 bg-white
-               flex gap-5 cursor-pointer hover:shadow-lg transition"
         @click="openModal(a)"
+        class="relative flex gap-5 cursor-pointer
+               border border-gray-200 dark:border-gray-700
+               rounded-2xl px-7 py-6
+               bg-white dark:bg-gray-800
+               transition
+               hover:shadow-lg
+               dark:hover:shadow-[0_0_20px_rgba(255,255,255,0.08)]"
       >
         <!-- COMPLETED CHECK -->
         <div
           v-if="a.completed"
-          class="absolute top-3 right-3 w-7 h-7 rounded-full
-                 bg-green-500 text-white flex items-center justify-center"
+          class="absolute top-3 right-3
+                 w-7 h-7 rounded-full
+                 bg-green-500 text-white
+                 flex items-center justify-center"
         >
           ✓
         </div>
 
         <div class="w-16 h-16 rounded-full flex items-center justify-center">
-          <img
-            v-if="icon"
-            :src="icon"
-            class="w-20 h-20 object-contain"
-          />
+          <img v-if="icon" :src="icon" class="w-20 h-20 object-contain" />
         </div>
 
         <div>
           <h3 class="font-semibold text-lg mb-1">
             {{ a.name }}
           </h3>
-          <p class="text-sm text-gray-600">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ a.description }}
           </p>
         </div>
@@ -167,37 +171,35 @@ onMounted(() => {
     </div>
 
     <!-- PAGINATION -->
-    <div
-      v-if="totalPages > 1"
-      class="flex justify-center gap-4 mt-16"
-    >
+    <div v-if="totalPages > 1" class="flex justify-center gap-4 mt-16">
       <button
         v-for="page in totalPages"
         :key="page"
         @click="goToPage(page)"
-        class="w-10 h-10 rounded-full
-               flex items-center justify-center font-semibold transition"
+        class="w-10 h-10 rounded-full flex items-center justify-center
+               font-semibold transition"
         :class="page === currentPage
           ? 'bg-blue-700 text-white'
-          : 'bg-gray-300 text-gray-700 hover:bg-gray-400'"
+          : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600'"
       >
         {{ page }}
       </button>
     </div>
-
   </div>
 
   <!-- MODAL -->
   <div
     v-if="showModal"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
   >
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative mx-4">
-
-      <button
-        @click="closeModal"
-        class="absolute top-4 right-4 text-2xl"
-      >
+    <div
+      class="bg-white dark:bg-gray-800
+             rounded-2xl shadow-xl p-8
+             w-full max-w-md relative mx-4
+             text-gray-900 dark:text-gray-100
+             transition-colors"
+    >
+      <button @click="closeModal" class="absolute top-4 right-4 text-2xl">
         ×
       </button>
 
@@ -208,21 +210,21 @@ onMounted(() => {
 
         <RouterLink
           to="/login"
-          class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold"
+          class="inline-block bg-blue-600 hover:bg-blue-700
+                 text-white px-4 py-2 rounded-lg font-semibold"
         >
           Go to Login
         </RouterLink>
       </div>
 
       <div v-else class="flex flex-col items-center text-center gap-4">
-
         <img v-if="icon" :src="icon" class="w-20 h-20 object-contain" />
 
         <h2 class="text-2xl font-bold">
           {{ selected?.name }}
         </h2>
 
-        <p class="text-gray-600">
+        <p class="text-gray-600 dark:text-gray-400">
           {{ selected?.description }}
         </p>
 
@@ -230,7 +232,8 @@ onMounted(() => {
           <button
             v-if="selected?.completed"
             disabled
-            class="w-full bg-gray-400 text-white py-2 rounded-lg font-semibold cursor-not-allowed"
+            class="w-full bg-gray-400 text-white py-2
+                   rounded-lg font-semibold cursor-not-allowed"
           >
             COMPLETED
           </button>
@@ -238,7 +241,8 @@ onMounted(() => {
           <button
             v-else
             @click="markAsCompleted"
-            class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold"
+            class="w-full bg-green-600 hover:bg-green-700
+                   text-white py-2 rounded-lg font-semibold transition"
           >
             MARK AS COMPLETED
           </button>
@@ -248,9 +252,7 @@ onMounted(() => {
           <p class="font-semibold">Reward:</p>
           <p>{{ selected?.xp }} XP</p>
         </div>
-
       </div>
-
     </div>
   </div>
 </template>

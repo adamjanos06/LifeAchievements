@@ -41,8 +41,8 @@ onMounted(() => loadCategories());
         class="flex items-center gap-5 border rounded-2xl px-7 py-6 cursor-pointer bg-white hover:shadow-lg transition"
       >
         <!-- Ha van ikon, jelenítsd meg -->
-        <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-          <img v-if="cat.icon" :src="cat.icon" alt="Category Icon" class="w-22 h-22 object-contain" />
+        <div class="w-16 h-16 rounded-full flex items-center justify-center">
+          <img v-if="cat.icon" :src="cat.icon" alt="Category Icon" class="w-20 h-20 object-contain" />
           <!-- Ha nincs ikon, akkor a kezdőbetűt jelenítse meg -->
           <span v-else class="text-lg font-bold text-gray-600">
             {{ cat.name.charAt(0) }}

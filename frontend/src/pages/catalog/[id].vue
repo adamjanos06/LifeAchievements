@@ -62,8 +62,8 @@ onMounted(() => {
         :key="a.id"
         class="border rounded-2xl px-7 py-6 bg-white flex gap-5"
       >
-        <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-          <img v-if="icon" :src="icon" alt="Category Icon" class="w-22 h-22 object-contain" />
+        <div class="w-16 h-16 rounded-full flex items-center justify-center">
+          <img v-if="icon" :src="icon" alt="Category Icon" class="w-20 h-20 object-contain" />
           <span v-else class="text-lg font-bold text-gray-600">
             {{ categoryName }}
           </span>

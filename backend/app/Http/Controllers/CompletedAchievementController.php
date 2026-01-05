@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CompletedAchievementResource;
+use App\Models\Achievement;
 use App\Models\CompletedAchievement;
 use Illuminate\Http\Request;
 
 class CompletedAchievementController extends Controller
 {
-    public function index()
+    public function store(Request $request, Achievement $achievement)
     {
-        return CompletedAchievementResource::collection(CompletedAchievement::all());
+        CompletedAchievement::firstOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'achievement_id' => $achievement->id,
+            ],
+            [
+                'completion_date' => now(),
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Achievement marked as completed'
+        ]);
     }
 
-    public function show(CompletedAchievement $completedAchievement)
+    public function userCompleted(Request $request)
     {
-        return new CompletedAchievementResource($completedAchievement);
-    }
+        $achievementIds = CompletedAchievement::where(
+            'user_id',
+            $request->user()->id
+        )->pluck('achievement_id');
 
-    public function store(Request $r)
-    {
-        $validated = $r->validate([
-            'achievement_id' => 'required|exists:achievements,id',
-            'notes' => 'nullable|string',
+        return response()->json([
+            'data' => Achievement::whereIn('id', $achievementIds)->get()
         ]);
-
-        $completed = CompletedAchievement::create([
-            'user_id' => $r->user()->id,
-            'achievement_id' => $validated['achievement_id'],
-            'completion_date' => now(),
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        return new CompletedAchievementResource($completed);
     }
 }

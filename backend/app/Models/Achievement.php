@@ -6,7 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Achievement extends Model
 {
-    protected $fillable = ['category_id','name','description','xp','difficulty'];
+    protected $fillable = [
+        'category_id',
+        'name',
+        'description',
+        'xp',
+        'difficulty'
+    ];
 
 
     public function category()

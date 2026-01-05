@@ -2,34 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AchievementResource;
 use App\Models\Achievement;
+use App\Models\CompletedAchievement;
 use Illuminate\Http\Request;
 
 class AchievementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return AchievementResource::collection(Achievement::all());
+        $user = $request->user();
+
+        $completedIds = CompletedAchievement::where('user_id', $user->id)
+            ->pluck('achievement_id');
+
+        $achievements = Achievement::all()->map(function ($a) use ($completedIds) {
+            $a->completed = $completedIds->contains($a->id);
+            return $a;
+        });
+
+        return response()->json(['data' => $achievements]);
     }
 
-    public function show(Achievement $achievement)
+    // Mark as completed
+    public function complete(Request $request, $id)
     {
-        return new AchievementResource($achievement);
+        CompletedAchievement::firstOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'achievement_id' => $id,
+            ],
+            [
+                'completion_date' => now(),
+            ]
+        );
+
+        return response()->json(['message' => 'Completed']);
     }
 
-    public function store(Request $r)
+    // My achievements
+    public function myAchievements(Request $request)
     {
-        $validated = $r->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'xp' => 'required|integer|min:0',
-            'difficulty' => 'required|in:easy,medium,hard',
-        ]);
+        $achievementIds = CompletedAchievement::where(
+            'user_id',
+            $request->user()->id
+        )->pluck('achievement_id');
 
-        $achievement = Achievement::create($validated);
+        $achievements = Achievement::whereIn('id', $achievementIds)->get();
 
-        return new AchievementResource($achievement);
+        return response()->json(['data' => $achievements]);
     }
 }

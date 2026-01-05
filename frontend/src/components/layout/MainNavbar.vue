@@ -25,7 +25,7 @@ const isOpen = ref(false)
           to="/achievements"
           class="text-base font-semibold hover:underline"
         >
-          Achievements
+          My achievements
         </RouterLink>
 
         <RouterLink

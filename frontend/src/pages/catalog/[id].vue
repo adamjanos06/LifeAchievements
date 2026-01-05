@@ -11,6 +11,19 @@ const filtered = ref([]);
 
 const categoryId = Number(route.params.id);
 
+const selected = ref(null);
+const showModal = ref(false);
+
+function openModal(a) {
+  selected.value = a;
+  showModal.value = true;
+}
+
+function closeModal() {
+  selected.value = null;
+  showModal.value = false;
+}
+
 async function loadCategories() {
   const res = await fetch("http://backend.vm1.test/api/categories");
   const json = await res.json();
@@ -21,6 +34,7 @@ async function loadAchievements() {
   const res = await fetch("http://backend.vm1.test/api/achievements");
   const json = await res.json();
   achievements.value = json.data;
+
   filtered.value = achievements.value.filter(
     a => a.category_id === categoryId
   );
@@ -35,6 +49,7 @@ const icon = computed(() => {
   const cat = categories.value.find(c => c.id === categoryId);
   return cat ? cat.icon : "";
 });
+
 onMounted(() => {
   loadCategories();
   loadAchievements();
@@ -60,10 +75,16 @@ onMounted(() => {
       <div
         v-for="a in filtered"
         :key="a.id"
-        class="border rounded-2xl px-7 py-6 bg-white flex gap-5"
+        class="border rounded-2xl px-7 py-6 bg-white flex gap-5 cursor-pointer hover:shadow-lg transition"
+        @click="openModal(a)"
       >
         <div class="w-16 h-16 rounded-full flex items-center justify-center">
-          <img v-if="icon" :src="icon" alt="Category Icon" class="w-20 h-20 object-contain" />
+          <img
+            v-if="icon"
+            :src="icon"
+            alt="Category Icon"
+            class="w-20 h-20 object-contain"
+          />
           <span v-else class="text-lg font-bold text-gray-600">
             {{ categoryName }}
           </span>
@@ -97,5 +118,60 @@ onMounted(() => {
     </div>
 
   </div>
-</template>
 
+
+  <div
+    v-if="showModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+
+      <button
+        @click="closeModal"
+        class="absolute top-4 right-4 text-2xl leading-none"
+      >
+        ×
+      </button>
+
+      <div class="flex flex-col items-center text-center gap-4">
+
+        <img
+          v-if="icon"
+          :src="icon"
+          class="w-20 h-20 object-contain"
+        />
+
+        <h2 class="text-2xl font-bold">
+          {{ selected?.name }}
+        </h2>
+
+        <p class="text-gray-600">
+          {{ selected?.description }}
+        </p>
+
+        <div class="w-full flex gap-3 mt-3">
+          <button
+            class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold"
+          >
+            MARK AS COMPLETED
+          </button>
+
+          <button
+            class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold"
+          >
+            SAVE TO GOALS
+          </button>
+        </div>
+
+        <div class="text-left w-full mt-3">
+          <p class="font-semibold">Reward:</p>
+          <p>{{ selected?.xp }} XP</p>
+          <p>{{ selected?.badge }}</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</template>

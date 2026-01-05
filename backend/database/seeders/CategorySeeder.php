@@ -14,7 +14,7 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Language Learning', 'description' => 'Learn new languages.'],
+            ['name' => 'Language Learning', 'description' => 'Learn new languages.','icon' => 'https://cdn.imgchest.com/files/3aee140fc95a.png'],
             ['name' => 'Music', 'description' => 'Practice and play music.'],
             ['name' => 'Photography', 'description' => 'Take and edit photos.'],
             ['name' => 'Driving', 'description' => 'Driving skill development.'],

@@ -31,6 +31,10 @@ const categoryName = computed(() => {
   return cat ? cat.name.toUpperCase() : "";
 });
 
+const icon = computed(() => {
+  const cat = categories.value.find(c => c.id === categoryId);
+  return cat ? cat.icon : "";
+});
 onMounted(() => {
   loadCategories();
   loadAchievements();
@@ -58,11 +62,10 @@ onMounted(() => {
         :key="a.id"
         class="border rounded-2xl px-7 py-6 bg-white flex gap-5"
       >
-        <div
-          class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center shrink-0"
-        >
-          <span class="text-lg font-bold text-gray-600">
-            {{ categoryName.charAt(0) }}
+        <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
+          <img v-if="icon" :src="icon" alt="Category Icon" class="w-22 h-22 object-contain" />
+          <span v-else class="text-lg font-bold text-gray-600">
+            {{ categoryName }}
           </span>
         </div>
 

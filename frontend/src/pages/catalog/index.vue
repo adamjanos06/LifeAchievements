@@ -34,26 +34,25 @@ onMounted(() => loadCategories());
               sm:gap-x-10 sm:gap-y-10
               lg:gap-x-14 lg:gap-y-12">
 
-    <div
-      v-for="cat in categories"
-      :key="cat.id"
-      @click="goToCategory(cat.id)"
-      class="flex items-center gap-5 border rounded-2xl px-7 py-6 cursor-pointer bg-white hover:shadow-lg transition"
-    >
-      <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-        <span class="text-lg font-bold text-gray-600">
-          {{ cat.name.charAt(0) }}
+<div
+        v-for="cat in categories"
+        :key="cat.id"
+        @click="goToCategory(cat.id)"
+        class="flex items-center gap-5 border rounded-2xl px-7 py-6 cursor-pointer bg-white hover:shadow-lg transition"
+      >
+        <!-- Ha van ikon, jelenítsd meg -->
+        <div class="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
+          <img v-if="cat.icon" :src="cat.icon" alt="Category Icon" class="w-22 h-22 object-contain" />
+          <!-- Ha nincs ikon, akkor a kezdőbetűt jelenítse meg -->
+          <span v-else class="text-lg font-bold text-gray-600">
+            {{ cat.name.charAt(0) }}
+          </span>
+        </div>
+
+        <span class="text-lg font-semibold">
+          {{ cat.name }}
         </span>
       </div>
-
-      <span class="text-lg font-semibold">
-        {{ cat.name }}
-      </span>
     </div>
-
   </div>
-
-</div>
-
 </template>
-

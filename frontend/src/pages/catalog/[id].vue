@@ -16,7 +16,9 @@ const showModal = ref(false)
 const currentPage = ref(1)
 const perPage = 9
 
-const isLoggedIn = computed(() => !!localStorage.getItem("token"))
+function isLoggedIn() {
+  return !!localStorage.getItem("token");
+}
 
 /* ---------------- DATA LOAD ---------------- */
 
@@ -27,19 +29,21 @@ async function loadCategories() {
 }
 
 async function loadAchievements() {
-  const res = await fetch("http://backend.vm1.test/api/achievements", {
-    headers: isLoggedIn.value
-      ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      : {}
-  })
+  const token = localStorage.getItem("token");
 
-  const json = await res.json()
-  achievements.value = json.data.data ?? json.data
+  const res = await fetch("http://backend.vm1.test/api/achievements", {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+
+  const json = await res.json();
+
+  achievements.value = json.data;
 
   filtered.value = achievements.value.filter(
     a => Number(a.category_id) === categoryId
-  )
+  );
 }
+
 
 /* ---------------- UI HELPERS ---------------- */
 
@@ -81,26 +85,25 @@ function closeModal() {
 /* ---------------- ACTIONS ---------------- */
 
 async function markAsCompleted() {
-  if (!selected.value) return
+  if (!selected.value || selected.value.completed) return;
 
   await fetch(
     `http://backend.vm1.test/api/achievements/${selected.value.id}/complete`,
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }
-  )
+  );
 
-  // frontend state frissítés
-  selected.value.completed = true
+  selected.value.completed = true;
 
   const idx = achievements.value.findIndex(
     a => a.id === selected.value.id
-  )
+  );
   if (idx !== -1) {
-    achievements.value[idx].completed = true
+    achievements.value[idx].completed = true;
   }
 }
 
@@ -189,7 +192,7 @@ onMounted(() => {
     v-if="showModal"
     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
   >
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative mx-4">
 
       <button
         @click="closeModal"
@@ -198,7 +201,7 @@ onMounted(() => {
         ×
       </button>
 
-      <div v-if="!isLoggedIn" class="text-center space-y-4">
+      <div v-if="!isLoggedIn()" class="text-center space-y-4">
         <h2 class="text-xl font-bold">
           You must be logged in
         </h2>

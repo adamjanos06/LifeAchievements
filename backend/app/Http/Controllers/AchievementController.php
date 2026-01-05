@@ -8,19 +8,27 @@ use Illuminate\Http\Request;
 
 class AchievementController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $user = $request->user();
-
+        
         $completedIds = $user
-            ? CompletedAchievement::where('user_id', $user->id) ->pluck('achievement_id')
-            : collect();
-
-        $achievements = Achievement::all()->map(function ($a) use ($completedIds) {
-            $a->completed = $completedIds->contains($a->id);
-            return $a;
+            ? CompletedAchievement::where('user_id', $user->id)
+                ->pluck('achievement_id')
+                ->toArray()
+            : [];
+        
+        $achievements = Achievement::all()->map(function ($achievement) use ($completedIds) {
+            return [
+                'id' => $achievement->id,
+                'category_id' => $achievement->category_id,
+                'name' => $achievement->name,
+                'description' => $achievement->description,
+                'xp' => $achievement->xp,
+                'difficulty' => $achievement->difficulty,
+                'completed' => in_array($achievement->id, $completedIds),
+            ];
         });
-
+    
         return response()->json([
             'data' => $achievements
         ]);

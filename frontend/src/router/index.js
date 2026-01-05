@@ -46,6 +46,12 @@ export const router = createRouter({
       meta: { title: 'Catalog' }
     },
     {
+      path: '/achievements',
+      name: 'achievements',
+      component: () => import('@/pages/achievements.vue'),
+      meta: { title: 'My Achievements' }
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/profile.vue'),

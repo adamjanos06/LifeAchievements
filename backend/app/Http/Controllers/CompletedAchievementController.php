@@ -27,13 +27,13 @@ class CompletedAchievementController extends Controller
 
     public function userCompleted(Request $request)
     {
-        $achievementIds = CompletedAchievement::where(
-            'user_id',
-            $request->user()->id
-        )->pluck('achievement_id');
-
+        $completed = CompletedAchievement::with('achievement.category')
+            ->where('user_id', $request->user()->id)
+            ->get();
+    
         return response()->json([
-            'data' => Achievement::whereIn('id', $achievementIds)->get()
+            'data' => $completed
         ]);
     }
+
 }

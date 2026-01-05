@@ -14,6 +14,9 @@ const categoryId = Number(route.params.id);
 const selected = ref(null);
 const showModal = ref(false);
 
+const currentPage = ref(1);
+const perPage = 9;
+
 function openModal(a) {
   selected.value = a;
   showModal.value = true;
@@ -50,6 +53,21 @@ const icon = computed(() => {
   return cat ? cat.icon : "";
 });
 
+const totalPages = computed(() => {
+  return Math.min(2, Math.ceil(filtered.value.length / perPage));
+});
+
+const paginatedAchievements = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return filtered.value.slice(start, start + perPage);
+});
+
+function goToPage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+}
+
 onMounted(() => {
   loadCategories();
   loadAchievements();
@@ -73,7 +91,7 @@ onMounted(() => {
     >
 
       <div
-        v-for="a in filtered"
+        v-for="a in paginatedAchievements"
         :key="a.id"
         class="border rounded-2xl px-7 py-6 bg-white flex gap-5 cursor-pointer hover:shadow-lg transition"
         @click="openModal(a)"
@@ -102,19 +120,23 @@ onMounted(() => {
 
     </div>
 
-    <div class="flex justify-center gap-4 mt-16">
-      <div
-        class="w-10 h-10 rounded-full bg-blue-700 text-white
-               flex items-center justify-center font-semibold cursor-default"
+    <div
+      v-if="totalPages > 1"
+      class="flex justify-center gap-4 mt-16"
+    >
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        @click="goToPage(page)"
+        class="w-10 h-10 rounded-full
+               flex items-center justify-center
+               font-semibold transition"
+        :class="page === currentPage
+          ? 'bg-blue-700 text-white'
+          : 'bg-gray-300 text-gray-700 hover:bg-gray-400'"
       >
-        1
-      </div>
-      <div
-        class="w-10 h-10 rounded-full bg-gray-300 text-gray-700
-               flex items-center justify-center font-semibold cursor-default"
-      >
-        2
-      </div>
+        {{ page }}
+      </button>
     </div>
 
   </div>
@@ -130,7 +152,7 @@ onMounted(() => {
         @click="closeModal"
         class="absolute top-4 right-4 text-2xl leading-none"
       >
-        ×
+        x
       </button>
 
       <div class="flex flex-col items-center text-center gap-4">

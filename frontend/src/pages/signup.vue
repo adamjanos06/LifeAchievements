@@ -55,10 +55,12 @@ async function register() {
       <h1 class="text-3xl font-bold text-center mb-6">
         Sign Up
       </h1>
-      <form @submit.prevent="handleSignup" class="space-y-5">
+      <form @submit.prevent="register" class="space-y-5">
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Username</label>
+          <label class="block text-sm font-semibold mb-1">
+            Username
+          </label>
           <input
             v-model="name"
             type="text"
@@ -69,7 +71,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Email</label>
+          <label class="block text-sm font-semibold mb-1">
+            Email
+          </label>
           <input
             v-model="email"
             type="email"
@@ -80,7 +84,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Password</label>
+          <label class="block text-sm font-semibold mb-1">
+            Password
+          </label>
           <input
             v-model="password"
             type="password"
@@ -91,7 +97,9 @@ async function register() {
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Confirm Password</label>
+          <label class="block text-sm font-semibold mb-1">
+            Confirm Password
+          </label>
           <input
             v-model="password_confirmation"
             type="password"
@@ -104,11 +112,9 @@ async function register() {
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition"
-          onclick="register()"
         >
           Create Account
         </button>
-
       </form>
 
       <div class="text-center mt-6 text-sm text-gray-600">

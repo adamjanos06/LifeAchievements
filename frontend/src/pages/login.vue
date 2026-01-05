@@ -19,9 +19,7 @@ async function login() {
     })
 
     localStorage.setItem("token", res.data.token)
-
-    axios.defaults.headers.common["Authorization"] =
-      `Bearer ${res.data.token}`
+    axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`
 
     router.push("/catalog")
   } catch (err) {
@@ -40,8 +38,12 @@ async function login() {
         Log In
       </h1>
 
-      <form @submit.prevent="handleLogin" class="space-y-5">
+      <form @submit.prevent="login" class="space-y-5">
         
+        <div v-if="error" class="text-red-600 text-sm text-center">
+          {{ error }}
+        </div>
+
         <div>
           <label class="block text-sm font-semibold mb-1">Email</label>
           <input

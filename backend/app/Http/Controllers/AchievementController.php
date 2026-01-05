@@ -12,15 +12,18 @@ class AchievementController extends Controller
     {
         $user = $request->user();
 
-        $completedIds = CompletedAchievement::where('user_id', $user->id)
-            ->pluck('achievement_id');
+        $completedIds = $user
+            ? CompletedAchievement::where('user_id', $user->id) ->pluck('achievement_id')
+            : collect();
 
         $achievements = Achievement::all()->map(function ($a) use ($completedIds) {
             $a->completed = $completedIds->contains($a->id);
             return $a;
         });
 
-        return response()->json(['data' => $achievements]);
+        return response()->json([
+            'data' => $achievements
+        ]);
     }
 
     // Mark as completed
@@ -36,7 +39,9 @@ class AchievementController extends Controller
             ]
         );
 
-        return response()->json(['message' => 'Completed']);
+        return response()->json([
+            'message' => 'Completed'
+        ]);
     }
 
     // My achievements
@@ -49,6 +54,8 @@ class AchievementController extends Controller
 
         $achievements = Achievement::whereIn('id', $achievementIds)->get();
 
-        return response()->json(['data' => $achievements]);
+        return response()->json([
+            'data' => $achievements
+        ]);
     }
 }

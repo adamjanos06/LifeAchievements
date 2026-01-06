@@ -39,21 +39,19 @@ const isOpen = ref(false)
 
       <!-- DESKTOP MENU -->
       <div class="hidden lg:flex items-center gap-10">
-        <RouterLink to="/achievements" class="font-semibold hover:underline">
-          My achievements
-        </RouterLink>
 
         <RouterLink to="/catalog" class="font-semibold hover:underline">
           Catalog
+        </RouterLink>
+
+        <RouterLink to="/achievements" class="font-semibold hover:underline">
+          My achievements
         </RouterLink>
 
         <RouterLink to="/profile" class="font-semibold hover:underline">
           Profile
         </RouterLink>
 
-        <RouterLink to="/leaderboard" class="font-semibold hover:underline">
-          Leaderboard
-        </RouterLink>
       </div>
 
       <!-- MOBILE TOGGLE -->
@@ -80,20 +78,16 @@ const isOpen = ref(false)
         class="flex flex-col items-center gap-5 py-6
                text-gray-900 dark:text-gray-100"
       >
-        <RouterLink to="/achievements" @click="isOpen = false">
-          Achievements
-        </RouterLink>
-
         <RouterLink to="/catalog" @click="isOpen = false">
           Catalog
         </RouterLink>
 
-        <RouterLink to="/profile" @click="isOpen = false">
-          Profile
+        <RouterLink to="/achievements" @click="isOpen = false">
+          My achievements
         </RouterLink>
 
-        <RouterLink to="/leaderboard" @click="isOpen = false">
-          Leaderboard
+        <RouterLink to="/profile" @click="isOpen = false">
+          Profile
         </RouterLink>
       </div>
     </div>

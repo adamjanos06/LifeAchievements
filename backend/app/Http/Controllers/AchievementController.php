@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class AchievementController extends Controller
 {
     public function index(Request $request) {
-        $user = $request->user();
+        $user = $request->user('sanctum');
         
         $completedIds = $user
             ? CompletedAchievement::where('user_id', $user->id)

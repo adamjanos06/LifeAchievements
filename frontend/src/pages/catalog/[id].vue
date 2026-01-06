@@ -8,7 +8,6 @@ const categoryId = Number(route.params.id)
 
 const categories = ref([])
 const achievements = ref([])
-const filtered = ref([])
 
 const selected = ref(null)
 const showModal = ref(false)
@@ -37,11 +36,15 @@ async function loadAchievements() {
 
   const json = await res.json();
   achievements.value = json.data;
-
-  filtered.value = achievements.value.filter(
-    a => Number(a.category_id) === categoryId
-  );
 }
+
+/* ---------------- FILTER (FIX!!) ---------------- */
+
+const filtered = computed(() =>
+  achievements.value.filter(
+    a => Number(a.category_id) === categoryId
+  )
+)
 
 /* ---------------- UI HELPERS ---------------- */
 
@@ -95,8 +98,10 @@ async function markAsCompleted() {
     }
   );
 
+  // update modal
   selected.value.completed = true;
 
+  // update main achievements array
   const idx = achievements.value.findIndex(
     a => a.id === selected.value.id
   );

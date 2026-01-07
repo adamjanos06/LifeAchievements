@@ -1,16 +1,16 @@
 # LifeAchievements™ – Developer Documentation
 
 ## Table of Contents
-1. Introduction
-2. System Architecture
-3. Used Technologies
-4. Project Structure
-5. Backend – Laravel API
-6. Database
-7. Seeders and Factory Data
-8. Frontend – Vue.js Application
-9. Authentication and Token Handling
-10. Styles and Theme Switching
+1. [Introduction](#introduction)
+2. [System Architecture](#system-architecture)
+3. [Used Technologies](#used-technologies)
+4. [Project Structure](#project-structure)
+5. [Backend – Laravel API](#backend--laravel-api)
+6. [Database](#database)
+7. [Seeders and Factory Data](#seeders-and-factory-data)
+8. [Frontend – Vue.js Application](#frontend--vuejs-application)
+9. [Authentication and Token Handling](#authentication-and-token-handling)
+10. [Styles and Theme Switching](#styles-and-theme-switching)
 
 ---
 

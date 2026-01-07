@@ -20,13 +20,13 @@ const isOpen = ref(false)
       <!-- LOGO -->
       <div
         class="flex items-center gap-4 cursor-pointer select-none"
-        @click="toggleTheme"
+       
       >
         <div
           class="w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12
                  border-[5px] md:border-[6px] lg:border-[7px]
                  border-blue-700 dark:border-blue-400
-                 rounded-full transition-colors"
+                 rounded-full transition-colors" @click="toggleTheme"
         ></div>
 
         <RouterLink

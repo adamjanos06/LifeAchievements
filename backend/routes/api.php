@@ -8,6 +8,7 @@ use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompletedAchievementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 // ----------------------
 // Public Routes
@@ -25,6 +26,9 @@ Route::get('/badges/{badge}', [BadgeController::class, 'show']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// get other user's profile
+Route::get('/users/{user}', [UserController::class, 'show']);
+
 // ----------------------
 // Authenticated Routes
 // ----------------------
@@ -32,7 +36,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     // AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
+
+    // profile and updating profile
+    Route::get('/me', [UserController::class, 'me']);
+    Route::put('/me', [UserController::class, 'update']);
 
     // --- Categories (admin) ---
     Route::post('/categories', [CategoryController::class, 'store']);

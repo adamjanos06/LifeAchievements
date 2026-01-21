@@ -11,7 +11,8 @@ class Achievement extends Model
         'name',
         'description',
         'xp',
-        'difficulty'
+        'difficulty',
+        'repeatable'
     ];
 
 

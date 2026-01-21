@@ -17,6 +17,7 @@ class AchievementResource extends JsonResource
             'xp' => $this->xp,
             'difficulty' => $this->difficulty,
             'category' => new CategoryResource($this->whenLoaded('category')),
+            'repeatable' => $this->repeatable
         ];
     }
 }

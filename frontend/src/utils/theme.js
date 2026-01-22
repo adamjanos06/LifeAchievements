@@ -1,4 +1,8 @@
+import { ref } from "vue";
+
 const STORAGE_KEY = "theme";
+
+export const isDark = ref(false);
 
 export function initTheme() {
   const theme = localStorage.getItem(STORAGE_KEY) || "light";
@@ -6,8 +10,7 @@ export function initTheme() {
 }
 
 export function toggleTheme() {
-  const isDark = document.documentElement.classList.contains("dark");
-  applyTheme(isDark ? "light" : "dark");
+  applyTheme(isDark.value ? "light" : "dark");
 }
 
 export function applyTheme(theme) {
@@ -15,9 +18,13 @@ export function applyTheme(theme) {
 
   if (theme === "dark") {
     html.classList.add("dark");
+    isDark.value = true;
   } else {
     html.classList.remove("dark");
+    isDark.value = false;
   }
 
   localStorage.setItem(STORAGE_KEY, theme);
 }
+
+

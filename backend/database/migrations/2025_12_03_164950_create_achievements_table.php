@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('xp')->default(10);
             $table->enum('difficulty', ['easy','medium','hard'])->default('easy');
             $table->timestamps();
-            $table->boolean('repeatable');
+            $table->boolean('repeatable')->default(false);
         });
     }
 

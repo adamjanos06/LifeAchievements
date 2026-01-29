@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('requirement_text')->nullable();
             $table->timestamps();
+            $table->string('icon');
         });
     }
 

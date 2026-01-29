@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->foreignId('achievement_id')->constrained();
             $table->timestamp('completion_date')->nullable();
-            $table->text('notes')->nullable();
+            $table->integer('completions');
+            $table->string('notes')->nullable();
             $table->timestamps();
         });
     }

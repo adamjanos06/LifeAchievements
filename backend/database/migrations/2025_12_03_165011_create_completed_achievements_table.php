@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('completions');
             $table->string('notes')->nullable();
             $table->timestamps();
+            $table->integer('completions');
         });
     }
 

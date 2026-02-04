@@ -1,68 +1,65 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Route;
 
-class UserController extends Controller
-{
-    /**
-     * Get current user's profile
-     */
-    public function me(Request $request)
-    {
-        return response()->json($request->user());
-    }
+use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\BadgeController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompletedAchievementController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
-    public function show(User $user)
-    {
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'bio' => $user->bio,
-            'image' => $user->image,
-            'xp' => $user->xp,
-        ]);
-    }
+// ----------------------
+// Public Routes
+// ----------------------
 
-    /**
-     * Update logged-in user's profile
-     */
-    public function update(Request $request)
-    {
-        $user = $request->user();
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:32',
-            'bio' => 'nullable|string|max:32',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'password' => 'nullable|min:6|confirmed',
-        ]);
+Route::get('/achievements', [AchievementController::class, 'index']);
+Route::get('/achievements/{achievement}', [AchievementController::class, 'show']);
 
-        $user->name = $validated['name'];
-        $user->bio = $validated['bio'] ?? null;
+Route::get('/badges', [BadgeController::class, 'index']);
+Route::get('/badges/{badge}', [BadgeController::class, 'show']);
 
-        if ($request->hasFile('image')) {
-            if ($user->image) {
-                Storage::disk('public')->delete($user->image);
-            }
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-            $path = $request->file('image')->store('pfp', 'public');
-            $user->image = $path;
-        }
+// get other user's profile
+Route::get('/users/{user}', [UserController::class, 'show']);
 
-        if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
+// ----------------------
+// Authenticated Routes
+// ----------------------
 
-        $user->save();
+Route::middleware('auth:sanctum')->group(function () {
+    // AUTH
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user,
-        ]);
-    }
-}
+    // profile and updating profile
+    Route::get('/me', [UserController::class, 'me']);
+    Route::put('/me', [UserController::class, 'update']);
+
+    // --- Categories (admin) ---
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+
+    // --- Achievements (admin + catalog logic) ---
+    Route::post('/achievements', [AchievementController::class, 'store']);
+    Route::put('/achievements/{achievement}', [AchievementController::class, 'update']);
+    Route::delete('/achievements/{achievement}', [AchievementController::class, 'destroy']);
+
+    // --- Catalog: mark achievement as completed ---
+    Route::post(
+        '/achievements/{achievement}/complete',
+        [CompletedAchievementController::class, 'store']
+    );
+
+    // --- My Achievements (only logged-in user) ---
+    Route::get(
+        '/my-achievements',
+        [CompletedAchievementController::class, 'userCompleted']
+    );
+});

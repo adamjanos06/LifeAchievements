@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Achievement;
 use App\Models\CompletedAchievement;
 use Illuminate\Http\Request;
+use App\Services\BadgeService;
 
 class CompletedAchievementController extends Controller
 {
@@ -27,6 +28,10 @@ class CompletedAchievementController extends Controller
 
     public function userCompleted(Request $request)
     {
+        $user = $request->user();
+
+        BadgeService::checkFirstStep($user);
+    
         $completed = CompletedAchievement::with('achievement.category')
             ->where('user_id', $request->user()->id)
             ->get();

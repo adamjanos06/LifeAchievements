@@ -95,7 +95,7 @@ async function markAsCompleted() {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-    }
+    },
   );
 
   // update modal

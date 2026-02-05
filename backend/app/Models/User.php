@@ -35,12 +35,12 @@ class User extends Authenticatable
 
     public function completedAchievements()
     {
-        return $this->hasMany(CompletedAchievement::class);
+        return $this->hasMany(\App\Models\CompletedAchievement::class);
     }
 
     public function badges()
     {
-        return $this->belongsToMany(Badge::class)
+        return $this->belongsToMany(\App\Models\Badge::class)
                     ->withPivot('earned_at')
                     ->withTimestamps();
     }

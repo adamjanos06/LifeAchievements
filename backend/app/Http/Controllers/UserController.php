@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Badge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,19 @@ class UserController extends Controller
      */
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+
+        $badge = Badge::where('name', 'Profile Checked')->first();
+
+        if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
+            $user->badges()->attach($badge->id, [
+                'earned_at' => now()
+            ]);
+        }
+
+        return response()->json(
+            $user->load('badges')
+        );
     }
 
     public function show(User $user)

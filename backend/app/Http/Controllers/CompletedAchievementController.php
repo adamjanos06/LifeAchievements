@@ -31,6 +31,7 @@ class CompletedAchievementController extends Controller
         $user = $request->user();
 
         BadgeService::checkFirstStep($user);
+        BadgeService::checkCategoryBadges($user);
     
         $completed = CompletedAchievement::with('achievement.category')
             ->where('user_id', $request->user()->id)

@@ -8,6 +8,9 @@ use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompletedAchievementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BadgeUserController;
+use App\Http\Controllers\FriendController;
+use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\UserController;
 
 // ----------------------
@@ -62,4 +65,20 @@ Route::middleware('auth:sanctum')->group(function () {
         '/my-achievements',
         [CompletedAchievementController::class, 'userCompleted']
     );
+
+    // --- Friends stuff
+    Route::get('/friends', [FriendController::class, 'index']);
+    Route::get('/friend-requests', [FriendController::class, 'incoming']);
+    Route::post('/friends/{user}', [FriendController::class, 'send']);
+    Route::post('/friend-requests/{friendRequest}/accept', [FriendController::class, 'accept']);
+
+    // --- Goals (user ↔ achievement) ---
+    Route::get('/goals', [GoalsController::class, 'index']);
+    Route::post('/goals/{achievement}', [GoalsController::class, 'store']);
+    Route::delete('/goals/{achievement}', [GoalsController::class, 'destroy']);
+
+    // --- Earned Badges (user ↔ badge) ---
+    Route::get('/my-badges', [BadgeUserController::class, 'index']);
+    Route::post('/badges/{badge}/earn', [BadgeUserController::class, 'store']);
+
 });

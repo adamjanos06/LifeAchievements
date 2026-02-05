@@ -37,4 +37,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(CompletedAchievement::class);
     }
+
+    public function sentFriendRequests()
+{
+    return $this->hasMany(friend_request::class, 'sender_id');
+}
+
+public function receivedFriendRequests()
+{
+    return $this->hasMany(friend_request::class, 'receiver_id');
+}
+
+public function friends()
+{
+    return User::whereIn('id', function ($query) {
+        $query->select('receiver_id')
+              ->from('friend_requests')
+              ->where('sender_id', $this->id)
+              ->where('status', 'accepted');
+    })->orWhereIn('id', function ($query) {
+        $query->select('sender_id')
+              ->from('friend_requests')
+              ->where('receiver_id', $this->id)
+              ->where('status', 'accepted');
+    });
+}
 }

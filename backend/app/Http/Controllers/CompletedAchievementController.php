@@ -9,22 +9,29 @@ use App\Services\BadgeService;
 
 class CompletedAchievementController extends Controller
 {
-    public function store(Request $request, Achievement $achievement)
-    {
-        CompletedAchievement::firstOrCreate(
-            [
-                'user_id' => $request->user()->id,
-                'achievement_id' => $achievement->id,
-            ],
-            [
-                'completion_date' => now(),
-            ]
-        );
+public function store(Request $request, Achievement $achievement)
+{
+    $user = $request->user();
 
-        return response()->json([
-            'message' => 'Achievement marked as completed'
-        ]);
-    }
+    CompletedAchievement::firstOrCreate(
+        [
+            'user_id' => $user->id,
+            'achievement_id' => $achievement->id,
+        ],
+        [
+            'completion_date' => now(),
+        ]
+    );
+
+
+    $user->xp += $achievement->xp;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Achievement marked as completed',
+        'xp' => $user->xp
+    ]);
+}
 
     public function userCompleted(Request $request)
     {

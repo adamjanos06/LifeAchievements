@@ -16,6 +16,16 @@ use App\Http\Controllers\UserController;
 // ----------------------
 // Public Routes
 // ----------------------
+Route::get('/avatar/{filename}', function ($filename) {
+
+    $path = storage_path('app/public/pfp/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);

@@ -18,7 +18,14 @@ async function loadUser() {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   })
+
   user.value = await res.json()
+
+  if (user.value.image) {
+    const filename = user.value.image.split("/").pop()
+    imageUrl.value =
+      `http://backend.vm1.test/api/avatar/${filename}`
+  }
 }
 
 async function loadCompletedAchievements() {
@@ -131,7 +138,14 @@ async function saveProfile() {
     )
 
     user.value = res.data.user || res.data
-    imageUrl.value = res.data.image_url || null
+
+    if (user.value.image) {
+      const filename = user.value.image.split("/").pop()
+      imageUrl.value =
+        `http://backend.vm1.test/api/avatar/${filename}`
+    } else {
+      imageUrl.value = null
+    }
     showEditModal.value = false
   } catch (err) {
     errorMsg.value =
@@ -154,95 +168,145 @@ async function saveProfile() {
       You need to log in.
     </div>
 
-    <div v-else class="space-y-8">
+<div v-else class="space-y-8">
 
-      <!-- HEADER -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 flex gap-6">
-        <div
-          class="w-24 h-24 rounded-full bg-blue-600 text-white
-                 flex items-center justify-center text-4xl font-bold overflow-hidden"
-        >
-          <img
-            v-if="imageUrl"
-            :src="imageUrl"
-            class="w-full h-full object-cover"
-          />
-          <span v-else>{{ user?.name?.[0]?.toUpperCase() }}</span>
-        </div>
+  <!-- PROFILE HEADER -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+    <div class="flex flex-col md:flex-row md:items-center gap-6">
 
-        <div class="flex-1 space-y-2">
-          <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-bold">{{ user.name }}</h2>
-            <span class="text-gray-500">Level {{ level }}</span>
+      <!-- Avatar -->
+      <div
+        class="w-28 h-28 rounded-full bg-blue-600 text-white
+               flex items-center justify-center text-5xl font-bold overflow-hidden"
+      >
+        <img
+          v-if="imageUrl"
+          :src="imageUrl"
+          class="w-full h-full object-cover"
+        />
+        <span v-else>
+          {{ user.name[0].toUpperCase() }}
+        </span>
+      </div>
+
+      <!-- Main Info -->
+      <div class="flex-1 space-y-3">
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              {{ user.name }}
+            </h2>
+            <p class="text-gray-500 dark:text-gray-400">
+              {{ user.email }}
+            </p>
           </div>
 
+          <span class="text-sm font-semibold text-blue-600">
+            Level {{ level }}
+          </span>
+        </div>
+
+        <!-- XP Bar -->
+        <div>
           <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
             <div
-              class="bg-blue-600 h-3 rounded-full"
+              class="bg-blue-600 h-3 rounded-full transition-all duration-500"
               :style="{ width: progressPercent + '%' }"
             ></div>
           </div>
-
-          <p class="text-sm text-gray-500">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {{ currentLevelXp }} / {{ XP_PER_LEVEL }} XP
           </p>
-
-          <p class="text-sm text-gray-500">📧 {{ user.email }}</p>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <button
-            @click="openEditModal"
-            class="border px-4 py-2 rounded-lg font-semibold
-                   hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            ✏️ Edit Profile
-          </button>
-
-          <button
-            @click="logout"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold"
-          >
-            Log Out
-          </button>
-        </div>
       </div>
 
-      <!-- STATS + ACTIVITY -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
-          <h3 class="font-semibold text-lg">Stats</h3>
-          <div class="flex justify-between">
-            <span>🏆 Achievements</span>
-            <strong>{{ achievementsUnlocked }}</strong>
-          </div>
-          <div class="flex justify-between">
-            <span>⭐ Total XP</span>
-            <strong>{{ totalXp }}</strong>
-          </div>
-        </div>
+      <!-- Buttons -->
+      <div class="flex md:flex-col gap-2">
+        <button
+          @click="openEditModal"
+          class="border border-gray-300 dark:border-gray-600
+                 px-4 py-2 rounded-lg font-semibold
+                 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+        >
+          Edit
+        </button>
 
-        <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
-          <h3 class="font-semibold text-lg">Recent Activity</h3>
+        <button
+          @click="logout"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold"
+        >
+          Log Out
+        </button>
+      </div>
 
-          <div
-            v-for="a in recentActivity"
-            :key="a.id"
-            class="border rounded-xl px-4 py-3 flex justify-between"
-          >
-            <div>
-              <p class="font-medium">{{ a.achievement.name }}</p>
-              <p class="text-sm text-gray-500">
-                {{ new Date(a.completion_date).toLocaleDateString() }}
-              </p>
-            </div>
-            <span class="text-green-600 font-semibold">
-              +{{ a.achievement.xp }} XP
-            </span>
-          </div>
-        </div>
+    </div>
+  </div>
+
+  <!-- BIO CARD -->
+  <div
+    v-if="user.bio"
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6"
+  >
+    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
+      About
+    </h3>
+
+    <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">
+      {{ user.bio }}
+    </p>
+  </div>
+
+  <!-- STATS + ACTIVITY -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Stats -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+      <h3 class="font-semibold text-lg">Stats</h3>
+
+      <div class="flex justify-between">
+        <span>🏆 Achievements</span>
+        <strong>{{ achievementsUnlocked }}</strong>
+      </div>
+
+      <div class="flex justify-between">
+        <span>⭐ Total XP</span>
+        <strong>{{ totalXp }}</strong>
       </div>
     </div>
+
+    <!-- Activity -->
+    <div
+      class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4"
+    >
+      <h3 class="font-semibold text-lg">Recent Activity</h3>
+
+      <div
+        v-for="a in recentActivity"
+        :key="a.id"
+        class="border dark:border-gray-700 rounded-xl px-4 py-3
+               flex justify-between items-center"
+      >
+        <div>
+          <p class="font-medium">
+            {{ a.achievement.name }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ new Date(a.completion_date).toLocaleDateString() }}
+          </p>
+        </div>
+
+        <span class="text-green-600 font-semibold">
+          +{{ a.achievement.xp }} XP
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
 
     <!-- EDIT MODAL -->
     <div

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { toggleTheme } from "@/utils/theme"
-
+const isDark = ref(false)
 const isOpen = ref(false)
 </script>
 

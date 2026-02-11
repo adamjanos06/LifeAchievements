@@ -62,6 +62,12 @@ export const router = createRouter({
       name: 'logout',
       component: () => import('@/pages/logout.vue'),
       meta: { title: 'Logout' }
+    },
+    {
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: () => import('@/pages/leaderboard.vue'),
+      meta: { title: 'Leaderboard' }
     }
  
   ]

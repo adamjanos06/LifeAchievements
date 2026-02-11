@@ -12,6 +12,7 @@ use App\Http\Controllers\BadgeUserController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 
 // ----------------------
 // Public Routes
@@ -39,6 +40,12 @@ Route::get('/badges/{badge}', [BadgeController::class, 'show']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/leaderboard', function () {
+    return User::orderByDesc('xp')
+        ->select('id', 'name', 'xp', 'image')
+        ->take(50)
+        ->get();
+});
 // get other user's profile
 Route::get('/users/{user}', [UserController::class, 'show']);
 

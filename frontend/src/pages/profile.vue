@@ -49,12 +49,7 @@ onMounted(async () => {
 
 const achievementsUnlocked = computed(() => completedAchievements.value.length)
 
-const totalXp = computed(() =>
-  completedAchievements.value.reduce(
-    (sum, a) => sum + (a.achievement?.xp ?? 0),
-    0
-  )
-)
+const totalXp = computed(() => user.value?.xp ?? 0)
 
 const XP_PER_LEVEL = 600
 

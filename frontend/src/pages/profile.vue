@@ -250,7 +250,81 @@ async function saveProfile() {
             </strong>
           </div>
         </div>
+        <!-- EDIT MODAL -->
+      <div
+        v-if="showEditModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      >
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 w-full max-w-md space-y-4">
 
+          <h3 class="text-xl font-bold">Edit Profile</h3>
+
+          <div class="flex justify-center">
+            <img
+              v-if="imagePreview"
+              :src="imagePreview"
+              class="w-24 h-24 rounded-full object-cover"
+            />
+          </div>
+
+          <input
+            ref="fileInput"
+            type="file"
+            class="hidden"
+            accept="image/*"
+            @change="onImageChange"
+          />
+
+          <div
+            @click="$refs.fileInput.click()"
+            class="cursor-pointer border-2 border-dashed
+                  border-gray-300 dark:border-gray-600
+                  rounded-xl p-4 text-center
+                  hover:border-blue-500
+                  hover:bg-gray-50 dark:hover:bg-gray-700
+                  transition"
+          >
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Click to upload a profile picture
+            </p>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              PNG or JPG up to 5MB
+            </p>
+          </div>
+
+          <input
+            v-model="editName"
+            placeholder="Name"
+            class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+          />
+
+          <textarea
+            v-model="editBio"
+            placeholder="Bio"
+            class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+          ></textarea>
+
+          <p v-if="errorMsg" class="text-red-500 text-sm">
+            {{ errorMsg }}
+          </p>
+
+          <div class="flex justify-end gap-2">
+            <button @click="showEditModal = false">
+              Cancel
+            </button>
+
+            <button
+              @click="saveProfile"
+              :disabled="saving || !editName.trim()"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+
+        </div>
+      </div>
         <div class="md:col-span-2">
           <ProfileRecentActivity
             :completedAchievements="completedAchievements"

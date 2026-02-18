@@ -5,15 +5,9 @@ import MainNavbar from "@/components/layout/MainNavbar.vue"
 const users = ref([])
 const loading = ref(true)
 
-const XP_PER_LEVEL = 600
-
 async function loadLeaderboard() {
   const res = await fetch("http://backend.vm1.test/api/leaderboard")
   users.value = await res.json()
-}
-
-function getLevel(xp) {
-  return Math.floor(xp / XP_PER_LEVEL) + 1
 }
 
 function getAvatarUrl(image) {
@@ -27,6 +21,7 @@ onMounted(async () => {
   loading.value = false
 })
 </script>
+
 
 <template>
   <MainNavbar />
@@ -77,12 +72,11 @@ onMounted(async () => {
               {{ user.name }}
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Level {{ getLevel(user.xp) }}
+              Level {{ user.level_data?.level }}
             </p>
           </div>
         </div>
 
-        <!-- XP -->
         <div class="text-right">
           <p class="font-bold text-blue-600">
             {{ user.xp }} XP

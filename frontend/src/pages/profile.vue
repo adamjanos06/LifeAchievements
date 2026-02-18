@@ -164,11 +164,15 @@ async function saveProfile() {
                 <h2 class="text-2xl font-bold">
                   {{ user.name }}
                 </h2>
-                <p class="text-gray-500 dark:text-gray-400">
+                <p class="text-gray-700 dark:text-gray-300">
                   {{ user.email }}
                 </p>
               </div>
-              <span class="text-sm font-semibold text-blue-600">
+              <span
+                class="text-sm font-semibold
+                      text-blue-600
+                      dark:text-cyan-400"
+              >
                 Level {{ user.level_data?.level }}
               </span>
             </div>
@@ -232,6 +236,18 @@ async function saveProfile() {
           <div class="flex justify-between">
             <span>⭐ Total XP</span>
             <strong>{{ totalXp }}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>🔥 Favorite Category</span>
+            <strong>
+              {{ user.favorite_category ?? 'None' }}
+            </strong>
+          </div>
+          <div class="flex justify-between">
+            <span>📅 Member Since</span>
+            <strong>
+              {{ new Date(user.created_at).toLocaleDateString() }}
+            </strong>
           </div>
         </div>
 

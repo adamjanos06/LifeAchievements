@@ -75,8 +75,32 @@ class User extends Authenticatable
     {
         return ProgressionService::calculateLevel($this->xp);
     }
-    
+
+
+    public function getFavoriteCategoryAttribute()
+    {
+        $completed = $this->completedAchievements()
+            ->with('achievement.category')
+            ->get();
+
+        if ($completed->isEmpty()) {
+            return null;
+        }
+
+        $counts = [];
+
+        foreach ($completed as $item) {
+            $category = $item->achievement->category->name ?? 'Uncategorized';
+
+            $counts[$category] = ($counts[$category] ?? 0) + 1;
+        }
+
+        arsort($counts);
+
+        return array_key_first($counts);
+    }
     protected $appends = [
-    'level_data',
+        'level_data',
+        'favorite_category',
     ];
 }

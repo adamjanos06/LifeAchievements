@@ -8,7 +8,6 @@ const props = defineProps({
   },
 })
 
-/* ---- JS ProgressionService másolat ---- */
 
 function xpRequiredForLevel(level) {
   if (level <= 10) return level * 25
@@ -31,7 +30,6 @@ function calculateLevel(xp) {
   return level
 }
 
-/* ---- Activity számítás ---- */
 
 const events = computed(() => {
   const sorted = [...props.completedAchievements].sort(
@@ -48,7 +46,6 @@ const events = computed(() => {
 
     const newLevel = calculateLevel(accumulatedXp)
 
-    // achievement event
     result.push({
       type: "achievement",
       name: achievement.achievement?.name,
@@ -56,7 +53,6 @@ const events = computed(() => {
       date: achievement.completion_date,
     })
 
-    // level up event (multiple level jump kezelve)
     while (newLevel > currentLevel) {
       currentLevel++
 
@@ -94,7 +90,7 @@ const events = computed(() => {
       </div>
 
       <div v-else>
-        <p class="font-medium text-blue-600">
+        <p class="font-medium text-blue-600 dark:text-cyan-400">
           🎉 Level Up!
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400">

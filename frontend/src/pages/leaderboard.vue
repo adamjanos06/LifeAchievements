@@ -3,11 +3,49 @@ import { ref, onMounted } from "vue"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 
 const users = ref([])
+const currentUser = ref(null)
 const loading = ref(true)
+const animatedXp = ref({})
 
 async function loadLeaderboard() {
   const res = await fetch("http://backend.vm1.test/api/leaderboard")
   users.value = await res.json()
+}
+
+async function loadCurrentUser() {
+  const res = await fetch("http://backend.vm1.test/api/me", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+  currentUser.value = await res.json()
+}
+
+/* XP animation */
+function animateXpValues() {
+  users.value.forEach(user => {
+    animatedXp.value[user.id] = 0
+
+    const target = user.xp
+    const step = Math.ceil(target / 30)
+
+    const interval = setInterval(() => {
+      if (animatedXp.value[user.id] >= target) {
+        animatedXp.value[user.id] = target
+        clearInterval(interval)
+      } else {
+        animatedXp.value[user.id] += step
+      }
+    }, 20)
+  })
+}
+
+/* Top 3 badge */
+function getMedal(index) {
+  if (index === 0) return "🥇"
+  if (index === 1) return "🥈"
+  if (index === 2) return "🥉"
+  return null
 }
 
 function getAvatarUrl(image) {
@@ -17,11 +55,11 @@ function getAvatarUrl(image) {
 }
 
 onMounted(async () => {
-  await loadLeaderboard()
+  await Promise.all([loadLeaderboard(), loadCurrentUser()])
+  animateXpValues()
   loading.value = false
 })
 </script>
-
 
 <template>
   <MainNavbar />
@@ -40,22 +78,37 @@ onMounted(async () => {
       <div
         v-for="(user, index) in users"
         :key="user.id"
-        class="bg-white dark:bg-gray-800
-               rounded-xl shadow
-               px-6 py-4
-               flex items-center justify-between
-               transition hover:scale-[1.01]"
+        :class="[
+          'rounded-xl shadow px-6 py-4 flex items-center justify-between transition',
+          index === 0
+            ? 'bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-400 shadow-yellow-400/40'
+            : 'bg-white dark:bg-gray-800',
+          user.id === currentUser?.id
+            ? 'ring-2 ring-blue-500'
+            : ''
+        ]"
       >
+
         <div class="flex items-center gap-4">
 
-          <span class="text-lg font-bold w-6">
-            {{ index + 1 }}
+          <!-- Rank -->
+          <span class="text-lg font-bold w-8 text-center">
+            <span v-if="getMedal(index)">
+              {{ getMedal(index) }}
+            </span>
+            <span v-else>
+              {{ index + 1 }}
+            </span>
           </span>
 
+          <!-- Avatar -->
           <div
-            class="w-12 h-12 rounded-full bg-blue-600
-                   flex items-center justify-center
-                   text-white font-bold overflow-hidden"
+            :class="[
+              'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold overflow-hidden',
+              index === 0
+                ? 'bg-yellow-500 shadow-lg shadow-yellow-400/60'
+                : 'bg-blue-600'
+            ]"
           >
             <img
               v-if="getAvatarUrl(user.image)"
@@ -67,6 +120,7 @@ onMounted(async () => {
             </span>
           </div>
 
+          <!-- Name + Level -->
           <div>
             <p class="font-semibold">
               {{ user.name }}
@@ -77,11 +131,20 @@ onMounted(async () => {
           </div>
         </div>
 
+        <!-- XP -->
         <div class="text-right">
-          <p class="font-bold text-blue-600">
-            {{ user.xp }} XP
+          <p
+            :class="[
+              'font-bold text-lg',
+              index === 0
+                ? 'text-yellow-500 drop-shadow-[0_0_6px_rgba(234,179,8,0.8)]'
+                : 'text-blue-600 dark:text-blue-400'
+            ]"
+          >
+            {{ animatedXp[user.id] ?? 0 }} XP
           </p>
         </div>
+
       </div>
 
     </div>

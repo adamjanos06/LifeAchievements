@@ -15,6 +15,8 @@ const showModal = ref(false)
 const currentPage = ref(1)
 const perPage = 9
 
+const searchQuery = ref("")
+
 function isLoggedIn() {
   return !!localStorage.getItem("token");
 }
@@ -46,6 +48,17 @@ const filtered = computed(() =>
   )
 )
 
+const searched = computed(() => {
+  if (!searchQuery.value.trim()) return filtered.value
+
+  const q = searchQuery.value.toLowerCase()
+
+  return filtered.value.filter(a =>
+    a.name.toLowerCase().includes(q) ||
+    a.description.toLowerCase().includes(q)
+  )
+})
+
 /* ---------------- UI HELPERS ---------------- */
 
 const categoryName = computed(() => {
@@ -59,13 +72,14 @@ const icon = computed(() => {
 })
 
 const totalPages = computed(() =>
-  Math.min(2, Math.ceil(filtered.value.length / perPage))
+  Math.min(2, Math.ceil(searched.value.length / perPage))
 )
 
 const paginatedAchievements = computed(() => {
   const start = (currentPage.value - 1) * perPage
-  return filtered.value.slice(start, start + perPage)
+  return searched.value.slice(start, start + perPage)
 })
+
 
 function goToPage(page) {
   currentPage.value = page
@@ -129,6 +143,21 @@ onMounted(() => {
     <h2 class="text-center text-3xl font-bold tracking-wide mb-16">
       {{ categoryName }}
     </h2>
+
+    <div class="flex justify-center mb-10">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search achievements..."
+        class="w-full max-w-md px-4 py-2
+              rounded-xl border
+              border-gray-300 dark:border-gray-600
+              bg-white dark:bg-gray-800
+              text-gray-900 dark:text-gray-100
+              focus:outline-none focus:ring-2 focus:ring-blue-600"
+      />
+    </div>
+
 
     <!-- ACHIEVEMENT GRID -->
     <div

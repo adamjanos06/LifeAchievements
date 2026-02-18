@@ -32,12 +32,18 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $user->loadCount('completedAchievements');
+
         return response()->json([
             'id' => $user->id,
             'name' => $user->name,
             'bio' => $user->bio,
             'image' => $user->image,
             'xp' => $user->xp,
+            'level_data' => $user->level_data,
+            'favorite_category' => $user->favorite_category,
+            'achievements_count' => $user->completed_achievements_count,
+            'created_at' => $user->created_at,
         ]);
     }
 
@@ -78,4 +84,5 @@ class UserController extends Controller
             'user' => $user,
         ]);
     }
+    
 }

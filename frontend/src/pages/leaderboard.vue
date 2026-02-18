@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import { useRouter } from "vue-router"
 
+const router = useRouter()
 const users = ref([])
 const currentUser = ref(null)
 const loading = ref(true)
@@ -19,6 +21,14 @@ async function loadCurrentUser() {
     },
   })
   currentUser.value = await res.json()
+}
+
+function goToProfile(id) {
+  if (currentUser.value && id === currentUser.value.id) {
+    router.push("/profile")
+  } else {
+    router.push(`/users/${id}`)
+  }
 }
 
 /* XP animation */
@@ -78,8 +88,10 @@ onMounted(async () => {
       <div
         v-for="(user, index) in users"
         :key="user.id"
+        @click="goToProfile(user.id)"
+        class="cursor-pointer"
         :class="[
-          'rounded-xl shadow px-6 py-4 flex items-center justify-between transition',
+          'rounded-xl shadow px-6 py-4 flex items-center justify-between transition hover:scale-[1.01]',
           index === 0
             ? 'bg-yellow-100 dark:bg-yellow-500/10 border border-yellow-400 shadow-yellow-400/40'
             : 'bg-white dark:bg-gray-800',
@@ -88,7 +100,6 @@ onMounted(async () => {
             : ''
         ]"
       >
-
         <div class="flex items-center gap-4">
 
           <!-- Rank -->

@@ -86,7 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- Friends stuff
     Route::get('/friends', [FriendController::class, 'index']);
     Route::get('/friend-requests', [FriendController::class, 'incoming']);
-    Route::post('/friends/{user}', [FriendController::class, 'send']);
+    Route::post('/friends', [FriendController::class, 'send']);
     Route::post('/friend-requests/{friendRequest}/accept', [FriendController::class, 'accept']);
 
     // --- Goals (user ↔ achievement) ---

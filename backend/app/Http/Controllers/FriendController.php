@@ -17,33 +17,44 @@ class FriendController extends Controller
     }
 
     // Send friend request
-    public function send(Request $request, User $user)
-    {
-        $auth = $request->user();
+    public function send(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|exists:users,name'
+    ]);
 
-        if ($auth->id === $user->id) {
-            return response()->json(['message' => 'Cannot friend yourself'], 400);
-        }
+    $auth = $request->user();
 
-        $exists = friend_request::where(function ($q) use ($auth, $user) {
-            $q->where('sender_id', $auth->id)
-              ->where('receiver_id', $user->id);
-        })->orWhere(function ($q) use ($auth, $user) {
-            $q->where('sender_id', $user->id)
-              ->where('receiver_id', $auth->id);
-        })->exists();
+    $user = User::where('name', $request->name)->first();
 
-        if ($exists) {
-            return response()->json(['message' => 'Request already exists'], 409);
-        }
-
-        friend_request::create([
-            'sender_id' => $auth->id,
-            'receiver_id' => $user->id,
-        ]);
-
-        return response()->json(['message' => 'Friend request sent'], 201);
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
     }
+
+    if ($auth->id === $user->id) {
+        return response()->json(['message' => 'Cannot friend yourself'], 400);
+    }
+
+    $exists = friend_request::where(function ($q) use ($auth, $user) {
+        $q->where('sender_id', $auth->id)
+          ->where('receiver_id', $user->id);
+    })->orWhere(function ($q) use ($auth, $user) {
+        $q->where('sender_id', $user->id)
+          ->where('receiver_id', $auth->id);
+    })->exists();
+
+    if ($exists) {
+        return response()->json(['message' => 'Request already exists'], 409);
+    }
+
+    friend_request::create([
+        'sender_id' => $auth->id,
+        'receiver_id' => $user->id,
+        'status' => 'pending'
+    ]);
+
+    return response()->json(['message' => 'Friend request sent'], 201);
+}
 
     // Accept request
     public function accept(Request $request, friend_request $friendRequest)

@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { toggleTheme } from "@/utils/theme"
+import FriendsPanel from "@/components/FriendsPanel.vue"
+
 const isDark = ref(false)
 const isOpen = ref(false)
 </script>
@@ -39,6 +41,8 @@ const isOpen = ref(false)
 
       <!-- DESKTOP MENU -->
       <div class="hidden lg:flex items-center gap-10">
+
+        <FriendsPanel />
 
         <RouterLink to="/catalog" class="font-semibold hover:underline">
           Catalog
@@ -136,6 +140,8 @@ const isOpen = ref(false)
         class="flex flex-col items-center gap-5 py-6
                text-gray-900 dark:text-gray-100"
       >
+        <FriendsPanel />
+
         <RouterLink to="/catalog" @click="isOpen = false">
           Catalog
         </RouterLink>

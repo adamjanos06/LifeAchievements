@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Services\ProgressionService;
 
 class User extends Authenticatable
 {
@@ -69,4 +70,13 @@ class User extends Authenticatable
                   ->where('status', 'accepted');
         });
     }
+
+    public function getLevelDataAttribute()
+    {
+        return ProgressionService::calculateLevel($this->xp);
+    }
+    
+    protected $appends = [
+    'level_data',
+    ];
 }

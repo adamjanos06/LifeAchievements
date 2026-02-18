@@ -68,6 +68,12 @@ export const router = createRouter({
       name: 'leaderboard',
       component: () => import('@/pages/leaderboard.vue'),
       meta: { title: 'Leaderboard' }
+    },
+    {
+      path: "/users/:id",
+      name: "userProfile",
+      component: () => import("@/pages/userProfile.vue"),
+      meta: { title: 'User Profile' }
     }
  
   ]

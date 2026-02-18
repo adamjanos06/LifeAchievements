@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Services\ProgressionService;
 
 class User extends Authenticatable
 {
@@ -69,4 +70,37 @@ class User extends Authenticatable
                   ->where('status', 'accepted');
         });
     }
+
+    public function getLevelDataAttribute()
+    {
+        return ProgressionService::calculateLevel($this->xp);
+    }
+
+
+    public function getFavoriteCategoryAttribute()
+    {
+        $completed = $this->completedAchievements()
+            ->with('achievement.category')
+            ->get();
+
+        if ($completed->isEmpty()) {
+            return null;
+        }
+
+        $counts = [];
+
+        foreach ($completed as $item) {
+            $category = $item->achievement->category->name ?? 'Uncategorized';
+
+            $counts[$category] = ($counts[$category] ?? 0) + 1;
+        }
+
+        arsort($counts);
+
+        return array_key_first($counts);
+    }
+    protected $appends = [
+        'level_data',
+        'favorite_category',
+    ];
 }

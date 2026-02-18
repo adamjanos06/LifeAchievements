@@ -46,8 +46,7 @@ Route::get('/leaderboard', function () {
         ->take(50)
         ->get();
 });
-// get other user's profile
-Route::get('/users/{user}', [UserController::class, 'show']);
+
 
 // ----------------------
 // Authenticated Routes
@@ -97,5 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- Earned Badges (user ↔ badge) ---
     Route::get('/my-badges', [BadgeUserController::class, 'index']);
     Route::post('/badges/{badge}/earn', [BadgeUserController::class, 'store']);
-
+    
+    // get other user's profile
+    Route::get('/users/{user}', [UserController::class, 'show']);
 });

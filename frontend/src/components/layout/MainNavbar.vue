@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
 import { toggleTheme } from "@/utils/theme"
 import FriendsPanel from "@/components/FriendsPanel.vue"
 
@@ -20,15 +20,14 @@ const isOpen = ref(false)
     >
 
       <!-- LOGO -->
-      <div
-        class="flex items-center gap-4 cursor-pointer select-none"
-       
-      >
+      <div class="flex items-center gap-4 select-none">
+
         <div
           class="w-9 h-9 md:w-11 md:h-11 lg:w-12 lg:h-12
                  border-[5px] md:border-[6px] lg:border-[7px]
-                 border-blue-700 dark:border-blue-400
-                 rounded-full transition-colors" @click="toggleTheme"
+                 border-blue-600 dark:border-blue-400
+                 rounded-full cursor-pointer transition-colors"
+          @click="toggleTheme"
         ></div>
 
         <RouterLink
@@ -52,6 +51,11 @@ const isOpen = ref(false)
           My achievements
         </RouterLink>
 
+        <!-- 🔥 LEADERBOARD -->
+        <RouterLink to="/leaderboard" class="font-semibold hover:underline">
+          🏆 Leaderboard
+        </RouterLink>
+
         <RouterLink to="/profile" class="font-semibold hover:underline">
           Profile
         </RouterLink>
@@ -64,9 +68,7 @@ const isOpen = ref(false)
                  transition"
           aria-label="Toggle theme"
         >
-          <!-- 🌙 HOLD – ha LIGHT módban vagyunk -->
           <svg
-            v-if="!isDark"
             xmlns="http://www.w3.org/2000/svg"
             class="w-6 h-6"
             fill="none"
@@ -81,37 +83,6 @@ const isOpen = ref(false)
                  7 7 0 0021 12.79z"
             />
           </svg>
-        
-          <!-- ☀️ NAP – ha DARK módban vagyunk -->
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="w-6 h-6 text-yellow-400"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5
-               0v-1.5A.75.75 0 0110 2zm0 13.5a.75.75 0
-               01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75
-               0 01.75-.75zM4.22 4.22a.75.75 0 011.06 0l1.06
-               1.06a.75.75 0 11-1.06 1.06L4.22 5.28a.75.75 0
-               010-1.06zm9.44 9.44a.75.75 0 011.06 0l1.06
-               1.06a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75
-               0 010-1.06zM2 10a.75.75 0 01.75-.75h1.5a.75.75
-               0 010 1.5h-1.5A.75.75 0 012 10zm13.5 0a.75.75
-               0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75
-               0 01-.75-.75zM4.22 15.78a.75.75 0
-               010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06
-               1.06a.75.75 0 01-1.06 0zM13.66 6.34a.75.75 0
-               010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06
-               1.06a.75.75 0 01-1.06 0zM10 6.25a3.75 3.75 0
-               100 7.5 3.75 3.75 0 000-7.5z"
-            clip-rule="evenodd"
-          />
-        </svg>
-
         </button>
 
       </div>
@@ -121,9 +92,14 @@ const isOpen = ref(false)
         class="lg:hidden text-gray-900 dark:text-gray-100"
         @click="isOpen = !isOpen"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-9 h-9"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
                 d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
@@ -140,8 +116,6 @@ const isOpen = ref(false)
         class="flex flex-col items-center gap-5 py-6
                text-gray-900 dark:text-gray-100"
       >
-        <FriendsPanel />
-
         <RouterLink to="/catalog" @click="isOpen = false">
           Catalog
         </RouterLink>
@@ -150,18 +124,22 @@ const isOpen = ref(false)
           My achievements
         </RouterLink>
 
+        <!-- 🔥 LEADERBOARD -->
+        <RouterLink to="/leaderboard" @click="isOpen = false">
+          🏆 Leaderboard
+        </RouterLink>
+
         <RouterLink to="/profile" @click="isOpen = false">
           Profile
         </RouterLink>
 
-        <!-- MOBILE THEME TOGGLE -->
         <button
           @click="toggleTheme"
-          class="mt-4 flex items-center gap-2 font-semibold"
+          class="mt-4 font-semibold"
         >
-          {{ isDark ? 'Light theme' : 'Dark theme' }}
+          Toggle theme
         </button>
-        
+
       </div>
     </div>
   </header>

@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted, computed } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import { isDark } from "@/utils/theme"
 
 const route = useRoute()
+const router = useRouter()
 const categoryId = Number(route.params.id)
 
 const categories = ref([])
@@ -19,6 +21,10 @@ const searchQuery = ref("")
 
 function isLoggedIn() {
   return !!localStorage.getItem("token");
+}
+
+function goBackToCategories() {
+  router.push("/catalog")
 }
 
 /* ---------------- DATA LOAD ---------------- */
@@ -69,6 +75,14 @@ const categoryName = computed(() => {
 const icon = computed(() => {
   const cat = categories.value.find(c => c.id === categoryId)
   return cat ? cat.icon : ""
+})
+
+const categoryColor = computed(() => {
+  const cat = categories.value.find(c => c.id === categoryId)
+
+  if (isDark.value && categoryId === 8) return "#3b82f6"
+
+  return cat?.color ? `#${cat.color}` : "#3b82f6"
 })
 
 const totalPages = computed(() =>
@@ -218,6 +232,21 @@ onMounted(() => {
           : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600'"
       >
         {{ page }}
+      </button>
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="flex justify-center mt-12">
+      <button
+        @click="goBackToCategories"
+        class="px-8 py-3 text-white font-semibold rounded-xl
+        transition cursor-pointer hover:sclae-105"
+        :style="{
+          backgroundColor: categoryColor,
+          boxShadow: `0 0 20px ${categoryColor}66`
+        }"
+      >
+        ← Back to Categories
       </button>
     </div>
   </div>

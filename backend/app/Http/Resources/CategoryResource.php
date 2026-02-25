@@ -15,6 +15,7 @@ class CategoryResource extends JsonResource
             'icon' => $this->icon,
             'achievements' => AchievementResource::collection($this->whenLoaded('achievements')),
             'id' => $this->id,
+            'color' => $this->color
         ];
     }
 }

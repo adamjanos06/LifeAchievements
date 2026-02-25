@@ -6,6 +6,7 @@ use App\Models\Badge;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\CompletedAchievement;
+use App\Models\Goal;
 
 class BadgeService
 {
@@ -66,6 +67,23 @@ class BadgeService
             $user->badges()->attach($badge->id, [
                 'earned_at' => now()
             ]);
+        }
+    }
+
+    public static function checkGoalSetter(User $user)
+    {
+        $goalCount = Goal::where('user_id', $user->id)->count();
+    
+        if ($goalCount >= 1) {
+    
+            $badge = Badge::where('name', 'Goal Setter')->first();
+    
+            if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
+    
+                $user->badges()->attach($badge->id, [
+                    'earned_at' => now()
+                ]);
+            }
         }
     }
     

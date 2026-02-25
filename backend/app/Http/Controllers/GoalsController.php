@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Achievement;
 use App\Models\Goal;
 use Illuminate\Http\Request;
+use App\Services\BadgeService;
 
 class GoalsController extends Controller
 {
@@ -28,6 +29,9 @@ class GoalsController extends Controller
             'user_id' => $request->user()->id,
             'achievement_id' => $achievement->id,
         ]);
+
+        // Check Badge
+        BadgeService::checkGoalSetter($request->user());
 
         return response()->json([
             'message' => 'Goal added'

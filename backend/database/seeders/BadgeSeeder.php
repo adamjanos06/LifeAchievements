@@ -120,6 +120,13 @@ class BadgeSeeder extends Seeder
                 'requirement_text' => 'You added your first friend',
                 'icon' => 'badge-friend.png',
             ],
+
+            [
+                'name' => 'Goal Setter',
+                'description' => 'You saved your first achievement as a goal.',
+                'requirement_text' => 'Save your first goal',
+                'icon' => 'goal-setter.png',
+            ],
         ];
 
         foreach ($badges as $bad) {

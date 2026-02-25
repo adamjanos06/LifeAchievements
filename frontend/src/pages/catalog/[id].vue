@@ -308,7 +308,7 @@ onMounted(() => {
       <button
         @click="goBackToCategories"
         class="px-8 py-3 text-white font-semibold rounded-xl
-        transition cursor-pointer hover:sclae-105"
+        transition transform duration-300 cursor-pointer hover:scale-120"
         :style="{
           backgroundColor: categoryColor,
           boxShadow: `0 0 20px ${categoryColor}66`
@@ -373,8 +373,10 @@ onMounted(() => {
           <button
             v-else
             @click="markAsCompleted"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white
-            py-2 rounded-lg font-semibold cursor-pointer transition"
+            class="w-full bg-blue-600 hover:bg-blue-800 text-white
+            py-2 rounded-lg font-semibold transition cursor-pointer
+            border-2 border-blue-400 dark:border-blue-300
+            shadow-md dark:shadow-[0_0_15px_rgba(59,130,246,0.6)]"
           >
             MARK AS COMPLETED
           </button>
@@ -384,7 +386,7 @@ onMounted(() => {
             @click="toggleGoal"
             :class="isGoal(selected.id)
               ? 'bg-transparent text-amber-600 border-2 border-amber-500'
-              : 'bg-amber-600 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_10px_rgba(251,191,36,0.6)]'
+              : 'bg-amber-600 hover:bg-amber-800 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_15px_rgba(251,191,36,0.6)]'
             "
             class="w-full my-5 py-2 rounded-lg font-semibold cursor-pointer transition"
           >

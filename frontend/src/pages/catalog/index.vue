@@ -27,7 +27,7 @@ onMounted(loadCategories);
            text-gray-900 dark:text-gray-100
            transition-colors"
   >
-    <h2 class="text-center text-2xl font-bold tracking-wide mb-14">
+    <h2 class="text-center text-3xl font-bold tracking-wide mb-14">
       CATEGORIES
     </h2>
 

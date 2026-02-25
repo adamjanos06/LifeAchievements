@@ -10,6 +10,7 @@ const categoryId = Number(route.params.id)
 
 const categories = ref([])
 const achievements = ref([])
+const goals = ref([])
 
 const selected = ref(null)
 const showModal = ref(false)
@@ -21,6 +22,10 @@ const searchQuery = ref("")
 
 function isLoggedIn() {
   return !!localStorage.getItem("token");
+}
+
+function isGoal(achievementId) {
+  return goals.value.some(g => g.id === achievementId)
 }
 
 function goBackToCategories() {
@@ -44,6 +49,18 @@ async function loadAchievements() {
 
   const json = await res.json();
   achievements.value = json.data;
+}
+
+async function loadGoals() {
+  if (!isLoggedIn()) return
+  
+  const res = await fetch("http://backend.vm1.test/api/goals", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+  const json = await res.json();
+  goals.value = json.data;
 }
 
 /* ---------------- FILTER (FIX!!) ---------------- */
@@ -94,7 +111,6 @@ const paginatedAchievements = computed(() => {
   return searched.value.slice(start, start + perPage)
 })
 
-
 function goToPage(page) {
   currentPage.value = page
 }
@@ -109,6 +125,50 @@ function openModal(a) {
 function closeModal() {
   selected.value = null
   showModal.value = false
+}
+
+/* ---------------- GOALS ---------------- */
+
+async function saveGoal() {
+  if (!selected.value) return
+
+  await fetch(
+    `http://backend.vm1.test/api/goals/${selected.value.id}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    }
+  )
+  await loadGoals()
+}
+
+async function removeGoal() {
+  if (!selected.value) return
+
+  await fetch(
+    `http://backend.vm1.test/api/goals/${selected.value.id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    }
+  )
+  await loadGoals()
+}
+
+async function toggleGoal() {
+
+  if (!selected.value) return
+
+  if (isGoal(selected.value.id)) {
+    await removeGoal()
+  }
+  else {
+    await saveGoal()
+  }
 }
 
 /* ---------------- ACTIONS ---------------- */
@@ -132,9 +192,14 @@ async function markAsCompleted() {
   // update main achievements array
   const idx = achievements.value.findIndex(
     a => a.id === selected.value.id
-  );
+  )
+
   if (idx !== -1) {
     achievements.value[idx].completed = true;
+  }
+
+  if (isGoal(selected.value.id)) {
+    await removeGoal()
   }
 }
 
@@ -143,6 +208,9 @@ async function markAsCompleted() {
 onMounted(() => {
   loadCategories()
   loadAchievements()
+  if (isLoggedIn()) {
+    loadGoals()
+  }
 })
 </script>
 

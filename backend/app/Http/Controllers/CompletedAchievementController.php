@@ -6,6 +6,7 @@ use App\Models\Achievement;
 use App\Models\CompletedAchievement;
 use Illuminate\Http\Request;
 use App\Services\BadgeService;
+use App\Models\Goal;
 
 class CompletedAchievementController extends Controller
 {
@@ -23,6 +24,15 @@ public function store(Request $request, Achievement $achievement)
         ]
     );
 
+    // Remove from goals if exists
+    Goal::where([
+        'user_id' => $request->user()->id,
+        'achievement_id' => $achievement->id
+    ])->delete();
+
+    return response()->json([
+        'message' => 'Achievement marked as completed'
+    ]);
 
     $user->xp += $achievement->xp;
     $user->save();

@@ -267,8 +267,8 @@ onMounted(() => {
           <button
             v-if="selected?.completed"
             disabled
-            class="w-full bg-gray-400 text-white py-2
-                   rounded-lg font-semibold cursor-not-allowed"
+            class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold cursor-default
+            border-2 border-green-400 dark:border-green-300 shadow-md dark:shadow-[0_0_15px_rgba(34,197,94,0.6)]"
           >
             COMPLETED
           </button>
@@ -276,8 +276,8 @@ onMounted(() => {
           <button
             v-else
             @click="markAsCompleted"
-            class="w-full bg-green-600 hover:bg-green-700
-                   text-white py-2 rounded-lg font-semibold transition"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white
+            py-2 rounded-lg font-semibold transition cursor-pointer"
           >
             MARK AS COMPLETED
           </button>

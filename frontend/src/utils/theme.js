@@ -26,5 +26,3 @@ export function applyTheme(theme) {
 
   localStorage.setItem(STORAGE_KEY, theme);
 }
-
-

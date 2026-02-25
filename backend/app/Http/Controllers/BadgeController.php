@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BadgeResource;
 use App\Models\Badge;
 use Illuminate\Http\Request;
+use App\Services\BadgeService;
 
 class BadgeController extends Controller
 {
@@ -29,5 +30,14 @@ class BadgeController extends Controller
         $badge = Badge::create($validated);
 
         return new BadgeResource($badge);
+    }
+
+    public function darkSide(Request $request)
+    {
+        BadgeService::checkDarkSide($request->user());
+
+        return response()->json([
+            'message' => 'Dark Side badge checked'
+        ]);
     }
 }

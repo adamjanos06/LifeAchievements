@@ -51,6 +51,23 @@ class BadgeService
             }
         }
     }
+
+    public static function checkDarkSide(User $user)
+    {
+        $badge = Badge::where('name', 'Dark Side')->first();
+    
+        if (!$badge) return;
+    
+        $alreadyEarned = $user->badges()
+            ->where('badge_id', $badge->id)
+            ->exists();
+    
+        if (!$alreadyEarned) {
+            $user->badges()->attach($badge->id, [
+                'earned_at' => now()
+            ]);
+        }
+    }
     
     public static function checkAllBadges(User $user)
     {

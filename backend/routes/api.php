@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- Earned Badges (user ↔ badge) ---
     Route::get('/my-badges', [BadgeUserController::class, 'index']);
     Route::post('/badges/{badge}/earn', [BadgeUserController::class, 'store']);
+    Route::post('/badges/dark-side', [BadgeController::class, 'darkSide']);
     
     // get other user's profile
     Route::get('/users/{user}', [UserController::class, 'show']);

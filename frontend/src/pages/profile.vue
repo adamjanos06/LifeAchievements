@@ -12,6 +12,9 @@ const imageUrl = ref(null)
 const completedAchievements = ref([])
 const loading = ref(true)
 
+function goToMyAchievements() {
+  router.push("/achievements")
+}
 
 async function loadUser() {
   const res = await fetch("http://backend.vm1.test/api/me", {
@@ -228,9 +231,11 @@ async function saveProfile() {
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
           <h3 class="font-semibold text-lg">Stats</h3>
 
-          <div class="flex justify-between">
-            <span>🏆 Achievements</span>
-            <strong>{{ achievementsUnlocked }}</strong>
+          <div
+            @click="goToMyAchievements"
+            class="flex justify-between hover:text-blue-600 dark:hover:text-cyan-400 cursor-pointer transition">
+              <span>🏆 Achievements</span>
+              <strong>{{ achievementsUnlocked }}</strong>
           </div>
 
           <div class="flex justify-between">

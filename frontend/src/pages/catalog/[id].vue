@@ -374,9 +374,24 @@ onMounted(() => {
             v-else
             @click="markAsCompleted"
             class="w-full bg-blue-600 hover:bg-blue-700 text-white
-            py-2 rounded-lg font-semibold transition cursor-pointer"
+            py-2 rounded-lg font-semibold cursor-pointer transition"
           >
             MARK AS COMPLETED
+          </button>
+
+          <button
+            v-if="!selected?.completed"
+            @click="toggleGoal"
+            :class="isGoal(selected.id)
+              ? 'bg-transparent text-amber-600 border-2 border-amber-500'
+              : 'bg-amber-600 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_10px_rgba(251,191,36,0.6)]'
+            "
+            class="w-full my-5 py-2 rounded-lg font-semibold cursor-pointer transition"
+          >
+            {{ isGoal(selected.id)
+                ? "REMOVE FROM GOALS"
+                : "SAVE TO GOALS"
+            }}
           </button>
         </div>
 

@@ -11,6 +11,7 @@ const isOpen = ref(false)
     class="w-full border-b border-black/20 dark:border-white/10
            bg-white dark:bg-gray-900 transition-colors"
   >
+  <FriendsPanel />
     <nav
       class="w-full px-4 sm:px-8 lg:px-16
              h-16 md:h-20 lg:h-24
@@ -148,6 +149,7 @@ const isOpen = ref(false)
         class="flex flex-col items-center gap-5 py-6
                text-gray-900 dark:text-gray-100"
       >
+      
         <RouterLink to="/catalog" @click="isOpen = false">
           Catalog
         </RouterLink>

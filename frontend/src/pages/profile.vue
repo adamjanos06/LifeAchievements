@@ -4,7 +4,6 @@ import { useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vue"
 import axios from "axios"
-
 const router = useRouter()
 
 const user = ref(null)

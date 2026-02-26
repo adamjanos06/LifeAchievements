@@ -34,24 +34,6 @@ class AchievementController extends Controller
         ]);
     }
 
-    // Mark as completed
-    public function complete(Request $request, $id)
-    {
-        CompletedAchievement::firstOrCreate(
-            [
-                'user_id' => $request->user()->id,
-                'achievement_id' => $id,
-            ],
-            [
-                'completion_date' => now(),
-            ]
-        );
-
-        return response()->json([
-            'message' => 'Completed'
-        ]);
-    }
-
     // My achievements
     public function myAchievements(Request $request)
     {

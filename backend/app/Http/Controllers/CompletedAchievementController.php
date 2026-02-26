@@ -14,25 +14,42 @@ public function store(Request $request, Achievement $achievement)
 {
     $user = $request->user();
 
-    CompletedAchievement::firstOrCreate(
-        [
-            'user_id' => $user->id,
-            'achievement_id' => $achievement->id,
-        ],
-        [
-            'completion_date' => now(),
-        ]
-    );
+    if ($achievement->repeatable) {
+        // For repeatable achievements, increment completion count
+        $completed = CompletedAchievement::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'achievement_id' => $achievement->id,
+            ],
+            [
+                'completion_date' => now(),
+                'completions' => 1,
+            ]
+        );
+
+        // If record already exists, increment completions
+        if (!$completed->wasRecentlyCreated) {
+            $completed->increment('completions');
+        }
+    } else {
+        // For non-repeatable achievements, create once
+        CompletedAchievement::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'achievement_id' => $achievement->id,
+            ],
+            [
+                'completion_date' => now(),
+                'completions' => 1,
+            ]
+        );
+    }
 
     // Remove from goals if exists
     Goal::where([
         'user_id' => $request->user()->id,
         'achievement_id' => $achievement->id
     ])->delete();
-
-    return response()->json([
-        'message' => 'Achievement marked as completed'
-    ]);
 
     $user->xp += $achievement->xp;
     $user->save();

@@ -68,14 +68,42 @@ class FriendController extends Controller
         return response()->json(['message' => 'Friend request accepted']);
     }
 
-    // Incoming requests
+    // Cancel a sent request (allows the sender to revoke a pending request)
+    public function cancel(Request $request, friend_request $friendRequest)
+    {
+        if ($friendRequest->sender_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($friendRequest->status !== 'pending') {
+            return response()->json(['message' => 'Cannot cancel'], 400);
+        }
+
+        $friendRequest->delete();
+        return response()->json(['message' => 'Friend request cancelled']);
+    }
+
+    // Incoming *and* outgoing requests
     public function incoming(Request $request)
     {
+        $user = $request->user();
+
+        // eager load the related user objects so the frontend can access
+        // `sender.name` / `receiver.name` without crashing when the relation is
+        // not automatically serialized otherwise.
+        $incoming = $user->receivedFriendRequests()
+            ->where('status', 'pending')
+            ->with('sender')
+            ->get();
+
+        $sent = $user->sentFriendRequests()
+            ->where('status', 'pending')
+            ->with('receiver')
+            ->get();
+
         return response()->json([
-            'data' => $request->user()
-                ->receivedFriendRequests()
-                ->where('status', 'pending')
-                ->get()
+            'incoming' => $incoming,
+            'sent' => $sent,
         ]);
     }
 }

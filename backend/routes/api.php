@@ -84,9 +84,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- Friends stuff
     Route::get('/friends', [FriendController::class, 'index']);
+    // the same endpoint now returns both incoming and sent pending requests
     Route::get('/friend-requests', [FriendController::class, 'incoming']);
     Route::post('/friends', [FriendController::class, 'send']);
     Route::post('/friend-requests/{friendRequest}/accept', [FriendController::class, 'accept']);
+    // allow cancelling an outgoing request
+    Route::delete('/friend-requests/{friendRequest}', [FriendController::class, 'cancel']);
 
     // --- Goals (user ↔ achievement) ---
     Route::get('/goals', [GoalsController::class, 'index']);

@@ -3,10 +3,12 @@ import { ref, onMounted, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import { isDark } from "@/utils/theme"
-
+import BadgePopup from "@/components/BadgePopup.vue"
 const route = useRoute()
 const router = useRouter()
 const categoryId = Number(route.params.id)
+
+const unlockedBadge = ref(null)
 
 const categories = ref([])
 const achievements = ref([])
@@ -176,15 +178,21 @@ async function toggleGoal() {
 async function markAsCompleted() {
   if (!selected.value || selected.value.completed) return;
 
-  await fetch(
+  const res = await fetch(
     `http://backend.vm1.test/api/achievements/${selected.value.id}/complete`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-    },
+    }
   );
+
+  const data = await res.json()
+
+  if (data.badge) {
+    unlockedBadge.value = data.badge
+  }
 
   // update modal
   selected.value.completed = true;
@@ -404,4 +412,9 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <BadgePopup
+  v-if="unlockedBadge"
+  :badge="unlockedBadge"
+  @close="unlockedBadge = null"
+/>
 </template>

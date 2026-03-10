@@ -19,15 +19,19 @@ class BadgeService
             $badge = Badge::where('name', 'First Step')->first();
 
             if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
+
                 $user->badges()->attach($badge->id, [
                     'earned_at' => now()
                 ]);
+
+                return $badge;
             }
         }
+
+        return null;
     }
     public static function checkCategoryBadges(User $user)
     {
-        // Összes kategória
         $categories = Category::all();
 
         foreach ($categories as $category) {
@@ -45,12 +49,17 @@ class BadgeService
                 $badge = Badge::where('name', $badgeName)->first();
 
                 if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
+
                     $user->badges()->attach($badge->id, [
                         'earned_at' => now()
                     ]);
+
+                    return $badge;
                 }
             }
         }
+
+        return null;
     }
 
     public static function checkDarkSide(User $user)
@@ -71,7 +80,7 @@ class BadgeService
                 'earned_at' => now()
             ]);
 
-            return $badge; // <<< EZ A FONTOS
+            return $badge;
         }
 
         return null;

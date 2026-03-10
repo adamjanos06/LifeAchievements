@@ -56,18 +56,25 @@ class BadgeService
     public static function checkDarkSide(User $user)
     {
         $badge = Badge::where('name', 'Dark Side')->first();
-    
-        if (!$badge) return;
-    
+
+        if (!$badge) {
+            return null;
+        }
+
         $alreadyEarned = $user->badges()
             ->where('badge_id', $badge->id)
             ->exists();
-    
+
         if (!$alreadyEarned) {
+
             $user->badges()->attach($badge->id, [
                 'earned_at' => now()
             ]);
+
+            return $badge; // <<< EZ A FONTOS
         }
+
+        return null;
     }
 
     public static function checkGoalSetter(User $user)

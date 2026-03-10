@@ -34,10 +34,10 @@ class BadgeController extends Controller
 
     public function darkSide(Request $request)
     {
-        BadgeService::checkDarkSide($request->user());
+        $badge = BadgeService::checkDarkSide($request->user());
 
         return response()->json([
-            'message' => 'Dark Side badge checked'
+            'badge' => $badge
         ]);
     }
 }

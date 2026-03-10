@@ -2,8 +2,37 @@
 import { ref } from "vue"
 import { toggleTheme, isDark } from "@/utils/theme"
 import FriendsPanel from "@/components/FriendsPanel.vue"
+import BadgePopup from "@/components/BadgePopup.vue"
 
+const unlockedBadge = ref(null)
 const isOpen = ref(false)
+async function toggleThemeWithBadge() {
+
+  toggleTheme()
+
+  if (isDark.value) {
+
+    const token = localStorage.getItem("token")
+    if (!token) return
+
+    const res = await fetch(
+      "http://backend.vm1.test/api/badges/dark-side",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+
+    const data = await res.json()
+
+    if (data.badge) {
+      unlockedBadge.value = data.badge
+    }
+
+  }
+}
 </script>
 
 <template>
@@ -27,7 +56,7 @@ const isOpen = ref(false)
                  border-[5px] md:border-[6px] lg:border-[7px]
                  border-blue-600 dark:border-blue-400
                  rounded-full cursor-pointer transition-colors"
-          @click="toggleTheme"
+          @click="toggleThemeWithBadge"
         ></div>
 
         <RouterLink
@@ -62,7 +91,7 @@ const isOpen = ref(false)
 
         <!-- THEME TOGGLE -->
         <button
-          @click="toggleTheme"
+          @click="toggleThemeWithBadge"
           class="ml-2 p-2 rounded-full
                  hover:bg-black/10 dark:hover:bg-white/10
                  transition"
@@ -168,7 +197,7 @@ const isOpen = ref(false)
         </RouterLink>
 
         <button
-          @click="toggleTheme"
+          @click="toggleThemeWithBadge"
           class="mt-4 font-semibold"
         >
           Toggle theme
@@ -177,4 +206,9 @@ const isOpen = ref(false)
       </div>
     </div>
   </header>
+  <BadgePopup
+  v-if="unlockedBadge"
+  :badge="unlockedBadge"
+  @close="unlockedBadge = null"
+/>
 </template>

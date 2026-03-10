@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->timestamp('earned_at')->nullable();
             $table->timestamps();
+            $table->unique(['user_id', 'badge_id']);
         });
     }
 

@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vue"
+import ProfileBadges from "@/components/profile/ProfileBadges.vue"
 import axios from "axios"
 const router = useRouter()
 
@@ -223,7 +224,7 @@ async function saveProfile() {
           {{ user.bio }}
         </p>
       </div>
-
+      <ProfileBadges />
       <!-- STATS + ACTIVITY -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 

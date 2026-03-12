@@ -10,7 +10,9 @@ class CompletedAchievement extends Model
         'user_id',
         'achievement_id',
         'completion_date',
-        'notes'
+        'notes',
+        // tracking number of times a repeatable achievement was done
+        'completions',
     ];
 
     public function user() {

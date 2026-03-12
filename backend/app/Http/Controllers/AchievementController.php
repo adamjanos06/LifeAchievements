@@ -12,12 +12,10 @@ class AchievementController extends Controller
     public function index(Request $request) {
         $user = $request->user('sanctum');
 
-        // gather completion counts for the current user (if logged in)
         $completionCounts = [];
         if ($user) {
             $completionCounts = CompletedAchievement::where('user_id', $user->id)
-                ->select('achievement_id', 
-                         DB::raw('count(*) as count'))
+                ->select('achievement_id', DB::raw('COALESCE(SUM(completions),0) as count'))
                 ->groupBy('achievement_id')
                 ->pluck('count', 'achievement_id')
                 ->toArray();
@@ -44,7 +42,6 @@ class AchievementController extends Controller
         ]);
     }
 
-    // My achievements
     public function myAchievements(Request $request)
     {
         $achievementIds = CompletedAchievement::where(

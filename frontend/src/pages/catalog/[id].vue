@@ -50,11 +50,10 @@ async function loadAchievements() {
   });
 
   const json = await res.json();
-  // normalize fields so we always have repeatable & completions keys
   achievements.value = (json.data || []).map(a => ({
     ...a,
     repeatable: a.repeatable ?? false,
-    completions: a.completions ?? 0,
+    completions: Number(a.completions) || 0,
   }));
 }
 
@@ -118,7 +117,6 @@ const paginatedAchievements = computed(() => {
   return searched.value.slice(start, start + perPage)
 })
 
-// helpers for completion button in modal
 const completionButtonText = computed(() => {
   if (!selected.value) return 'MARK AS COMPLETED'
   if (selected.value.completed) {
@@ -197,7 +195,6 @@ async function toggleGoal() {
 async function markAsCompleted() {
   if (!selected.value) return;
 
-  // if not repeatable and already done, bail out
   if (!selected.value.repeatable && selected.value.completed) return;
 
   const res = await fetch(
@@ -216,15 +213,11 @@ async function markAsCompleted() {
     unlockedBadge.value = data.badge;
   }
 
-  // update modal state
   if (selected.value.repeatable) {
     selected.value.completed = true;
-    selected.value.completions = (selected.value.completions || 0) + 1;
-  } else {
-    selected.value.completed = true;
+    selected.value.completions = (Number(selected.value.completions) || 0) + 1;
   }
 
-  // sync back to main achievements array
   const idx = achievements.value.findIndex(
     a => a.id === selected.value.id
   );
@@ -242,7 +235,6 @@ async function markAsCompleted() {
     await removeGoal();
   }
 
-  // refresh list so that any updated repeatable/completions data comes from server
   await loadAchievements();
 }
 

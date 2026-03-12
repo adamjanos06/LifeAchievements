@@ -17,7 +17,14 @@ async function loadMyAchievements() {
   });
 
   const json = await res.json();
-  achievements.value = json.data.data ?? json.data;
+  achievements.value = (json.data.data ?? json.data ?? []).map(a => ({
+    ...a,
+    completions: Number(a.completions) || 0,
+    achievement: {
+      ...a.achievement,
+      repeatable: a.achievement?.repeatable ?? false,
+    }
+  }));
 }
 
 /* -------- PAGINATION -------- */
@@ -73,12 +80,23 @@ onMounted(loadMyAchievements);
                rounded-2xl px-7 py-6 bg-white dark:bg-gray-800
                flex gap-5 transition-colors"
       >
-        <!-- GREEN CHECK -->
-        <div
-          class="absolute top-3 right-3 w-7 h-7 rounded-full
-                 bg-green-500 text-white flex items-center justify-center"
-        >
-          ✓
+        <!-- COMPLETION INDICATOR -->
+        <div class="absolute top-3 right-3">
+          <template v-if="a.achievement?.repeatable">
+            <span
+              class="w-7 h-7 rounded-full bg-blue-600 text-white
+                     flex items-center justify-center text-sm font-semibold"
+            >
+              {{ a.completions }}
+            </span>
+          </template>
+          <template v-else>
+            <div
+              class="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center"
+            >
+              ✓
+            </div>
+          </template>
         </div>
 
         <div class="w-16 h-16 rounded-full flex items-center justify-center">

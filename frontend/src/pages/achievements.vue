@@ -30,7 +30,7 @@ async function loadMyAchievements() {
 /* -------- PAGINATION -------- */
 
 const totalPages = computed(() => {
-  return Math.min(2, Math.ceil(achievements.value.length / perPage));
+  return Math.max(2, Math.ceil(achievements.value.length / perPage));
 });
 
 const paginatedAchievements = computed(() => {

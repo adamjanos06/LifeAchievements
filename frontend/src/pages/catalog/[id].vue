@@ -50,7 +50,12 @@ async function loadAchievements() {
   });
 
   const json = await res.json();
-  achievements.value = json.data;
+  // normalize fields so we always have repeatable & completions keys
+  achievements.value = (json.data || []).map(a => ({
+    ...a,
+    repeatable: a.repeatable ?? false,
+    completions: a.completions ?? 0,
+  }));
 }
 
 async function loadGoals() {
@@ -111,6 +116,20 @@ const totalPages = computed(() =>
 const paginatedAchievements = computed(() => {
   const start = (currentPage.value - 1) * perPage
   return searched.value.slice(start, start + perPage)
+})
+
+// helpers for completion button in modal
+const completionButtonText = computed(() => {
+  if (!selected.value) return 'MARK AS COMPLETED'
+  if (selected.value.completed) {
+    return selected.value.repeatable ? 'COMPLETE AGAIN' : 'COMPLETED'
+  }
+  return 'MARK AS COMPLETED'
+})
+
+const completionButtonDisabled = computed(() => {
+  if (!selected.value) return false
+  return selected.value.completed && !selected.value.repeatable
 })
 
 function goToPage(page) {
@@ -176,7 +195,10 @@ async function toggleGoal() {
 /* ---------------- ACTIONS ---------------- */
 
 async function markAsCompleted() {
-  if (!selected.value || selected.value.completed) return;
+  if (!selected.value) return;
+
+  // if not repeatable and already done, bail out
+  if (!selected.value.repeatable && selected.value.completed) return;
 
   const res = await fetch(
     `http://backend.vm1.test/api/achievements/${selected.value.id}/complete`,
@@ -188,27 +210,40 @@ async function markAsCompleted() {
     }
   );
 
-  const data = await res.json()
+  const data = await res.json();
 
   if (data.badge) {
-    unlockedBadge.value = data.badge
+    unlockedBadge.value = data.badge;
   }
 
-  // update modal
-  selected.value.completed = true;
+  // update modal state
+  if (selected.value.repeatable) {
+    selected.value.completed = true;
+    selected.value.completions = (selected.value.completions || 0) + 1;
+  } else {
+    selected.value.completed = true;
+  }
 
-  // update main achievements array
+  // sync back to main achievements array
   const idx = achievements.value.findIndex(
     a => a.id === selected.value.id
-  )
+  );
 
   if (idx !== -1) {
-    achievements.value[idx].completed = true;
+    if (selected.value.repeatable) {
+      achievements.value[idx].completions = selected.value.completions;
+      achievements.value[idx].completed = true;
+    } else {
+      achievements.value[idx].completed = true;
+    }
   }
 
   if (isGoal(selected.value.id)) {
-    await removeGoal()
+    await removeGoal();
   }
+
+  // refresh list so that any updated repeatable/completions data comes from server
+  await loadAchievements();
 }
 
 /* ---------------- LIFECYCLE ---------------- */
@@ -367,10 +402,17 @@ onMounted(() => {
         <p class="text-gray-600 dark:text-gray-400">
           {{ selected?.description }}
         </p>
+        <p
+          v-if="selected?.repeatable && selected?.completions"
+          class="text-sm text-gray-500 dark:text-gray-400 mt-1"
+        >
+          Completed {{ selected.completions }} time<span v-if="selected.completions > 1">s</span>.
+        </p>
 
         <div class="w-full mt-3">
+          <!-- show disabled completed badge only for non-repeatable items -->
           <button
-            v-if="selected?.completed"
+            v-if="selected?.completed && !selected?.repeatable"
             disabled
             class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold cursor-default
             border-2 border-green-400 dark:border-green-300 shadow-md dark:shadow-[0_0_15px_rgba(34,197,94,0.6)]"
@@ -378,15 +420,17 @@ onMounted(() => {
             COMPLETED
           </button>
 
+          <!-- allow clicking for first-time or repeatable completions -->
           <button
             v-else
             @click="markAsCompleted"
+            :disabled="completionButtonDisabled"
             class="w-full bg-blue-600 hover:bg-blue-800 text-white
             py-2 rounded-lg font-semibold transition cursor-pointer
             border-2 border-blue-400 dark:border-blue-300
             shadow-md dark:shadow-[0_0_15px_rgba(59,130,246,0.6)]"
           >
-            MARK AS COMPLETED
+            {{ completionButtonText }}
           </button>
 
           <button

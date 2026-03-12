@@ -109,7 +109,7 @@ const categoryColor = computed(() => {
 })
 
 const totalPages = computed(() =>
-  Math.max(2, Math.ceil(searched.value.length / perPage))
+  Math.max(1, Math.ceil(searched.value.length / perPage))
 )
 
 const paginatedAchievements = computed(() => {

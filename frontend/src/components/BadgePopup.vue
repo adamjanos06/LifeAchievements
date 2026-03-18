@@ -2,7 +2,9 @@
   <div class="fixed bottom-6 right-6 z-50">
 
     <div
-      class="bg-gray-900 text-white rounded-xl shadow-lg p-4 w-64 border border-gray-700"
+      class="bg-white text-gray-900 border border-gray-300
+       dark:bg-gray-900 dark:text-white dark:border-gray-700
+       rounded-xl shadow-lg p-4 w-64"
     >
       <div class="text-sm text-gray-400">
         🏅 Badge Unlocked

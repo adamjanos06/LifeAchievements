@@ -2,6 +2,9 @@
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 const route = useRoute()
 const user = ref(null)
@@ -30,6 +33,12 @@ function getAvatarUrl(image) {
   const filename = image.split("/").pop()
   return `http://backend.vm1.test/api/avatar/${filename}`
 }
+
+function goBack() {
+  window.history.length > 1
+    ? router.back()
+    : router.push("/leaderboard")
+}
 </script>
 
 <template>
@@ -42,7 +51,17 @@ function getAvatarUrl(image) {
     <div v-else-if="!user">User not found.</div>
 
     <div v-else class="space-y-8">
-
+      <button
+        @click="goBack"
+        class="mb-6 px-5 py-2 rounded-xl
+              bg-gray-200 dark:bg-gray-700
+              text-gray-800 dark:text-gray-100
+              font-semibold
+              hover:bg-gray-300 dark:hover:bg-gray-600
+              transition"
+      >
+        ← Back
+      </button>
       <!-- HEADER -->
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
         <div class="flex items-center gap-6">
@@ -143,4 +162,5 @@ function getAvatarUrl(image) {
 
     </div>
   </div>
+  
 </template>

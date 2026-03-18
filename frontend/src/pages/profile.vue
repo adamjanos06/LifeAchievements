@@ -224,13 +224,12 @@ async function saveProfile() {
           {{ user.bio }}
         </p>
       </div>
-      <ProfileBadges />
       <!-- STATS + ACTIVITY -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
           <h3 class="font-semibold text-lg">Stats</h3>
-
+          <ProfileBadges />
           <div
             @click="goToMyAchievements"
             class="flex justify-between hover:text-blue-600 dark:hover:text-cyan-400 cursor-pointer transition">

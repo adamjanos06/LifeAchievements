@@ -1,17 +1,46 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
+
 const users = ref([])
 const currentUser = ref(null)
 const loading = ref(true)
 const animatedXp = ref({})
+const mode = ref("global")
 
 async function loadLeaderboard() {
-  const res = await fetch("http://backend.vm1.test/api/leaderboard")
-  users.value = await res.json()
+
+  if (mode.value === "global") {
+    const res = await fetch("http://backend.vm1.test/api/leaderboard")
+    users.value = await res.json()
+    return
+  }
+
+  // 🔥 FRIENDS MODE
+  const res = await fetch("http://backend.vm1.test/api/friends", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+
+  const json = await res.json()
+
+  // 🔥 FONTOS: saját user + friends
+  const meRes = await fetch("http://backend.vm1.test/api/me", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+
+  const me = await meRes.json()
+
+  const all = [me, ...json.data]
+
+  // XP szerinti rendezés
+  users.value = all.sort((a, b) => b.xp - a.xp)
 }
 
 async function loadCurrentUser() {
@@ -33,6 +62,8 @@ function goToProfile(id) {
 
 /* XP animation */
 function animateXpValues() {
+  animatedXp.value = {}
+
   users.value.forEach(user => {
     animatedXp.value[user.id] = 0
 
@@ -64,6 +95,14 @@ function getAvatarUrl(image) {
   return `http://backend.vm1.test/api/avatar/${filename}`
 }
 
+/* watch mode change */
+watch(mode, async () => {
+  loading.value = true
+  await loadLeaderboard()
+  animateXpValues()
+  loading.value = false
+})
+
 onMounted(async () => {
   await Promise.all([loadLeaderboard(), loadCurrentUser()])
   animateXpValues()
@@ -74,12 +113,47 @@ onMounted(async () => {
 <template>
   <MainNavbar />
 
-  <div class="max-w-4xl mx-auto px-6 py-14 space-y-8">
-    <h1 class="text-3xl font-bold">
+  <div class="max-w-4xl mx-auto px-6 py-14 space-y-6">
+
+    <h1 class="text-3xl font-bold text-center">
       Leaderboard
     </h1>
 
-    <div v-if="loading">
+    <!-- TOGGLE -->
+    <div class="flex justify-center">
+
+      <div class="bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex">
+
+        <button
+          @click="mode = 'global'"
+          :class="mode === 'global'
+            ? 'bg-white dark:bg-gray-900 shadow text-blue-600'
+            : 'text-gray-600 dark:text-gray-300'"
+          class="px-6 py-2 rounded-full font-semibold transition"
+        >
+          Global
+        </button>
+
+        <button
+          @click="mode = 'friends'"
+          :class="mode === 'friends'
+            ? 'bg-white dark:bg-gray-900 shadow text-blue-600'
+            : 'text-gray-600 dark:text-gray-300'"
+          class="px-6 py-2 rounded-full font-semibold transition"
+        >
+          Friends
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- LABEL -->
+    <p class="text-center text-sm text-gray-500 dark:text-gray-400">
+      {{ mode === 'friends' ? 'Friends leaderboard' : 'Global leaderboard' }}
+    </p>
+
+    <div v-if="loading" class="text-center">
       Loading...
     </div>
 
@@ -159,5 +233,6 @@ onMounted(async () => {
       </div>
 
     </div>
+
   </div>
 </template>

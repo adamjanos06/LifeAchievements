@@ -190,6 +190,18 @@ async function toggleGoal() {
   }
 }
 
+function tryOpenFromQuery() {
+  const openId = Number(route.query.open)
+
+  if (!openId) return
+
+  const found = achievements.value.find(a => a.id === openId)
+
+  if (found) {
+    openModal(found)
+  }
+}
+
 /* ---------------- ACTIONS ---------------- */
 
 async function markAsCompleted() {
@@ -240,12 +252,14 @@ async function markAsCompleted() {
 
 /* ---------------- LIFECYCLE ---------------- */
 
-onMounted(() => {
-  loadCategories()
-  loadAchievements()
+onMounted(async () => {
+  await loadCategories()
+  await loadAchievements()
+  
   if (isLoggedIn()) {
     loadGoals()
   }
+  tryOpenFromQuery()
 })
 </script>
 

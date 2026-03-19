@@ -253,17 +253,18 @@ onMounted(() => {
   <MainNavbar />
 
   <div
-    class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14
+    class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-10
            text-gray-900 dark:text-gray-100
            transition-colors"
   >
-    <h2 class="text-center text-3xl font-bold tracking-wide mb-16">
+    <h2 class="text-center text-3xl font-bold tracking-wide mb-12">
       {{ categoryName }}
     </h2>
 
-    <div class="flex justify-center mb-10">
+    <div class="flex justify-center mb-6">
       <input
         v-model="searchQuery"
+        @input="currentPage = 1"
         type="text"
         placeholder="Search achievements..."
         class="w-full max-w-md px-4 py-2
@@ -322,7 +323,7 @@ onMounted(() => {
     </div>
 
     <!-- PAGINATION -->
-    <div v-if="totalPages > 1" class="flex justify-center gap-4 mt-16">
+    <div v-if="totalPages > 1" class="flex justify-center gap-4 mt-8">
       <button
         v-for="page in totalPages"
         :key="page"
@@ -339,7 +340,7 @@ onMounted(() => {
     </div>
 
     <!-- BACK BUTTON -->
-    <div class="flex justify-center mt-12">
+    <div class="flex justify-center mt-8">
       <button
         @click="goBackToCategories"
         class="px-8 py-3 text-white font-semibold rounded-xl

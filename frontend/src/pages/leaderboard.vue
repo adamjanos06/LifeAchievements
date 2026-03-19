@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import { useRouter } from "vue-router"
 
@@ -10,6 +10,13 @@ const currentUser = ref(null)
 const loading = ref(true)
 const animatedXp = ref({})
 const mode = ref("global")
+const searchQuery = ref("")
+
+const filteredUsers = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return users.value
+  return users.value.filter((u) => u.name?.toLowerCase().includes(q))
+})
 
 async function loadLeaderboard() {
 
@@ -119,8 +126,17 @@ onMounted(async () => {
       Leaderboard
     </h1>
 
+    <div class="flex justify-center mt-4">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search people..."
+        class="w-full max-w-md px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
     <!-- TOGGLE -->
-    <div class="flex justify-center">
+    <div class="flex justify-center mt-3">
 
       <div class="bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex">
 
@@ -160,7 +176,7 @@ onMounted(async () => {
     <div v-else class="space-y-4">
 
       <div
-        v-for="(user, index) in users"
+        v-for="(user, index) in filteredUsers"
         :key="user.id"
         @click="goToProfile(user.id)"
         class="cursor-pointer"

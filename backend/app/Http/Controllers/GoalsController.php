@@ -15,7 +15,7 @@ class GoalsController extends Controller
         $achievementIds = Goal::where('user_id', $request->user()->id)
             ->pluck('achievement_id');
 
-        $achievements = Achievement::whereIn('id', $achievementIds)->get();
+        $achievements = Achievement::with('category')->whereIn('id', $achievementIds)->get();
 
         return response()->json([
             'data' => $achievements

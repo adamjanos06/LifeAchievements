@@ -52,6 +52,12 @@ export const router = createRouter({
       meta: { title: 'My Achievements' }
     },
     {
+      path: '/goals',
+      name: 'Goals',
+      component: () => import('@/pages/goals.vue'),
+      meta: { title: 'Goals' }
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('@/pages/profile.vue'),
@@ -74,8 +80,7 @@ export const router = createRouter({
       name: "userProfile",
       component: () => import("@/pages/userProfile.vue"),
       meta: { title: 'User Profile' }
-    }
- 
+    } 
   ]
 })
 

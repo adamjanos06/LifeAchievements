@@ -79,10 +79,13 @@ async function toggleThemeWithBadge() {
         <RouterLink to="/achievements" class="font-semibold hover:underline">
           My achievements
         </RouterLink>
-
-        <!-- 🔥 LEADERBOARD -->
+        
         <RouterLink to="/leaderboard" class="font-semibold hover:underline">
           🏆 Leaderboard
+        </RouterLink>
+
+        <RouterLink to="/goals" class="font-semibold hover:underline">
+          🎯 Goals
         </RouterLink>
 
         <RouterLink to="/profile" class="font-semibold hover:underline">
@@ -187,9 +190,12 @@ async function toggleThemeWithBadge() {
           My achievements
         </RouterLink>
 
-        <!-- 🔥 LEADERBOARD -->
         <RouterLink to="/leaderboard" @click="isOpen = false">
           🏆 Leaderboard
+        </RouterLink>
+
+        <RouterLink to="/goals" @click="isOpen = false">
+          🎯 Goals
         </RouterLink>
 
         <RouterLink to="/profile" @click="isOpen = false">

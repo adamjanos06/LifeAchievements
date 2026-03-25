@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import { isDark } from "@/utils/theme"
 import BadgePopup from "@/components/BadgePopup.vue"
-import confetti from "canvas-confetti/dist/confetti.module.mjs"
+
 const route = useRoute()
 const router = useRouter()
 const categoryId = Number(route.params.id)
@@ -22,6 +22,29 @@ const currentPage = ref(1)
 const perPage = 9
 
 const searchQuery = ref("")
+
+let confetti = null
+
+function loadConfetti() {
+  return new Promise((resolve) => {
+    
+    // When already loaded
+    if (window.confetti) {
+      confetti = window.confetti
+      return resolve()
+    }
+
+    const script = document.createElement("script")
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
+
+    script.onload = () => {
+      confetti = window.confetti
+      resolve()
+    }
+
+    document.body.appendChild(script)
+  })
+}
 
 function isLoggedIn() {
   return !!localStorage.getItem("token");
@@ -206,6 +229,9 @@ function tryOpenFromQuery() {
 /* ---------------- ACTIONS ---------------- */
 
 function fireConfetti() {
+
+  if (!confetti) return
+
   const colors = ['#ef4444', '#3b82f6', '#22c55e', '#eab308']
 
   // Left
@@ -283,6 +309,7 @@ async function markAsCompleted() {
 onMounted(async () => {
   await loadCategories()
   await loadAchievements()
+  await loadConfetti()
   
   if (isLoggedIn()) {
     loadGoals()

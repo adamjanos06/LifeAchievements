@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import { isDark } from "@/utils/theme"
 import BadgePopup from "@/components/BadgePopup.vue"
+import confetti from "canvas-confetti/dist/confetti.module.mjs"
 const route = useRoute()
 const router = useRouter()
 const categoryId = Number(route.params.id)
@@ -204,7 +205,30 @@ function tryOpenFromQuery() {
 
 /* ---------------- ACTIONS ---------------- */
 
+function fireConfetti() {
+  const colors = ['#ef4444', '#3b82f6', '#22c55e', '#eab308']
+
+  // Left
+  confetti({
+    particleCount: 80,
+    angle: 60,
+    spread: 70,
+    origin: { x: 0, y: 0.6 },
+    colors
+  })
+
+  // Right
+  confetti({
+    particleCount: 80,
+    angle: 120,
+    spread: 70,
+    origin: { x: 1, y: 0.6 },
+    colors
+  })
+}
+
 async function markAsCompleted() {
+  const wasCompleted = selected.value.completed
   if (!selected.value) return;
 
   if (!selected.value.repeatable && selected.value.completed) return;
@@ -248,6 +272,10 @@ async function markAsCompleted() {
   }
 
   await loadAchievements();
+
+  if (!wasCompleted) {
+    fireConfetti()
+  }
 }
 
 /* ---------------- LIFECYCLE ---------------- */

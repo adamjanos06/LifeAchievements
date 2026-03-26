@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('bio')->nullable();
             $table->string('image')->nullable();
+            $table->boolean('isAdmin')->nullable()->default(null);
         });
     }
 

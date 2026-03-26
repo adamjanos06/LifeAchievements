@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompletedAchievementController;
@@ -103,4 +104,18 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // get other user's profile
     Route::get('/users/{user}', [UserController::class, 'show']);
+
+    // ----------------------
+    // Admin Routes
+    // ----------------------
+    Route::middleware('is_admin')->prefix('/admin')->group(function () {
+        // Table Management (phpMyAdmin-like)
+        Route::get('/tables', [AdminController::class, 'getTables']);
+        Route::get('/tables/{table}/structure', [AdminController::class, 'getTableStructure']);
+        Route::get('/tables/{table}/records', [AdminController::class, 'getTableRecords']);
+        Route::get('/tables/{table}/records/{id}', [AdminController::class, 'getRecord']);
+        Route::post('/tables/{table}/records', [AdminController::class, 'createRecord']);
+        Route::put('/tables/{table}/records/{id}', [AdminController::class, 'updateRecord']);
+        Route::delete('/tables/{table}/records/{id}', [AdminController::class, 'deleteRecord']);
+    });
 });

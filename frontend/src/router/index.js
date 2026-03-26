@@ -80,6 +80,12 @@ export const router = createRouter({
       name: "userProfile",
       component: () => import("@/pages/userProfile.vue"),
       meta: { title: 'User Profile' }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/pages/dashboard.vue'),
+      meta: { title: 'Admin Dashboard' }
     } 
   ]
 })

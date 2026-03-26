@@ -1,11 +1,34 @@
 <script setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { toggleTheme, isDark } from "@/utils/theme"
 import FriendsPanel from "@/components/FriendsPanel.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
 
 const unlockedBadge = ref(null)
 const isOpen = ref(false)
+const user = ref(null)
+const isAdmin = ref(false)
+
+async function loadUser() {
+  const token = localStorage.getItem("token")
+  if (!token) return
+
+  try {
+    const res = await fetch("http://backend.vm1.test/api/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      user.value = data.data || data
+      isAdmin.value = user.value?.isAdmin === true || user.value?.isAdmin === 1
+    }
+  } catch (err) {
+    console.error("Error loading user:", err)
+  }
+}
+
 async function toggleThemeWithBadge() {
 
   toggleTheme()
@@ -33,6 +56,10 @@ async function toggleThemeWithBadge() {
 
   }
 }
+
+onMounted(() => {
+  loadUser()
+})
 </script>
 
 <template>
@@ -81,15 +108,24 @@ async function toggleThemeWithBadge() {
         </RouterLink>
         
         <RouterLink to="/leaderboard" class="font-semibold hover:underline">
-          🏆 Leaderboard
+          Leaderboard
         </RouterLink>
 
         <RouterLink to="/goals" class="font-semibold hover:underline">
-          🎯 Goals
+          Goals
         </RouterLink>
 
         <RouterLink to="/profile" class="font-semibold hover:underline">
           Profile
+        </RouterLink>
+
+        <!-- ADMIN DASHBOARD (only for admins) -->
+        <RouterLink 
+          v-if="isAdmin"
+          to="/dashboard" 
+          class="font-semibold hover:underline"
+        >
+          Dashboard
         </RouterLink>
 
         <!-- THEME TOGGLE -->
@@ -200,6 +236,16 @@ async function toggleThemeWithBadge() {
 
         <RouterLink to="/profile" @click="isOpen = false">
           Profile
+        </RouterLink>
+
+        <!-- ADMIN DASHBOARD (only for admins) -->
+        <RouterLink 
+          v-if="isAdmin"
+          to="/dashboard" 
+          @click="isOpen = false"
+          class="text-blue-600 dark:text-blue-400 font-semibold"
+        >
+          📊 Dashboard
         </RouterLink>
 
         <button

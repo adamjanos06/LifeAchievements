@@ -8,21 +8,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * 
-     * Usage: php artisan db:seed --class=AdminSeeder
-     * 
-     * This seeder will create a default admin user with:
-     * - Email: admin@example.com
-     * - Password: password
-     * - Name: Admin User
-     * 
-     * IMPORTANT: Change the password immediately in production!
-     */
+   
     public function run(): void
     {
-        // Create or update the admin user
         User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [

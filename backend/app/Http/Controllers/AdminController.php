@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AdminController extends Controller
 {
-    /**
-     * Map of table names to their Model classes
-     */
     private static array $tableModels = [
         'users' => \App\Models\User::class,
         'categories' => \App\Models\Category::class,
@@ -22,9 +19,6 @@ class AdminController extends Controller
         'badge_user' => null, // pivot table, handled differently
     ];
 
-    /**
-     * Get list of all available tables and their record counts
-     */
     public function getTables()
     {
         $tables = [];
@@ -44,9 +38,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Get all records from a specific table with pagination
-     */
     public function getTableRecords(Request $request, string $table)
     {
         // Validate table name exists
@@ -71,7 +62,6 @@ class AdminController extends Controller
 
         $query = $modelClass::query();
 
-        // Simple search across all columns
         if ($search) {
             $query->where(function ($q) use ($search, $modelClass) {
                 $columns = DB::getSchemaBuilder()->getColumnListing((new $modelClass)->getTable());
@@ -83,7 +73,6 @@ class AdminController extends Controller
             });
         }
 
-        // Pagination
         $records = $query
             ->orderBy($sortBy, $sortOrder)
             ->paginate($perPage, ['*'], 'page', $page);
@@ -100,9 +89,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Get a single record by ID
-     */
     public function getRecord(string $table, int $id)
     {
         if (!isset(self::$tableModels[$table])) {
@@ -125,9 +111,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Create a new record
-     */
     public function createRecord(Request $request, string $table)
     {
         if (!isset(self::$tableModels[$table])) {
@@ -139,11 +122,9 @@ class AdminController extends Controller
             return response()->json(['error' => 'Table not accessible'], 403);
         }
 
-        // Get fillable attributes for validation
         $model = new $modelClass();
         $fillable = $model->getFillable();
 
-        // Basic validation - check that required fields are present
         $validated = $request->validate(
             array_combine(
                 $fillable,
@@ -159,9 +140,6 @@ class AdminController extends Controller
         ], 201);
     }
 
-    /**
-     * Update a record
-     */
     public function updateRecord(Request $request, string $table, int $id)
     {
         if (!isset(self::$tableModels[$table])) {
@@ -178,7 +156,6 @@ class AdminController extends Controller
             return response()->json(['error' => 'Record not found'], 404);
         }
 
-        // Get fillable attributes for validation
         $fillable = $record->getFillable();
         $validated = $request->validate(
             array_combine(
@@ -195,9 +172,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Delete a record
-     */
     public function deleteRecord(string $table, int $id)
     {
         if (!isset(self::$tableModels[$table])) {
@@ -221,9 +195,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Get table structure (column information)
-     */
     public function getTableStructure(string $table)
     {
         if (!isset(self::$tableModels[$table])) {
@@ -244,9 +215,6 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Helper: Get column information for a table
-     */
     private function getTableColumns(string $modelClass): array
     {
         $model = new $modelClass();

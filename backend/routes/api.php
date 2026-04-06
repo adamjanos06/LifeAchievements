@@ -60,6 +60,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // profile and updating profile
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/me', [UserController::class, 'update']);
+    Route::post('/profile-visited', [UserController::class, 'profileVisited']);
+   
 
     // --- Categories (admin) ---
     Route::post('/categories', [CategoryController::class, 'store']);

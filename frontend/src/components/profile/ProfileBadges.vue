@@ -16,7 +16,10 @@ async function loadBadges() {
   badges.value = (json.data ?? []).slice(0, 3)
 }
 
-onMounted(loadBadges)
+onMounted(async () => {
+  await new Promise(resolve => setTimeout(resolve, 300))
+  loadBadges()
+})
 </script>
 
 <template>

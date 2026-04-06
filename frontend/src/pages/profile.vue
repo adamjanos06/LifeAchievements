@@ -5,12 +5,16 @@ import MainNavbar from "@/components/layout/MainNavbar.vue"
 import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vue"
 import ProfileBadges from "@/components/profile/ProfileBadges.vue"
 import axios from "axios"
+import BadgePopup from "@/components/BadgePopup.vue"
+
+const unlockedBadge = ref(null)
 const router = useRouter()
 
 const user = ref(null)
 const imageUrl = ref(null)
 const completedAchievements = ref([])
 const loading = ref(true)
+const badgeShown = ref(false)
 
 function goToMyAchievements() {
   router.push("/achievements")
@@ -23,7 +27,12 @@ async function loadUser() {
     },
   })
 
-  user.value = await res.json()
+  const data = await res.json()
+
+  user.value = data.user
+
+  // Check for profile visited badge
+  await checkProfileBadge()
 
   if (user.value?.image) {
     const filename = user.value.image.split("/").pop()
@@ -33,6 +42,27 @@ async function loadUser() {
   }
 }
 
+async function checkProfileBadge() {
+  try {
+    const res = await fetch("http://backend.vm1.test/api/profile-visited", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+
+    const data = await res.json()
+
+    if (data.badge && !badgeShown.value) {
+      badgeShown.value = true
+      setTimeout(() => {
+        unlockedBadge.value = data.badge
+      }, 300)
+    }
+  } catch (err) {
+    console.error("Error checking profile badge:", err)
+  }
+}
 async function loadCompletedAchievements() {
   const res = await fetch("http://backend.vm1.test/api/my-achievements", {
     headers: {
@@ -141,18 +171,15 @@ async function saveProfile() {
 
     <p v-if="loading">Loading...</p>
 
-    <div v-else-if="!user" class="text-center text-gray-500">
-      You need to log in.
-    </div>
+    <div v-else-if="!user" class="text-center text-gray-500">You need to log in.</div>
 
     <div v-else class="space-y-8">
-
       <!-- PROFILE HEADER -->
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
         <div class="flex flex-col md:flex-row md:items-center gap-6">
-
-          <div class="w-28 h-28 rounded-full bg-blue-600 text-white
-               flex items-center justify-center text-5xl font-bold overflow-hidden">
+          <div
+            class="w-28 h-28 rounded-full bg-blue-600 text-white flex items-center justify-center text-5xl font-bold overflow-hidden"
+          >
             <img v-if="imageUrl" :src="imageUrl" class="w-full h-full object-cover" />
             <span v-else>
               {{ user.name[0].toUpperCase() }}
@@ -161,8 +188,9 @@ async function saveProfile() {
 
           <!-- Main Stuff -->
           <div class="flex-1 space-y-3">
-
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div
+              class="flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+            >
               <div>
                 <h2 class="text-2xl font-bold">
                   {{ user.name }}
@@ -171,11 +199,7 @@ async function saveProfile() {
                   {{ user.email }}
                 </p>
               </div>
-              <span
-                class="text-sm font-semibold
-                      text-blue-600
-                      dark:text-cyan-400"
-              >
+              <span class="text-sm font-semibold text-blue-600 dark:text-cyan-400">
                 Level {{ user.level_data?.level }}
               </span>
             </div>
@@ -194,26 +218,24 @@ async function saveProfile() {
                 {{ user.level_data?.xp_needed ?? 0 }} XP
               </p>
             </div>
-
           </div>
 
           <!-- Buttons -->
           <div class="flex md:flex-col gap-2">
             <button
               @click="openEditModal"
-              class="border border-gray-300 dark:border-gray-600
-                 px-4 py-2 rounded-lg font-semibold
-                 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+              class="border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            >
               Edit
             </button>
 
             <button
               @click="logout"
-              class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold">
+              class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold"
+            >
               Log Out
             </button>
           </div>
-
         </div>
       </div>
 
@@ -226,15 +248,15 @@ async function saveProfile() {
       </div>
       <!-- STATS + ACTIVITY -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
           <h3 class="font-semibold text-lg">Stats</h3>
           <ProfileBadges />
           <div
             @click="goToMyAchievements"
-            class="flex justify-between hover:text-blue-600 dark:hover:text-cyan-400 cursor-pointer transition">
-              <span>🏆 Achievements</span>
-              <strong>{{ achievementsUnlocked }}</strong>
+            class="flex justify-between hover:text-blue-600 dark:hover:text-cyan-400 cursor-pointer transition"
+          >
+            <span>🏆 Achievements</span>
+            <strong>{{ achievementsUnlocked }}</strong>
           </div>
 
           <div class="flex justify-between">
@@ -244,7 +266,7 @@ async function saveProfile() {
           <div class="flex justify-between">
             <span>🔥 Favorite Category</span>
             <strong>
-              {{ user.favorite_category ?? 'None' }}
+              {{ user.favorite_category ?? "None" }}
             </strong>
           </div>
           <div class="flex justify-between">
@@ -255,87 +277,78 @@ async function saveProfile() {
           </div>
         </div>
         <!-- EDIT MODAL -->
-      <div
-        v-if="showEditModal"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      >
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 w-full max-w-md space-y-4">
-
-          <h3 class="text-xl font-bold">Edit Profile</h3>
-
-          <div class="flex justify-center">
-            <img
-              v-if="imagePreview"
-              :src="imagePreview"
-              class="w-24 h-24 rounded-full object-cover"
-            />
-          </div>
-
-          <input
-            ref="fileInput"
-            type="file"
-            class="hidden"
-            accept="image/*"
-            @change="onImageChange"
-          />
-
+        <div
+          v-if="showEditModal"
+          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        >
           <div
-            @click="$refs.fileInput.click()"
-            class="cursor-pointer border-2 border-dashed
-                  border-gray-300 dark:border-gray-600
-                  rounded-xl p-4 text-center
-                  hover:border-blue-500
-                  hover:bg-gray-50 dark:hover:bg-gray-700
-                  transition"
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 w-full max-w-md space-y-4"
           >
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Click to upload a profile picture
-            </p>
+            <h3 class="text-xl font-bold">Edit Profile</h3>
 
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              PNG or JPG up to 5MB
-            </p>
-          </div>
+            <div class="flex justify-center">
+              <img
+                v-if="imagePreview"
+                :src="imagePreview"
+                class="w-24 h-24 rounded-full object-cover"
+              />
+            </div>
 
-          <input
-            v-model="editName"
-            placeholder="Name"
-            class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
-          />
+            <input
+              ref="fileInput"
+              type="file"
+              class="hidden"
+              accept="image/*"
+              @change="onImageChange"
+            />
 
-          <textarea
-            v-model="editBio"
-            placeholder="Bio"
-            class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
-          ></textarea>
-
-          <p v-if="errorMsg" class="text-red-500 text-sm">
-            {{ errorMsg }}
-          </p>
-
-          <div class="flex justify-end gap-2">
-            <button @click="showEditModal = false">
-              Cancel
-            </button>
-
-            <button
-              @click="saveProfile"
-              :disabled="saving || !editName.trim()"
-              class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50"
+            <div
+              @click="$refs.fileInput.click()"
+              class="cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 text-center hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
             >
-              Save
-            </button>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                Click to upload a profile picture
+              </p>
+
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                PNG or JPG up to 5MB
+              </p>
+            </div>
+
+            <input
+              v-model="editName"
+              placeholder="Name"
+              class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+            />
+
+            <textarea
+              v-model="editBio"
+              placeholder="Bio"
+              class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+            ></textarea>
+
+            <p v-if="errorMsg" class="text-red-500 text-sm">
+              {{ errorMsg }}
+            </p>
+
+            <div class="flex justify-end gap-2">
+              <button @click="showEditModal = false">Cancel</button>
+
+              <button
+                @click="saveProfile"
+                :disabled="saving || !editName.trim()"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
           </div>
-
         </div>
-      </div>
         <div class="md:col-span-2">
-          <ProfileRecentActivity
-            :completedAchievements="completedAchievements"
-          />
+          <ProfileRecentActivity :completedAchievements="completedAchievements" />
         </div>
-
       </div>
     </div>
   </div>
+  <BadgePopup v-if="unlockedBadge" :badge="unlockedBadge" @close="unlockedBadge = null" />
 </template>

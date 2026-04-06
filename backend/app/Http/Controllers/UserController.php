@@ -7,27 +7,35 @@ use App\Models\Badge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Services\BadgeService;
 
 class UserController extends Controller
 {
     /**
      * Get current user's profile
      */
+
     public function me(Request $request)
     {
         $user = $request->user();
 
-        $badge = Badge::where('name', 'Profile Checked')->first();
+        return response()->json([
+            'user' => $user->load('badges'),
+        ]);
+    }
 
-        if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
-            $user->badges()->attach($badge->id, [
-                'earned_at' => now()
-            ]);
-        }
+    /**
+     * Mark profile as visited (for badge awarding)
+     */
+    public function profileVisited(Request $request)
+    {
+        $user = $request->user();
 
-        return response()->json(
-            $user->load('badges')
-        );
+        $badge = BadgeService::checkProfileVisited($user);
+
+        return response()->json([
+            'badge' => $badge
+        ]);
     }
 
     public function show(User $user)

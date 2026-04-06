@@ -9,6 +9,9 @@ const router = useRouter()
 const route = useRoute()
 const user = ref(null)
 const loading = ref(true)
+const username = ref("")
+const token = localStorage.getItem("token")
+const currentUserId = Number(localStorage.getItem("userId"))
 
 async function loadUser() {
   const res = await fetch(
@@ -38,6 +41,22 @@ function goBack() {
   window.history.length > 1
     ? router.back()
     : router.push("/leaderboard")
+}
+async function sendRequest() {
+  const payload = { name: user.value.name }
+
+  const res = await fetch("http://backend.vm1.test/api/friends", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+
+  if (!res.ok) {
+    console.error("friend request failed", await res.text())
+  }
 }
 </script>
 
@@ -93,7 +112,8 @@ function goBack() {
                 </span>
 
                 <button
-                  v-if="user.id !== currentUser?.id"
+                  v-if="user.id !== currentUserId"
+                  @click="sendRequest"
                   class="bg-blue-600 hover:bg-blue-700
                         text-white text-sm font-semibold
                         px-5 py-2 rounded-xl transition"

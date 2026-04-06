@@ -175,7 +175,7 @@ function closeModal() {
 async function saveGoal() {
   if (!selected.value) return
 
-  await fetch(
+  const res = await fetch(
     `http://backend.vm1.test/api/goals/${selected.value.id}`,
     {
       method: "POST",
@@ -184,6 +184,13 @@ async function saveGoal() {
       }
     }
   )
+
+  const data = await res.json()
+
+  if (data.badge) {
+    unlockedBadge.value = data.badge
+  }
+
   await loadGoals()
 }
 

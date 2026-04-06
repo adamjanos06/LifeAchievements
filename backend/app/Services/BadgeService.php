@@ -89,20 +89,23 @@ class BadgeService
     public static function checkGoalSetter(User $user)
     {
         $goalCount = Goal::where('user_id', $user->id)->count();
-    
+
         if ($goalCount >= 1) {
-    
+
             $badge = Badge::where('name', 'Goal Setter')->first();
-    
+
             if ($badge && !$user->badges()->where('badge_id', $badge->id)->exists()) {
-    
+
                 $user->badges()->attach($badge->id, [
                     'earned_at' => now()
                 ]);
+
+                return $badge;
             }
         }
+
+        return null;
     }
-    
     public static function checkAllBadges(User $user)
     {
         self::checkFirstStep($user);

@@ -15,7 +15,9 @@ class GoalsController extends Controller
         $achievementIds = Goal::where('user_id', $request->user()->id)
             ->pluck('achievement_id');
 
-        $achievements = Achievement::with('category')->whereIn('id', $achievementIds)->get();
+        $achievements = Achievement::with('category')
+            ->whereIn('id', $achievementIds)
+            ->get();
 
         return response()->json([
             'data' => $achievements
@@ -25,16 +27,17 @@ class GoalsController extends Controller
     // Add a goal
     public function store(Request $request, Achievement $achievement)
     {
-        Goal::firstOrCreate([
+        $goal = Goal::firstOrCreate([
             'user_id' => $request->user()->id,
             'achievement_id' => $achievement->id,
         ]);
 
-        // Check Badge
-        BadgeService::checkGoalSetter($request->user());
+        // Badge check
+        $badge = BadgeService::checkGoalSetter($request->user());
 
         return response()->json([
-            'message' => 'Goal added'
+            'message' => 'Goal added',
+            'badge' => $badge
         ], 201);
     }
 
@@ -51,3 +54,4 @@ class GoalsController extends Controller
         ]);
     }
 }
+

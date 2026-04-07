@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import BadgePopup from "@/components/BadgePopup.vue"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
@@ -10,6 +11,7 @@ const route = useRoute()
 const user = ref(null)
 const loading = ref(true)
 const username = ref("")
+const unlockedBadge = ref(null)
 const token = localStorage.getItem("token")
 const currentUserId = Number(localStorage.getItem("userId"))
 
@@ -56,6 +58,11 @@ async function sendRequest() {
 
   if (!res.ok) {
     console.error("friend request failed", await res.text())
+  } else {
+    const data = await res.json().catch(() => ({}))
+    if (data.badge) {
+      unlockedBadge.value = data.badge
+    }
   }
 }
 </script>
@@ -182,5 +189,9 @@ async function sendRequest() {
 
     </div>
   </div>
-  
+  <BadgePopup
+    v-if="unlockedBadge"
+    :badge="unlockedBadge"
+    @close="unlockedBadge = null"
+  />
 </template>

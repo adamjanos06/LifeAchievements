@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\friend_request;
 use App\Models\User;
+use App\Services\BadgeService;
 use Illuminate\Http\Request;
 
 class FriendController extends Controller
@@ -47,13 +48,19 @@ class FriendController extends Controller
         return response()->json(['message' => 'Request already exists'], 409);
     }
 
+    // Check for badge BEFORE creating the request (to check if this is first)
+    $badge = BadgeService::checkSocialStarter($auth);
+
     friend_request::create([
         'sender_id' => $auth->id,
         'receiver_id' => $user->id,
         'status' => 'pending'
     ]);
 
-    return response()->json(['message' => 'Friend request sent'], 201);
+    return response()->json([
+        'message' => 'Friend request sent',
+        'badge' => $badge
+    ], 201);
 }
 
     // Accept request

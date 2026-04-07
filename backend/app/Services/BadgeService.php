@@ -126,6 +126,34 @@ class BadgeService
 
         return $badge;
     }
+
+    public static function checkSocialStarter(User $user)
+    {
+        $badge = Badge::where('name', 'Social Starter')->first();
+
+        if (!$badge) return null;
+
+        $alreadyEarned = $user->badges()
+            ->where('badge_id', $badge->id)
+            ->exists();
+
+        if ($alreadyEarned) return null;
+
+        // Check if this is their first friend connection
+        $friendRequestCount = $user->sentFriendRequests()->count() + 
+                             $user->receivedFriendRequests()->count() +
+                             $user->friends()->count();
+
+        if ($friendRequestCount === 0) {
+            $user->badges()->attach($badge->id, [
+                'earned_at' => now()
+            ]);
+
+            return $badge;
+        }
+
+        return null;
+    }
     public static function checkAllBadges(User $user)
     {
         self::checkFirstStep($user);

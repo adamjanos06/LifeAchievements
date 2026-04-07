@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
+import BadgePopup from "@/components/BadgePopup.vue"
 
 const router = useRouter()
 
@@ -10,6 +11,7 @@ const requests = ref([])
 const sentRequests = ref([])
 const username = ref("")
 const activeTab = ref("friends")
+const unlockedBadge = ref(null)
 
 const token = localStorage.getItem("token")
 
@@ -75,6 +77,10 @@ async function sendRequest() {
         id: data.id || Math.random(),
         receiver: { name: username.value }
       })
+    }
+
+    if (data.badge) {
+      unlockedBadge.value = data.badge
     }
   }
 
@@ -207,4 +213,9 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <BadgePopup
+    v-if="unlockedBadge"
+    :badge="unlockedBadge"
+    @close="unlockedBadge = null"
+  />
 </template>

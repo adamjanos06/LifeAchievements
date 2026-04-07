@@ -12,6 +12,7 @@ const user = ref(null)
 const loading = ref(true)
 const username = ref("")
 const unlockedBadge = ref(null)
+const requestSent = ref(false)
 const token = localStorage.getItem("token")
 const currentUserId = Number(localStorage.getItem("userId"))
 
@@ -28,8 +29,25 @@ async function loadUser() {
   user.value = await res.json()
 }
 
+async function loadFriendRequests() {
+  if (!token || !user.value?.id) return
+
+  const res = await fetch("http://backend.vm1.test/api/friend-requests", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  const json = await res.json().catch(() => ({}))
+  const sent = json.sent || []
+  requestSent.value = sent.some(
+    (r) => r.receiver?.id === user.value.id || r.receiver?.name === user.value.name
+  )
+}
+
 onMounted(async () => {
   await loadUser()
+  await loadFriendRequests()
   loading.value = false
 })
 
@@ -45,6 +63,8 @@ function goBack() {
     : router.push("/leaderboard")
 }
 async function sendRequest() {
+  if (requestSent.value) return
+
   const payload = { name: user.value.name }
 
   const res = await fetch("http://backend.vm1.test/api/friends", {
@@ -60,6 +80,7 @@ async function sendRequest() {
     console.error("friend request failed", await res.text())
   } else {
     const data = await res.json().catch(() => ({}))
+    requestSent.value = true
     if (data.badge) {
       unlockedBadge.value = data.badge
     }
@@ -120,12 +141,17 @@ async function sendRequest() {
 
                 <button
                   v-if="user.id !== currentUserId"
+                  type="button"
                   @click="sendRequest"
-                  class="bg-blue-600 hover:bg-blue-700
-                        text-white text-sm font-semibold
-                        px-5 py-2 rounded-xl transition"
+                  :disabled="requestSent"
+                  :class="[
+                    'text-sm font-semibold px-5 py-2 rounded-xl transition',
+                    requestSent
+                      ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ]"
                 >
-                  Add Friend
+                  {{ requestSent ? 'Request Sent' : 'Add Friend' }}
                 </button>
               </div>
             </div>

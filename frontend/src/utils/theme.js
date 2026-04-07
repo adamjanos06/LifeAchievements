@@ -10,26 +10,34 @@ export function initTheme() {
 }
 
 export function toggleTheme() {
-  applyTheme(isDark.value ? "light" : "dark");
+  return applyTheme(isDark.value ? "light" : "dark");
 }
 
 export async function applyTheme(theme) {
   const html = document.documentElement;
+  let badgeResponse = null;
 
   if (theme === "dark") {
     html.classList.add("dark");
     isDark.value = true;
 
-    // BADGE REQUEST
     const token = localStorage.getItem("token");
 
     if (token) {
-      await fetch("http://backend.vm1.test/api/badges/dark-side", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
+      try {
+        const res = await fetch("http://backend.vm1.test/api/badges/dark-side", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.ok) {
+          badgeResponse = await res.json();
         }
-      });
+      } catch (err) {
+        console.error("Error checking dark side badge:", err);
+      }
     }
   } else {
     html.classList.remove("dark");
@@ -37,4 +45,6 @@ export async function applyTheme(theme) {
   }
 
   localStorage.setItem(STORAGE_KEY, theme);
+
+  return badgeResponse;
 }

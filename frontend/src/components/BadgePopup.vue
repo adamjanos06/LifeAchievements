@@ -1,12 +1,12 @@
 <template>
-  <div class="fixed bottom-6 right-6 z-50">
+  <div class="fixed bottom-6 left-6 z-50">
 
     <div
       class="bg-white text-gray-900 border border-gray-300
        dark:bg-gray-900 dark:text-white dark:border-gray-700
        rounded-xl shadow-lg p-4 w-64"
     >
-      <div class="text-sm text-gray-400">
+      <div class="text-sm text-gray-900">
         🏅 Badge Unlocked
       </div>
 
@@ -14,7 +14,7 @@
         {{ badge.name }}
       </div>
 
-      <div class="text-sm text-gray-300 mt-1">
+      <div class="text-sm text-gray-800 mt-1">
         {{ badge.description }}
       </div>
     </div>

@@ -18,45 +18,60 @@ const filteredUsers = computed(() => {
   return users.value.filter((u) => u.name?.toLowerCase().includes(q))
 })
 
+function unwrapUserResponse(payload) {
+  return payload?.user ?? payload?.data ?? payload
+}
+
 async function loadLeaderboard() {
+  try {
+    if (mode.value === "global") {
+      const res = await fetch("http://backend.vm1.test/api/leaderboard")
+      const json = await res.json()
+      users.value = json?.data ?? json
+      return
+    }
 
-  if (mode.value === "global") {
-    const res = await fetch("http://backend.vm1.test/api/leaderboard")
-    users.value = await res.json()
-    return
+    const res = await fetch("http://backend.vm1.test/api/friends", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+
+    const json = await res.json()
+
+    const meRes = await fetch("http://backend.vm1.test/api/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+
+    const meData = await meRes.json()
+    const me = unwrapUserResponse(meData)
+
+    const friends = json?.data ?? []
+    const all = [me, ...friends].filter(Boolean)
+
+    users.value = all.sort((a, b) => (b?.xp ?? 0) - (a?.xp ?? 0))
+  } catch (err) {
+    console.error("Failed to load leaderboard:", err)
+    users.value = []
   }
-
-  // 🔥 FRIENDS MODE
-  const res = await fetch("http://backend.vm1.test/api/friends", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-
-  const json = await res.json()
-
-  // 🔥 FONTOS: saját user + friends
-  const meRes = await fetch("http://backend.vm1.test/api/me", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-
-  const me = await meRes.json()
-
-  const all = [me, ...json.data]
-
-  // XP szerinti rendezés
-  users.value = all.sort((a, b) => b.xp - a.xp)
 }
 
 async function loadCurrentUser() {
-  const res = await fetch("http://backend.vm1.test/api/me", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-  currentUser.value = await res.json()
+  try {
+    const res = await fetch("http://backend.vm1.test/api/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+
+    const json = await res.json()
+    currentUser.value = unwrapUserResponse(json)
+  } catch (err) {
+    console.error("Failed to load current user:", err)
+    currentUser.value = null
+  }
 }
 
 function goToProfile(id) {
@@ -72,17 +87,20 @@ function animateXpValues() {
   animatedXp.value = {}
 
   users.value.forEach(user => {
-    animatedXp.value[user.id] = 0
+    const id = user?.id
+    const target = Number(user?.xp ?? 0)
 
-    const target = user.xp
-    const step = Math.ceil(target / 30)
+    if (!id) return
+
+    animatedXp.value[id] = 0
+    const step = target > 0 ? Math.ceil(target / 30) : 1
 
     const interval = setInterval(() => {
-      if (animatedXp.value[user.id] >= target) {
-        animatedXp.value[user.id] = target
+      if (animatedXp.value[id] >= target) {
+        animatedXp.value[id] = target
         clearInterval(interval)
       } else {
-        animatedXp.value[user.id] += step
+        animatedXp.value[id] += step
       }
     }, 20)
   })

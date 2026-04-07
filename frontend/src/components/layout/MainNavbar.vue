@@ -30,30 +30,10 @@ async function loadUser() {
 }
 
 async function toggleThemeWithBadge() {
+  const data = await toggleTheme()
 
-  toggleTheme()
-
-  if (isDark.value) {
-
-    const token = localStorage.getItem("token")
-    if (!token) return
-
-    const res = await fetch(
-      "http://backend.vm1.test/api/badges/dark-side",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-
-    const data = await res.json()
-
-    if (data.badge) {
-      unlockedBadge.value = data.badge
-    }
-
+  if (data?.badge) {
+    unlockedBadge.value = data.badge
   }
 }
 

@@ -130,12 +130,37 @@ const icon = computed(() => {
   return cat ? cat.icon : ""
 })
 
+function getSafeColor(hex) {
+  if (!hex) return "#3b82f6"
+
+  const clean = hex.replace("#", "").toLowerCase()
+
+  // short hexes
+  const full = clean.length === 3
+    ? clean.split("").map(c => c + c).join("")
+    : clean
+
+  const r = parseInt(full.substring(0, 2), 16)
+  const g = parseInt(full.substring(2, 4), 16)
+  const b = parseInt(full.substring(4, 6), 16)
+
+  // brigthness
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000
+
+  // extreme colors
+  if (brightness > 220 || brightness < 40) {
+    return "#3b82f6"
+  }
+
+  return `#${full}`
+}
+
 const categoryColor = computed(() => {
   const cat = categories.value.find(c => c.id === categoryId)
 
   if (isDark.value && categoryId === 8) return "#3b82f6"
 
-  return cat?.color ? `#${cat.color}` : "#3b82f6"
+  return getSafeColor(cat?.color)
 })
 
 const totalPages = computed(() =>
@@ -420,9 +445,16 @@ onMounted(async () => {
         @click="goToPage(page)"
         class="w-10 h-10 rounded-full
                flex items-center justify-center
-               font-semibold transition"
+               font-semibold transition
+               hover:scale-110"
+        :style="page === currentPage
+          ? {
+              backgroundColor: categoryColor,
+              color: 'white'
+            }
+          : {}"
         :class="page === currentPage
-          ? 'bg-blue-700 text-white'
+          ? ''
           : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600'"
       >
         {{ page }}

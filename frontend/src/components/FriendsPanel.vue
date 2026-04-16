@@ -143,138 +143,197 @@ onMounted(() => {
   >
     <div
       class="bg-white dark:bg-gray-800
-             w-full max-w-lg mx-4 p-8 rounded-3xl
+             w-[35vw] min-w-[420px] max-w-[650px]
+             h-[420px]
+             p-8 rounded-3xl
              text-gray-900 dark:text-gray-100
              shadow-2xl
-             dark:shadow-[0_0_50px_rgba(255,255,255,0.18)]"
+             dark:shadow-[0_0_50px_rgba(255,255,255,0.18)]
+             flex flex-col"
     >
 
       <!-- HEADER -->
-      <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center justify-between mb-6 shrink-0">
         <div class="flex gap-2 bg-gray-200 dark:bg-gray-700 p-1.5 rounded-2xl">
 
-          <button @click="activeTab='friends'"
+          <button
+            @click="activeTab='friends'"
             class="px-4 py-2 rounded-xl text-sm font-semibold transition"
             :class="activeTab==='friends'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
-              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
+          >
             Friends
           </button>
 
-          <button @click="activeTab='requests'"
+          <button
+            @click="activeTab='requests'"
             class="px-4 py-2 rounded-xl text-sm font-semibold transition"
             :class="activeTab==='requests'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
-              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
+          >
             Requests
           </button>
 
-          <button @click="activeTab='add'"
+          <button
+            @click="activeTab='add'"
             class="px-4 py-2 rounded-xl text-sm font-semibold transition"
             :class="activeTab==='add'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
-              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
+          >
             Add
           </button>
 
         </div>
 
-        <button @click="toggle" class="text-2xl opacity-70 hover:opacity-100">
+        <button
+          @click="toggle"
+          class="text-2xl opacity-70 hover:opacity-100 transition"
+        >
           ×
         </button>
       </div>
 
-      <!-- FRIENDS -->
-      <div v-if="activeTab==='friends'" class="space-y-4 max-h-96 overflow-y-auto">
+      <!-- CONTENT -->
+      <div class="flex-1 overflow-hidden">
+
+        <!-- FRIENDS -->
         <div
-          v-for="f in friends"
-          :key="f.id"
-          class="p-5 rounded-2xl
-                 bg-gray-100 dark:bg-gray-700
-                 hover:bg-gray-200 dark:hover:bg-gray-600
-                 transition cursor-pointer flex items-center gap-4"
-          @click="goToProfile(f.id)"
+          v-if="activeTab==='friends'"
+          class="space-y-4 overflow-y-auto h-full"
         >
-          <!-- AVATAR -->
-          <div class="w-12 h-12 rounded-full overflow-hidden
-                      bg-blue-600 text-white
-                      flex items-center justify-center text-lg font-bold">
-            <img
-              v-if="getAvatarUrl(f.image)"
-              :src="getAvatarUrl(f.image)"
-              class="w-full h-full object-cover"
-            />
-            <span v-else>
-              {{ f.name[0].toUpperCase() }}
-            </span>
-          </div>
-
-          <span class="font-semibold text-blue-600">
-            {{ f.name }}
-          </span>
-        </div>
-      </div>
-
-      <!-- REQUESTS -->
-      <div v-if="activeTab==='requests'" class="space-y-4 max-h-96 overflow-y-auto">
-
-        <div
-          v-for="r in requests"
-          :key="r.id"
-          class="p-5 rounded-2xl
-                 bg-gray-100 dark:bg-gray-700
-                 flex justify-between items-center"
-        >
-          <span>{{ r.sender?.name }}</span>
-          <button
-            @click="acceptRequest(r.id)"
-            class="bg-green-600 hover:bg-green-700
-                   text-white px-4 py-2 rounded-xl"
-          >
-            Accept
-          </button>
-        </div>
-
-        <template v-if="sentRequests.length">
-          <hr class="my-3 border-gray-300 dark:border-gray-600" />
-
           <div
-            v-for="r in sentRequests"
-            :key="r.id"
+            v-for="f in friends"
+            :key="f.id"
             class="p-5 rounded-2xl
                    bg-gray-100 dark:bg-gray-700
-                   flex justify-between items-center"
+                   hover:bg-gray-200 dark:hover:bg-gray-600
+                   transition cursor-pointer flex items-center gap-4"
+            @click="goToProfile(f.id)"
           >
-            <span>To: {{ r.receiver?.name }}</span>
-            <button
-              @click="cancelRequest(r.id)"
-              class="bg-red-600 hover:bg-red-700
-                     text-white px-4 py-2 rounded-xl"
+            <div class="w-12 h-12 rounded-full overflow-hidden
+                        bg-blue-600 text-white
+                        flex items-center justify-center text-lg font-bold">
+              <img
+                v-if="getAvatarUrl(f.image)"
+                :src="getAvatarUrl(f.image)"
+                class="w-full h-full object-cover"
+              />
+              <span v-else>
+                {{ f.name[0].toUpperCase() }}
+              </span>
+            </div>
+
+            <span class="font-semibold text-blue-600">
+              {{ f.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- REQUESTS -->
+        <div
+          v-if="activeTab==='requests'"
+          class="space-y-4 overflow-y-auto h-full"
+        >
+
+          <!-- EMPTY STATE -->
+          <div
+            v-if="requests.length === 0 && sentRequests.length === 0"
+            class="h-full flex items-center justify-center text-center px-6"
+          >
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              You have no pending requests at the moment.<br />
+              When someone sends you a request, it will appear here.
+            </p>
+          </div>
+
+          <!-- CONTENT -->
+          <template v-else>
+
+            <!-- incoming -->
+            <div
+              v-for="r in requests"
+              :key="r.id"
+              class="p-5 rounded-2xl
+                     bg-gray-100 dark:bg-gray-700
+                     flex justify-between items-center"
             >
-              Cancel
+              <span>{{ r.sender?.name }}</span>
+              <button
+                @click="acceptRequest(r.id)"
+                class="bg-green-600 hover:bg-green-700
+                       text-white px-4 py-2 rounded-xl"
+              >
+                Accept
+              </button>
+            </div>
+
+            <!-- outgoing -->
+            <template v-if="sentRequests.length">
+              <hr class="my-3 border-gray-300 dark:border-gray-600" />
+
+              <div
+                v-for="r in sentRequests"
+                :key="r.id"
+                class="p-5 rounded-2xl
+                       bg-gray-100 dark:bg-gray-700
+                       flex justify-between items-center"
+              >
+                <span>To: {{ r.receiver?.name }}</span>
+                <button
+                  @click="cancelRequest(r.id)"
+                  class="bg-red-600 hover:bg-red-700
+                         text-white px-4 py-2 rounded-xl"
+                >
+                  Cancel
+                </button>
+              </div>
+            </template>
+
+          </template>
+        </div>
+
+        <!-- ADD -->
+        <div
+          v-if="activeTab==='add'"
+          class="flex flex-col h-full justify-between"
+        >
+
+          <!-- CENTER TEXT -->
+          <div class="flex-1 flex items-center justify-center text-center px-6">
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              You can add friends by entering their username.<br />
+              Once they accept your request, they will appear in your friends list.
+            </p>
+          </div>
+
+          <!-- BOTTOM INPUT + BUTTON -->
+          <div class="space-y-4">
+            <input
+              v-model="username"
+              placeholder="Username"
+              class="w-full px-4 py-3 rounded-xl
+                     bg-gray-100 dark:bg-gray-700
+                     border border-gray-300 dark:border-gray-600
+                     focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+
+            <button
+              @click="sendRequest"
+              class="w-full bg-blue-600 hover:bg-blue-700
+                     text-white py-3 rounded-xl font-semibold
+                     transition shadow-lg"
+            >
+              Send Request
             </button>
           </div>
-        </template>
+
+        </div>
+
       </div>
 
-      <!-- ADD -->
-      <div v-if="activeTab==='add'" class="space-y-5">
-        <input
-          v-model="username"
-          placeholder="Username"
-          class="w-full px-4 py-3 rounded-xl
-                 bg-gray-100 dark:bg-gray-700
-                 border border-gray-300 dark:border-gray-600"
-        />
-
-        <button
-          @click="sendRequest"
-          class="w-full bg-blue-600 hover:bg-blue-700
-                 text-white py-3 rounded-xl font-semibold"
-        >
-          Send Request
-        </button>
-      </div>
     </div>
   </div>
 

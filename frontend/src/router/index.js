@@ -14,14 +14,6 @@ export const router = createRouter({
       }
     },
     {
-      path: '/introduction',
-      name: 'introduction',
-      component: () => import('@/pages/introduction.vue'),
-      meta: {
-        title: 'Introduction'
-      }
-    },
-    {
       path: '/login',
       name: 'login',
       component: () => import('@/pages/login.vue'),

@@ -15,6 +15,12 @@ const unlockedBadge = ref(null)
 
 const token = localStorage.getItem("token")
 
+function getAvatarUrl(image) {
+  if (!image) return null
+  const filename = image.split("/").pop()
+  return `http://backend.vm1.test/api/avatar/${filename}`
+}
+
 function toggle() {
   show.value = !show.value
   if (show.value && token) loadAll()
@@ -93,7 +99,6 @@ async function acceptRequest(id) {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` }
   })
-
   loadAll()
 }
 
@@ -102,7 +107,6 @@ async function cancelRequest(id) {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` }
   })
-
   loadAll()
 }
 
@@ -112,12 +116,13 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- FLOATING BUTTON -->
   <div class="fixed bottom-6 right-6 z-60">
     <button
       @click="toggle"
       class="bg-blue-600 hover:bg-blue-700
              text-white px-5 py-3 rounded-full shadow-lg
-             transition relative"
+             transition hover:scale-105 relative"
     >
       Friends
       <div
@@ -131,76 +136,120 @@ onMounted(() => {
     </button>
   </div>
 
+  <!-- MODAL -->
   <div
     v-if="show"
     class="fixed inset-0 bg-black/60 flex items-center justify-center z-65"
   >
     <div
       class="bg-white dark:bg-gray-800
-             w-full max-w-md mx-4 p-6 rounded-2xl
-             text-gray-900 dark:text-gray-100"
+             w-full max-w-lg mx-4 p-8 rounded-3xl
+             text-gray-900 dark:text-gray-100
+             shadow-2xl
+             dark:shadow-[0_0_50px_rgba(255,255,255,0.18)]"
     >
-      <div class="flex justify-between mb-6">
-        <button @click="activeTab='friends'"
-          :class="activeTab==='friends'
-            ? 'font-bold text-blue-600'
-            : ''">
-          Friends
-        </button>
 
-        <button @click="activeTab='requests'"
-          :class="activeTab==='requests'
-            ? 'font-bold text-blue-600'
-            : ''">
-          Requests
-        </button>
+      <!-- HEADER -->
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex gap-2 bg-gray-200 dark:bg-gray-700 p-1.5 rounded-2xl">
 
-        <button @click="activeTab='add'"
-          :class="activeTab==='add'
-            ? 'font-bold text-blue-600'
-            : ''">
-          Add
-        </button>
+          <button @click="activeTab='friends'"
+            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            :class="activeTab==='friends'
+              ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+            Friends
+          </button>
 
-        <button @click="toggle">×</button>
+          <button @click="activeTab='requests'"
+            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            :class="activeTab==='requests'
+              ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+            Requests
+          </button>
+
+          <button @click="activeTab='add'"
+            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            :class="activeTab==='add'
+              ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
+              : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'">
+            Add
+          </button>
+
+        </div>
+
+        <button @click="toggle" class="text-2xl opacity-70 hover:opacity-100">
+          ×
+        </button>
       </div>
 
-      <div v-if="activeTab==='friends'" class="space-y-3 max-h-80 overflow-y-auto">
-        <div v-for="f in friends" :key="f.id"
-             class="p-3 border rounded-lg">
-          <span
-            class="cursor-pointer text-blue-600 hover:underline"
-            @click="goToProfile(f.id)"
-          >
+      <!-- FRIENDS -->
+      <div v-if="activeTab==='friends'" class="space-y-4 max-h-96 overflow-y-auto">
+        <div
+          v-for="f in friends"
+          :key="f.id"
+          class="p-5 rounded-2xl
+                 bg-gray-100 dark:bg-gray-700
+                 hover:bg-gray-200 dark:hover:bg-gray-600
+                 transition cursor-pointer flex items-center gap-4"
+          @click="goToProfile(f.id)"
+        >
+          <!-- AVATAR -->
+          <div class="w-12 h-12 rounded-full overflow-hidden
+                      bg-blue-600 text-white
+                      flex items-center justify-center text-lg font-bold">
+            <img
+              v-if="getAvatarUrl(f.image)"
+              :src="getAvatarUrl(f.image)"
+              class="w-full h-full object-cover"
+            />
+            <span v-else>
+              {{ f.name[0].toUpperCase() }}
+            </span>
+          </div>
+
+          <span class="font-semibold text-blue-600">
             {{ f.name }}
           </span>
         </div>
       </div>
 
-      <div v-if="activeTab==='requests'" class="space-y-3 max-h-80 overflow-y-auto">
-        <!-- incoming requests -->
-        <div v-for="r in requests" :key="r.id"
-             class="p-3 border rounded-lg flex justify-between items-center">
-          <span>{{ r.sender ? r.sender.name : '...' }}</span>
+      <!-- REQUESTS -->
+      <div v-if="activeTab==='requests'" class="space-y-4 max-h-96 overflow-y-auto">
+
+        <div
+          v-for="r in requests"
+          :key="r.id"
+          class="p-5 rounded-2xl
+                 bg-gray-100 dark:bg-gray-700
+                 flex justify-between items-center"
+        >
+          <span>{{ r.sender?.name }}</span>
           <button
             @click="acceptRequest(r.id)"
             class="bg-green-600 hover:bg-green-700
-                   text-white px-3 py-1 rounded"
+                   text-white px-4 py-2 rounded-xl"
           >
             Accept
           </button>
         </div>
 
-        <!-- outgoing requests -->
         <template v-if="sentRequests.length">
-          <hr class="my-2" />
-          <div v-for="r in sentRequests" :key="`sent-${r.id}`"
-               class="p-3 border rounded-lg flex justify-between items-center">
-            <span>To: {{ r.receiver ? r.receiver.name : '...' }}</span>
+          <hr class="my-3 border-gray-300 dark:border-gray-600" />
+
+          <div
+            v-for="r in sentRequests"
+            :key="r.id"
+            class="p-5 rounded-2xl
+                   bg-gray-100 dark:bg-gray-700
+                   flex justify-between items-center"
+          >
+            <span>To: {{ r.receiver?.name }}</span>
             <button
               @click="cancelRequest(r.id)"
               class="bg-red-600 hover:bg-red-700
-                     text-white px-3 py-1 rounded"
+                     text-white px-4 py-2 rounded-xl"
             >
               Cancel
             </button>
@@ -208,22 +257,27 @@ onMounted(() => {
         </template>
       </div>
 
-      <div v-if="activeTab==='add'" class="space-y-4">
+      <!-- ADD -->
+      <div v-if="activeTab==='add'" class="space-y-5">
         <input
           v-model="username"
           placeholder="Username"
-          class="w-full px-3 py-2 border rounded-lg"
+          class="w-full px-4 py-3 rounded-xl
+                 bg-gray-100 dark:bg-gray-700
+                 border border-gray-300 dark:border-gray-600"
         />
+
         <button
           @click="sendRequest"
           class="w-full bg-blue-600 hover:bg-blue-700
-                 text-white py-2 rounded-lg"
+                 text-white py-3 rounded-xl font-semibold"
         >
           Send Request
         </button>
       </div>
     </div>
   </div>
+
   <BadgePopup
     v-if="unlockedBadge"
     :badge="unlockedBadge"

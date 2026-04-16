@@ -21,7 +21,7 @@ async function loadUser() {
     })
     if (res.ok) {
       const data = await res.json()
-      user.value = data.data || data
+      user.value = data.data || data.user || data
       isAdmin.value = user.value?.isAdmin === true || user.value?.isAdmin === 1
     }
   } catch (err) {

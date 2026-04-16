@@ -158,7 +158,7 @@ onMounted(() => {
 
           <button
             @click="activeTab='friends'"
-            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            class="px-4 py-2 rounded-xl font-semibold transition"
             :class="activeTab==='friends'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
               : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
@@ -168,7 +168,7 @@ onMounted(() => {
 
           <button
             @click="activeTab='requests'"
-            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            class="px-4 py-2 rounded-xl font-semibold transition"
             :class="activeTab==='requests'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
               : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
@@ -178,7 +178,7 @@ onMounted(() => {
 
           <button
             @click="activeTab='add'"
-            class="px-4 py-2 rounded-xl text-sm font-semibold transition"
+            class="px-4 py-2 rounded-xl font-semibold transition"
             :class="activeTab==='add'
               ? 'bg-white dark:bg-gray-800 shadow text-blue-600'
               : 'text-gray-600 dark:text-gray-300 hover:text-blue-500'"
@@ -204,32 +204,47 @@ onMounted(() => {
           v-if="activeTab==='friends'"
           class="space-y-4 overflow-y-auto h-full"
         >
+
+          <!-- EMPTY STATE -->
           <div
-            v-for="f in friends"
-            :key="f.id"
-            class="p-5 rounded-2xl
-                   bg-gray-100 dark:bg-gray-700
-                   hover:bg-gray-200 dark:hover:bg-gray-600
-                   transition cursor-pointer flex items-center gap-4"
-            @click="goToProfile(f.id)"
+            v-if="friends.length === 0"
+            class="h-full flex items-center justify-center text-center px-6"
           >
-            <div class="w-12 h-12 rounded-full overflow-hidden
-                        bg-blue-600 text-white
-                        flex items-center justify-center text-lg font-bold">
-              <img
-                v-if="getAvatarUrl(f.image)"
-                :src="getAvatarUrl(f.image)"
-                class="w-full h-full object-cover"
-              />
-              <span v-else>
-                {{ f.name[0].toUpperCase() }}
+            <p class="text-gray-500 dark:text-gray-400 text-lg">
+              You don't have any friends yet.<br />
+              Start by adding someone in the Add tab.
+            </p>
+          </div>
+
+          <!-- LIST -->
+          <template v-else>
+            <div
+              v-for="f in friends"
+              :key="f.id"
+              class="p-5 rounded-2xl
+                     bg-gray-100 dark:bg-gray-700
+                     hover:bg-gray-200 dark:hover:bg-gray-600
+                     transition cursor-pointer flex items-center gap-4"
+              @click="goToProfile(f.id)"
+            >
+              <div class="w-12 h-12 rounded-full overflow-hidden
+                          bg-blue-600 text-white
+                          flex items-center justify-center text-lg font-bold">
+                <img
+                  v-if="getAvatarUrl(f.image)"
+                  :src="getAvatarUrl(f.image)"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else>
+                  {{ f.name[0].toUpperCase() }}
+                </span>
+              </div>
+
+              <span class="font-semibold text-blue-600">
+                {{ f.name }}
               </span>
             </div>
-
-            <span class="font-semibold text-blue-600">
-              {{ f.name }}
-            </span>
-          </div>
+          </template>
         </div>
 
         <!-- REQUESTS -->
@@ -252,7 +267,6 @@ onMounted(() => {
           <!-- CONTENT -->
           <template v-else>
 
-            <!-- incoming -->
             <div
               v-for="r in requests"
               :key="r.id"
@@ -270,7 +284,6 @@ onMounted(() => {
               </button>
             </div>
 
-            <!-- outgoing -->
             <template v-if="sentRequests.length">
               <hr class="my-3 border-gray-300 dark:border-gray-600" />
 
@@ -309,7 +322,7 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- BOTTOM INPUT + BUTTON -->
+          <!-- BOTTOM -->
           <div class="space-y-4">
             <input
               v-model="username"

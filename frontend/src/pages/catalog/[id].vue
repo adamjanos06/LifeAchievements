@@ -19,9 +19,15 @@ const selected = ref(null)
 const showModal = ref(false)
 
 const currentPage = ref(1)
-const perPage = 9
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 
 const searchQuery = ref("")
+
+const perPage = computed(() => {
+  if (windowWidth.value >= 1024) return 9    // lg: 3 columns
+  if (windowWidth.value >= 640) return 6     // md: 2 columns
+  return 3                                   // sm/xs: 1 column
+})
 
 let confetti = null
 
@@ -133,12 +139,12 @@ const categoryColor = computed(() => {
 })
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(searched.value.length / perPage))
+  Math.max(1, Math.ceil(searched.value.length / perPage.value))
 )
 
 const paginatedAchievements = computed(() => {
-  const start = (currentPage.value - 1) * perPage
-  return searched.value.slice(start, start + perPage)
+  const start = (currentPage.value - 1) * perPage.value
+  return searched.value.slice(start, start + perPage.value)
 })
 
 const completionButtonText = computed(() => {
@@ -322,6 +328,12 @@ onMounted(async () => {
     loadGoals()
   }
   tryOpenFromQuery()
+
+  const handleResize = () => {
+    windowWidth.value = window.innerWidth
+    currentPage.value = 1
+  }
+  window.addEventListener('resize', handleResize)
 })
 </script>
 
@@ -329,15 +341,15 @@ onMounted(async () => {
   <MainNavbar />
 
   <div
-    class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-10
+    class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-4
            text-gray-900 dark:text-gray-100
            transition-colors"
   >
-    <h2 class="text-center text-3xl font-bold tracking-wide mb-12">
+    <h2 class="text-center text-3xl font-bold tracking-wide mb-4">
       {{ categoryName }}
     </h2>
 
-    <div class="flex justify-center mb-6">
+    <div class="flex justify-center mb-4">
       <input
         v-model="searchQuery"
         @input="currentPage = 1"
@@ -356,9 +368,10 @@ onMounted(async () => {
     <!-- ACHIEVEMENT GRID -->
     <div
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-             gap-x-6 gap-y-6
-             sm:gap-x-10 sm:gap-y-10
-             lg:gap-x-14 lg:gap-y-12"
+             gap-3
+             sm:gap-5
+             lg:gap-6
+             min-h-[420px]"
     >
       <div
         v-for="a in paginatedAchievements"
@@ -366,11 +379,12 @@ onMounted(async () => {
         @click="openModal(a)"
         class="relative flex gap-5 cursor-pointer
                border border-gray-200 dark:border-gray-700
-               rounded-2xl px-7 py-6
+               rounded-2xl px-7 py-5
                bg-white dark:bg-gray-800
                transition
                hover:shadow-lg
-               dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]"
+               dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]
+               h-30"
       >
         <!-- COMPLETED CHECK -->
         <div

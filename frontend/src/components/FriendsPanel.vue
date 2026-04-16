@@ -112,13 +112,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <button
-    @click="toggle"
-    class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700
-           text-white px-5 py-3 rounded-full shadow-lg z-60"
-  >
-    Friends
-  </button>
+  <div class="fixed bottom-6 right-6 z-60">
+    <button
+      @click="toggle"
+      class="bg-blue-600 hover:bg-blue-700
+             text-white px-5 py-3 rounded-full shadow-lg
+             transition relative"
+    >
+      Friends
+      <div
+        v-if="requests.length > 0"
+        class="absolute -top-2 -right-2 bg-red-500 text-white
+               text-xs font-bold rounded-full w-6 h-6
+               flex items-center justify-center shadow-lg"
+      >
+        {{ requests.length }}
+      </div>
+    </button>
+  </div>
 
   <div
     v-if="show"

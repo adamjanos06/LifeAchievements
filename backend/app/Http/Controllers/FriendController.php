@@ -12,8 +12,28 @@ class FriendController extends Controller
     // List friends
     public function index(Request $request)
     {
+        $user = $request->user();
+
+        $acceptedRequests = friend_request::with(['sender', 'receiver'])
+            ->where('status', 'accepted')
+            ->where(function ($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                      ->orWhere('receiver_id', $user->id);
+            })
+            ->get();
+
+        $friends = $acceptedRequests->map(function ($friendRequest) use ($user) {
+            $friend = $friendRequest->sender_id === $user->id
+                ? $friendRequest->receiver
+                : $friendRequest->sender;
+
+            $friend->accepted_at = $friendRequest->created_at;
+
+            return $friend;
+        });
+
         return response()->json([
-            'data' => $request->user()->friends()->get()
+            'data' => $friends
         ]);
     }
 

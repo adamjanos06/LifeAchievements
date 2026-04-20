@@ -6,8 +6,15 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  earnedBadges: {
+    type: Array,
+    default: () => [],
+  },
+  friends: {
+    type: Array,
+    default: () => [],
+  },
 })
-
 
 function xpRequiredForLevel(level) {
   if (level <= 10) return level * 25
@@ -30,42 +37,60 @@ function calculateLevel(xp) {
   return level
 }
 
-
 const events = computed(() => {
-  const sorted = [...props.completedAchievements].sort(
-    (a, b) => new Date(a.completion_date) - new Date(b.completion_date)
-  )
+  const achievementEvents = [...props.completedAchievements]
+    .sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date))
+    .map((achievement) => ({
+      type: "achievement",
+      name: achievement.achievement?.name,
+      xp: achievement.achievement?.xp ?? 0,
+      date: new Date(achievement.completion_date),
+    }))
+
+  const badgeEvents = [...props.earnedBadges]
+    .map((badge) => {
+      const date = badge.pivot?.earned_at || badge.pivot?.created_at || badge.earned_at || badge.created_at
+      return {
+        type: "badge",
+        name: badge.name,
+        date: date ? new Date(date) : null,
+      }
+    })
+    .filter((event) => event.date)
+
+  const friendEvents = [...props.friends]
+    .map((friend) => {
+      const date = friend.accepted_at || friend.created_at || friend.updated_at
+      return {
+        type: "friend",
+        name: friend.name,
+        date: date ? new Date(date) : null,
+      }
+    })
+    .filter((event) => event.date)
 
   const result = []
   let accumulatedXp = 0
   let currentLevel = 1
 
-  for (const achievement of sorted) {
-    const xpGain = achievement.achievement?.xp ?? 0
-    accumulatedXp += xpGain
-
+  for (const event of achievementEvents) {
+    accumulatedXp += event.xp
     const newLevel = calculateLevel(accumulatedXp)
 
-    result.push({
-      type: "achievement",
-      name: achievement.achievement?.name,
-      xp: xpGain,
-      date: achievement.completion_date,
-    })
+    result.push(event)
 
     while (newLevel > currentLevel) {
       currentLevel++
-
       result.push({
         type: "level",
         level: currentLevel,
-        date: achievement.completion_date,
+        date: event.date,
       })
     }
   }
 
-  return result
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+  return [...result, ...badgeEvents, ...friendEvents]
+    .sort((a, b) => b.date - a.date)
     .slice(0, 3)
 })
 </script>
@@ -89,12 +114,39 @@ const events = computed(() => {
         </p>
       </div>
 
-      <div v-else>
+      <div v-else-if="event.type === 'badge'">
+        <p class="font-medium text-yellow-600 dark:text-amber-300">
+          🏅 Badge Unlocked
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ event.name }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ new Date(event.date).toLocaleDateString() }}
+        </p>
+      </div>
+
+      <div v-else-if="event.type === 'friend'">
+        <p class="font-medium text-pink-600 dark:text-pink-400">
+          👥 New Friend
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Added {{ event.name }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ new Date(event.date).toLocaleDateString() }}
+        </p>
+      </div>
+
+      <div v-else-if="event.type === 'level'">
         <p class="font-medium text-blue-600 dark:text-cyan-400">
           🎉 Level Up!
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400">
           Reached Level {{ event.level }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ new Date(event.date).toLocaleDateString() }}
         </p>
       </div>
 

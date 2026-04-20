@@ -13,6 +13,8 @@ const router = useRouter()
 const user = ref(null)
 const imageUrl = ref(null)
 const completedAchievements = ref([])
+const earnedBadges = ref([])
+const friends = ref([])
 const loading = ref(true)
 const badgeShown = ref(false)
 
@@ -73,9 +75,29 @@ async function loadCompletedAchievements() {
   completedAchievements.value = json.data?.data ?? json.data ?? []
 }
 
+async function loadEarnedBadges() {
+  const res = await fetch("http://backend.vm1.test/api/my-badges", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+  const json = await res.json()
+  earnedBadges.value = json.data ?? []
+}
+
+async function loadFriends() {
+  const res = await fetch("http://backend.vm1.test/api/friends", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+  const json = await res.json()
+  friends.value = json.data ?? []
+}
+
 onMounted(async () => {
   try {
-    await Promise.all([loadUser(), loadCompletedAchievements()])
+    await Promise.all([loadUser(), loadCompletedAchievements(), loadEarnedBadges(), loadFriends()])
   } finally {
     loading.value = false
   }
@@ -345,7 +367,11 @@ async function saveProfile() {
           </div>
         </div>
         <div class="md:col-span-2">
-          <ProfileRecentActivity :completedAchievements="completedAchievements" />
+          <ProfileRecentActivity
+            :completedAchievements="completedAchievements"
+            :earnedBadges="earnedBadges"
+            :friends="friends"
+          />
         </div>
       </div>
     </div>

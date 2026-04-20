@@ -110,6 +110,30 @@ class FriendController extends Controller
         return response()->json(['message' => 'Friend request cancelled']);
     }
 
+    public function remove(Request $request, User $user)
+    {
+        $auth = $request->user();
+
+        $friendRequest = friend_request::where('status', 'accepted')
+            ->where(function ($query) use ($auth, $user) {
+                $query->where('sender_id', $auth->id)
+                      ->where('receiver_id', $user->id);
+            })
+            ->orWhere(function ($query) use ($auth, $user) {
+                $query->where('sender_id', $user->id)
+                      ->where('receiver_id', $auth->id);
+            })
+            ->first();
+
+        if (!$friendRequest) {
+            return response()->json(['message' => 'Friendship not found'], 404);
+        }
+
+        $friendRequest->delete();
+
+        return response()->json(['message' => 'Friend removed']);
+    }
+
     // Incoming *and* outgoing requests
     public function incoming(Request $request)
     {

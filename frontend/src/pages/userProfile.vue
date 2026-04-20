@@ -9,10 +9,13 @@ const router = useRouter()
 
 const route = useRoute()
 const user = ref(null)
+const friendList = ref([])
+const isFriend = ref(false)
 const loading = ref(true)
 const username = ref("")
 const unlockedBadge = ref(null)
 const requestSent = ref(false)
+const removingFriend = ref(false)
 const token = localStorage.getItem("token")
 const currentUserId = Number(localStorage.getItem("userId"))
 
@@ -27,6 +30,32 @@ async function loadUser() {
   )
 
   user.value = await res.json()
+}
+
+async function loadFriendList() {
+  if (!token) return
+  if (!user.value?.id) {
+    return
+  }
+
+  const res = await fetch("http://backend.vm1.test/api/friends", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  const json = await res.json().catch(() => ({}))
+  friendList.value = json.data ?? []
+  
+  const profileUserId = user.value.id
+  const profileUserIdNum = Number(profileUserId)
+  
+  if (friendList.value.length === 0) {
+    isFriend.value = false
+  } else {
+    const matchedFriend = friendList.value.find(f => f.id == profileUserId || Number(f.id) === profileUserIdNum)
+    isFriend.value = !!matchedFriend
+  }
 }
 
 async function loadFriendRequests() {
@@ -47,7 +76,16 @@ async function loadFriendRequests() {
 
 onMounted(async () => {
   await loadUser()
-  await loadFriendRequests()
+  // Ensure user is loaded before checking friends
+  if (!user.value?.id) {
+    loading.value = false
+    return
+  }
+  
+  await Promise.all([
+    loadFriendRequests(),
+    loadFriendList(),
+  ])
   loading.value = false
 })
 
@@ -81,10 +119,35 @@ async function sendRequest() {
   } else {
     const data = await res.json().catch(() => ({}))
     requestSent.value = true
+    isFriend.value = false
+    await Promise.all([loadFriendRequests(), loadFriendList()])
     if (data.badge) {
       unlockedBadge.value = data.badge
     }
   }
+}
+
+async function removeFriend() {
+  if (!isFriend.value || !user.value?.id) return
+
+  removingFriend.value = true
+
+  const res = await fetch(`http://backend.vm1.test/api/friends/${user.value.id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!res.ok) {
+    console.error("remove friend failed", await res.text())
+  } else {
+    isFriend.value = false
+    requestSent.value = false
+    await Promise.all([loadFriendRequests(), loadFriendList()])
+  }
+
+  removingFriend.value = false
 }
 </script>
 
@@ -142,16 +205,18 @@ async function sendRequest() {
                 <button
                   v-if="user.id !== currentUserId"
                   type="button"
-                  @click="sendRequest"
-                  :disabled="requestSent"
+                  @click="isFriend ? removeFriend() : sendRequest()"
+                  :disabled="(requestSent && !isFriend) || removingFriend"
                   :class="[
                     'text-sm font-semibold px-5 py-2 rounded-xl transition',
-                    requestSent
-                      ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    isFriend
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : requestSent
+                        ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
                   ]"
                 >
-                  {{ requestSent ? 'Request Sent' : 'Add Friend' }}
+                  {{ isFriend ? 'Remove Friend' : requestSent ? 'Request Sent' : 'Add Friend' }}
                 </button>
               </div>
             </div>

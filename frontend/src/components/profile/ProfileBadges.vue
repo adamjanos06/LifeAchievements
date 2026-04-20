@@ -31,7 +31,7 @@ onMounted(async () => {
       class="flex flex-col items-center w-16"
     >
 
-      <div class="w-12 h-12 flex items-center justify-center">
+      <div class="w-24 h-24 flex items-center justify-center">
 
         <img
           v-if="badge.icon"

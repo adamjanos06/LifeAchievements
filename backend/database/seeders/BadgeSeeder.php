@@ -97,35 +97,35 @@ class BadgeSeeder extends Seeder
                 'name' => 'First Step',
                 'description' => 'Everyone starts somewhere.',
                 'requirement_text' => 'You completed your first achievement',
-                'icon' => 'badge-first-achievement.png',
+                'icon' => 'https://cdn.imgchest.com/files/2664bddb0e88.png',
             ],
 
             [
                 'name' => 'Dark Side',
                 'description' => 'You discovered the dark theme.',
                 'requirement_text' => 'You switched to dark theme mode',
-                'icon' => 'badge-dark-theme.png',
+                'icon' => 'https://cdn.imgchest.com/files/303133431fa7.png',
             ],
 
             [
                 'name' => 'Profile Checked',
                 'description' => 'You took a look at your profile.',
                 'requirement_text' => 'You visited your profile page',
-                'icon' => 'badge-profile.png',
+                'icon' => 'https://cdn.imgchest.com/files/0d08d570c8a2.png',
             ],
         
             [
                 'name' => 'Social Starter',
                 'description' => 'You made your first connection.',
                 'requirement_text' => 'You added your first friend',
-                'icon' => 'badge-friend.png',
+                'icon' => 'https://cdn.imgchest.com/files/5a2dd215898e.png',
             ],
 
             [
                 'name' => 'Goal Setter',
                 'description' => 'You saved your first achievement as a goal.',
                 'requirement_text' => 'Save your first goal',
-                'icon' => 'goal-setter.png',
+                'icon' => 'https://cdn.imgchest.com/files/f13999078b63.png',
             ],
         ];
 

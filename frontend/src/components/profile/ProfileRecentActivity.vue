@@ -10,10 +10,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  friends: {
-    type: Array,
-    default: () => [],
-  },
 })
 
 function xpRequiredForLevel(level) {
@@ -37,37 +33,42 @@ function calculateLevel(xp) {
   return level
 }
 
+function parseDate(value) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
 const events = computed(() => {
   const achievementEvents = [...props.completedAchievements]
-    .sort((a, b) => new Date(a.completion_date) - new Date(b.completion_date))
-    .map((achievement) => ({
-      type: "achievement",
-      name: achievement.achievement?.name,
-      xp: achievement.achievement?.xp ?? 0,
-      date: new Date(achievement.completion_date),
-    }))
+    .map((achievement) => {
+      const date = parseDate(achievement.completion_date)
+      return date
+        ? {
+            type: "achievement",
+            name: achievement.achievement?.name,
+            xp: achievement.achievement?.xp ?? 0,
+            date,
+            timestamp: date.getTime(),
+          }
+        : null
+    })
+    .filter((event) => event)
+    .sort((a, b) => a.timestamp - b.timestamp)
 
   const badgeEvents = [...props.earnedBadges]
     .map((badge) => {
-      const date = badge.pivot?.earned_at || badge.pivot?.created_at || badge.earned_at || badge.created_at
-      return {
-        type: "badge",
-        name: badge.name,
-        date: date ? new Date(date) : null,
-      }
+      const date = parseDate(badge.pivot?.earned_at || badge.pivot?.created_at || badge.earned_at || badge.created_at)
+      return date
+        ? {
+            type: "badge",
+            name: badge.name,
+            date,
+            timestamp: date.getTime(),
+          }
+        : null
     })
-    .filter((event) => event.date)
-
-  const friendEvents = [...props.friends]
-    .map((friend) => {
-      const date = friend.accepted_at || friend.created_at || friend.updated_at
-      return {
-        type: "friend",
-        name: friend.name,
-        date: date ? new Date(date) : null,
-      }
-    })
-    .filter((event) => event.date)
+    .filter((event) => event)
+    .sort((a, b) => a.timestamp - b.timestamp)
 
   const result = []
   let accumulatedXp = 0
@@ -85,12 +86,20 @@ const events = computed(() => {
         type: "level",
         level: currentLevel,
         date: event.date,
+        timestamp: event.timestamp,
       })
     }
   }
 
-  return [...result, ...badgeEvents, ...friendEvents]
-    .sort((a, b) => b.date - a.date)
+  const allEvents = [...result, ...badgeEvents]
+
+  return allEvents
+    .sort((a, b) => {
+      if (a.timestamp === b.timestamp) {
+        return 0
+      }
+      return b.timestamp - a.timestamp
+    })
     .slice(0, 3)
 })
 </script>
@@ -100,8 +109,8 @@ const events = computed(() => {
     <h3 class="font-semibold text-lg">Recent Activity</h3>
 
     <div
-      v-for="(event, index) in events"
-      :key="index"
+      v-for="event in events"
+      :key="event.type + '-' + event.timestamp"
       class="border dark:border-gray-700 rounded-xl px-4 py-3
              flex justify-between items-center"
     >

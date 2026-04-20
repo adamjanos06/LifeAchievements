@@ -27,7 +27,7 @@ class FriendController extends Controller
                 ? $friendRequest->receiver
                 : $friendRequest->sender;
 
-            $friend->accepted_at = $friendRequest->created_at;
+            $friend->accepted_at = $friendRequest->updated_at;
 
             return $friend;
         });

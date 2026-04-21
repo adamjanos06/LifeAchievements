@@ -1,97 +1,39 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref } from "vue"
 import { useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vue"
 import ProfileHeader from "@/components/profile/ProfileHeader.vue"
 import ProfileEditModal from "@/components/profile/ProfileEditModal.vue"
 import ProfileStats from "@/components/profile/ProfileStats.vue"
+import ProfileBio from "@/components/profile/ProfileBio.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
-import { fetchCurrentUser, checkProfileBadge, fetchUserBadges } from "@/utils/api/user.js"
-import { fetchMyAchievements } from "@/utils/api/achievements.js"
+import { useProfile } from "@/utils/composables/useProfile.js"
 
-const unlockedBadge = ref(null)
 const router = useRouter()
 
-const user = ref(null)
-const imageUrl = ref(null)
-const completedAchievements = ref([])
-const earnedBadges = ref([])
-const loading = ref(true)
-const badgeShown = ref(false)
+const {
+  unlockedBadge,
+  user,
+  imageUrl,
+  completedAchievements,
+  earnedBadges,
+  loading,
+  achievementsUnlocked,
+  totalXp,
+  initializeProfile
+} = useProfile()
+
+const showEditModal = ref(false)
 
 function goToMyAchievements() {
   router.push("/achievements")
 }
 
-async function loadUser() {
-  try {
-    user.value = await fetchCurrentUser()
-
-    // Check for profile visited badge
-    await checkProfileBadgeVisited()
-
-    if (user.value?.image) {
-      const filename = user.value.image.split("/").pop()
-      imageUrl.value = `http://backend.vm1.test/api/avatar/${filename}`
-    } else {
-      imageUrl.value = null
-    }
-  } catch (error) {
-    console.error("Failed to load user:", error)
-  }
-}
-
-async function checkProfileBadgeVisited() {
-  try {
-    const data = await checkProfileBadge()
-
-    if (data.badge && !badgeShown.value) {
-      badgeShown.value = true
-      setTimeout(() => {
-        unlockedBadge.value = data.badge
-      }, 300)
-    }
-  } catch (err) {
-    console.error("Error checking profile badge:", err)
-  }
-}
-
-async function loadCompletedAchievements() {
-  try {
-    completedAchievements.value = await fetchMyAchievements()
-  } catch (error) {
-    console.error("Failed to load achievements:", error)
-  }
-}
-
-async function loadEarnedBadges() {
-  try {
-    earnedBadges.value = await fetchUserBadges()
-  } catch (error) {
-    console.error("Failed to load badges:", error)
-  }
-}
-
-onMounted(async () => {
-  try {
-    await Promise.all([loadUser(), loadCompletedAchievements(), loadEarnedBadges()])
-  } finally {
-    loading.value = false
-  }
-})
-
-
-const achievementsUnlocked = computed(() => completedAchievements.value.length)
-const totalXp = computed(() => user.value?.xp ?? 0)
-
-
 function logout() {
   localStorage.removeItem("token")
   router.push("/")
 }
-
-const showEditModal = ref(false)
 
 function openEditModal() {
   showEditModal.value = true
@@ -106,6 +48,13 @@ function handleModalSave(data) {
   imageUrl.value = data.imageUrl
   showEditModal.value = false
 }
+
+// Initialize profile on mount
+import { onMounted } from "vue"
+
+onMounted(() => {
+  initializeProfile()
+})
 </script>
 
 <template>
@@ -126,13 +75,8 @@ function handleModalSave(data) {
         @logout="logout"
       />
 
-      <!-- BIO -->
-      <div v-if="user.bio" class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
-        <h3 class="text-lg font-semibold mb-2">About</h3>
-        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">
-          {{ user.bio }}
-        </p>
-      </div>
+      <ProfileBio :bio="user.bio" />
+
       <!-- STATS + ACTIVITY -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ProfileStats

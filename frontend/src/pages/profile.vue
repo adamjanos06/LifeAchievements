@@ -6,6 +6,8 @@ import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vu
 import ProfileBadges from "@/components/profile/ProfileBadges.vue"
 import axios from "axios"
 import BadgePopup from "@/components/BadgePopup.vue"
+import { fetchCurrentUser, checkProfileBadge, fetchUserBadges } from "@/utils/api/user.js"
+import { fetchMyAchievements } from "@/utils/api/achievements.js"
 
 const unlockedBadge = ref(null)
 const router = useRouter()
@@ -22,37 +24,26 @@ function goToMyAchievements() {
 }
 
 async function loadUser() {
-  const res = await fetch("http://backend.vm1.test/api/me", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
+  try {
+    user.value = await fetchCurrentUser()
 
-  const data = await res.json()
+    // Check for profile visited badge
+    await checkProfileBadgeVisited()
 
-  user.value = data.user
-
-  // Check for profile visited badge
-  await checkProfileBadge()
-
-  if (user.value?.image) {
-    const filename = user.value.image.split("/").pop()
-    imageUrl.value = `http://backend.vm1.test/api/avatar/${filename}`
-  } else {
-    imageUrl.value = null
+    if (user.value?.image) {
+      const filename = user.value.image.split("/").pop()
+      imageUrl.value = `http://backend.vm1.test/api/avatar/${filename}`
+    } else {
+      imageUrl.value = null
+    }
+  } catch (error) {
+    console.error("Failed to load user:", error)
   }
 }
 
-async function checkProfileBadge() {
+async function checkProfileBadgeVisited() {
   try {
-    const res = await fetch("http://backend.vm1.test/api/profile-visited", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-
-    const data = await res.json()
+    const data = await checkProfileBadge()
 
     if (data.badge && !badgeShown.value) {
       badgeShown.value = true
@@ -64,24 +55,21 @@ async function checkProfileBadge() {
     console.error("Error checking profile badge:", err)
   }
 }
+
 async function loadCompletedAchievements() {
-  const res = await fetch("http://backend.vm1.test/api/my-achievements", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-  const json = await res.json()
-  completedAchievements.value = json.data?.data ?? json.data ?? []
+  try {
+    completedAchievements.value = await fetchMyAchievements()
+  } catch (error) {
+    console.error("Failed to load achievements:", error)
+  }
 }
 
 async function loadEarnedBadges() {
-  const res = await fetch("http://backend.vm1.test/api/my-badges", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-  const json = await res.json()
-  earnedBadges.value = json.data ?? []
+  try {
+    earnedBadges.value = await fetchUserBadges()
+  } catch (error) {
+    console.error("Failed to load badges:", error)
+  }
 }
 
 onMounted(async () => {

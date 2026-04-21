@@ -2,8 +2,15 @@
 import { ref, onMounted, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import AchievementGrid from "@/components/AchievementGrid.vue"
+import PaginationButtons from "@/components/PaginationButtons.vue"
 import { isDark } from "@/utils/theme"
 import BadgePopup from "@/components/BadgePopup.vue"
+import { fetchCategories } from "@/utils/api/categories.js"
+import { fetchAchievements, completeAchievement } from "@/utils/api/achievements.js"
+import { fetchGoals, addGoal, removeGoal } from "@/utils/api/goals.js"
+import { loadConfetti, fireConfetti } from "@/utils/confetti.js"
+import { getSafeColor, markAchievementCompleted } from "@/utils/catalog.js"
 
 const route = useRoute()
 const router = useRouter()
@@ -29,28 +36,7 @@ const perPage = computed(() => {
   return 3                                   // sm/xs: 1 column
 })
 
-let confetti = null
-
-function loadConfetti() {
-  return new Promise((resolve) => {
-    
-    // When already loaded
-    if (window.confetti) {
-      confetti = window.confetti
-      return resolve()
-    }
-
-    const script = document.createElement("script")
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
-
-    script.onload = () => {
-      confetti = window.confetti
-      resolve()
-    }
-
-    document.body.appendChild(script)
-  })
-}
+let confettiFunc = null
 
 function isLoggedIn() {
   return !!localStorage.getItem("token");
@@ -66,40 +52,32 @@ function goBackToCategories() {
 
 /* ---------------- DATA LOAD ---------------- */
 
-async function loadCategories() {
-  const res = await fetch("http://backend.vm1.test/api/categories")
-  const json = await res.json()
-  categories.value = json.data
+async function loadCategoriesData() {
+  try {
+    categories.value = await fetchCategories()
+  } catch (error) {
+    console.error("Failed to load categories:", error)
+  }
 }
 
-async function loadAchievements() {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch("http://backend.vm1.test/api/achievements", {
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
-  });
-
-  const json = await res.json();
-  achievements.value = (json.data || []).map(a => ({
-    ...a,
-    repeatable: a.repeatable ?? false,
-    completions: Number(a.completions) || 0,
-  }));
+async function loadAchievementsData() {
+  try {
+    achievements.value = await fetchAchievements()
+  } catch (error) {
+    console.error("Failed to load achievements:", error)
+  }
 }
 
-async function loadGoals() {
+async function loadGoalsData() {
   if (!isLoggedIn()) return
-  
-  const res = await fetch("http://backend.vm1.test/api/goals", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-  const json = await res.json();
-  goals.value = json.data;
+  try {
+    goals.value = await fetchGoals()
+  } catch (error) {
+    console.error("Failed to load goals:", error)
+  }
 }
 
-/* ---------------- FILTER (FIX!!) ---------------- */
+/* ---------------- FILTER & SEARCH ---------------- */
 
 const filtered = computed(() =>
   achievements.value.filter(
@@ -129,31 +107,6 @@ const icon = computed(() => {
   const cat = categories.value.find(c => c.id === categoryId)
   return cat ? cat.icon : ""
 })
-
-function getSafeColor(hex) {
-  if (!hex) return "#3b82f6"
-
-  const clean = hex.replace("#", "").toLowerCase()
-
-  // short hexes
-  const full = clean.length === 3
-    ? clean.split("").map(c => c + c).join("")
-    : clean
-
-  const r = parseInt(full.substring(0, 2), 16)
-  const g = parseInt(full.substring(2, 4), 16)
-  const b = parseInt(full.substring(4, 6), 16)
-
-  // brigthness
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000
-
-  // extreme colors
-  if (brightness > 220 || brightness < 40) {
-    return "#3b82f6"
-  }
-
-  return `#${full}`
-}
 
 const categoryColor = computed(() => {
   const cat = categories.value.find(c => c.id === categoryId)
@@ -203,52 +156,39 @@ function closeModal() {
 
 /* ---------------- GOALS ---------------- */
 
-async function saveGoal() {
+async function saveGoalData() {
   if (!selected.value) return
 
-  const res = await fetch(
-    `http://backend.vm1.test/api/goals/${selected.value.id}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
+  try {
+    const data = await addGoal(selected.value.id)
+    if (data.badge) {
+      unlockedBadge.value = data.badge
     }
-  )
-
-  const data = await res.json()
-
-  if (data.badge) {
-    unlockedBadge.value = data.badge
+    await loadGoalsData()
+  } catch (error) {
+    console.error("Failed to save goal:", error)
   }
-
-  await loadGoals()
 }
 
-async function removeGoal() {
+async function removeGoalData() {
   if (!selected.value) return
 
-  await fetch(
-    `http://backend.vm1.test/api/goals/${selected.value.id}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    }
-  )
-  await loadGoals()
+  try {
+    await removeGoal(selected.value.id)
+    await loadGoalsData()
+  } catch (error) {
+    console.error("Failed to remove goal:", error)
+  }
 }
 
-async function toggleGoal() {
-
+async function toggleGoalData() {
   if (!selected.value) return
 
   if (isGoal(selected.value.id)) {
-    await removeGoal()
+    await removeGoalData()
   }
   else {
-    await saveGoal()
+    await saveGoalData()
   }
 }
 
@@ -266,88 +206,71 @@ function tryOpenFromQuery() {
 
 /* ---------------- ACTIONS ---------------- */
 
-function fireConfetti() {
-
-  if (!confetti) return
-
-  const colors = ['#ef4444', '#3b82f6', '#22c55e', '#eab308']
-
-  // Left
-  confetti({
-    particleCount: 80,
-    angle: 60,
-    spread: 70,
-    origin: { x: 0, y: 0.6 },
-    colors
-  })
-
-  // Right
-  confetti({
-    particleCount: 80,
-    angle: 120,
-    spread: 70,
-    origin: { x: 1, y: 0.6 },
-    colors
-  })
-}
-
 async function markAsCompleted() {
   const wasCompleted = selected.value.completed
   if (!selected.value) return;
 
   if (!selected.value.repeatable && selected.value.completed) return;
 
-  const res = await fetch(
-    `http://backend.vm1.test/api/achievements/${selected.value.id}/complete`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+  try {
+    const data = await markAchievementCompleted(selected.value.id)
+
+    if (data.badge) {
+      unlockedBadge.value = data.badge;
     }
-  );
 
-  const data = await res.json();
-
-  if (data.badge) {
-    unlockedBadge.value = data.badge;
-  }
-
-  if (selected.value.repeatable) {
-    selected.value.completed = true;
-    selected.value.completions = (Number(selected.value.completions) || 0) + 1;
-  }
-
-  const idx = achievements.value.findIndex(
-    a => a.id === selected.value.id
-  );
-
-  if (idx !== -1) {
     if (selected.value.repeatable) {
-      achievements.value[idx].completions = selected.value.completions;
-      achievements.value[idx].completed = true;
-    } else {
-      achievements.value[idx].completed = true;
+      selected.value.completed = true;
+      selected.value.completions = (Number(selected.value.completions) || 0) + 1;
     }
-  }
 
-  if (isGoal(selected.value.id)) {
-    await removeGoal();
-  }
+    const idx = achievements.value.findIndex(
+      a => a.id === selected.value.id
+    );
 
-  await loadAchievements();
+    if (idx !== -1) {
+      if (selected.value.repeatable) {
+        achievements.value[idx].completions = selected.value.completions;
+        achievements.value[idx].completed = true;
+      } else {
+        achievements.value[idx].completed = true;
+      }
+    }
 
-  if (!wasCompleted) {
-    fireConfetti()
+    if (isGoal(selected.value.id)) {
+      await removeGoalData();
+    }
+
+    await loadAchievementsData();
+
+    if (!wasCompleted && confettiFunc) {
+      fireConfetti(confettiFunc)
+    }
+  } catch (error) {
+    console.error("Failed to mark achievement as completed:", error)
   }
 }
 
 /* ---------------- LIFECYCLE ---------------- */
 
 onMounted(async () => {
-  await loadCategories()
-  await loadAchievements()
-  await loadConfetti()
+  await loadCategoriesData()
+  await loadAchievementsData()
+  
+  confettiFunc = await loadConfetti()
+  
+  if (isLoggedIn()) {
+    loadGoalsData()
+  }
+  tryOpenFromQuery()
+
+  const handleResize = () => {
+    windowWidth.value = window.innerWidth
+    currentPage.value = 1
+  }
+  window.addEventListener('resize', handleResize)
+})
+</script>
   
   if (isLoggedIn()) {
     loadGoals()
@@ -388,7 +311,6 @@ onMounted(async () => {
               focus:outline-none focus:ring-2 focus:ring-blue-600"
       />
     </div>
-
 
     <!-- ACHIEVEMENT GRID -->
     <div
@@ -550,7 +472,7 @@ onMounted(async () => {
 
           <button
             v-if="!selected?.completed"
-            @click="toggleGoal"
+            @click="toggleGoalData"
             :class="isGoal(selected.id)
               ? 'bg-transparent text-amber-600 border-2 border-amber-500'
               : 'bg-amber-600 hover:bg-amber-800 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_15px_rgba(251,191,36,0.6)]'

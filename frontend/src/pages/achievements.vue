@@ -1,33 +1,25 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import MainNavbar from "@/components/layout/MainNavbar.vue";
+import AchievementGrid from "@/components/AchievementGrid.vue";
+import PaginationButtons from "@/components/PaginationButtons.vue";
+import { fetchMyAchievements } from "@/utils/api/achievements.js";
 
 const achievements = ref([]);
-
+const isLoading = ref(false);
 const currentPage = ref(1);
 const perPage = 9;
 
-/* -------- LOAD DATA -------- */
-
 async function loadMyAchievements() {
-  const res = await fetch("http://backend.vm1.test/api/my-achievements", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-
-  const json = await res.json();
-  achievements.value = (json.data.data ?? json.data ?? []).map(a => ({
-    ...a,
-    completions: Number(a.completions) || 0,
-    achievement: {
-      ...a.achievement,
-      repeatable: a.achievement?.repeatable ?? false,
-    }
-  }));
+  try {
+    isLoading.value = true;
+    achievements.value = await fetchMyAchievements();
+  } catch (error) {
+    console.error("Failed to load achievements:", error);
+  } finally {
+    isLoading.value = false;
+  }
 }
-
-/* -------- PAGINATION -------- */
 
 const totalPages = computed(() => {
   return Math.max(1, Math.ceil(achievements.value.length / perPage));
@@ -50,94 +42,25 @@ onMounted(loadMyAchievements);
 <template>
   <MainNavbar />
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14 dark:text-gray-100
-           transition-colors">
+  <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-14 text-gray-900 dark:text-gray-100 transition-colors">
 
     <h2 class="text-center text-3xl font-bold tracking-wide mb-16">
       MY ACHIEVEMENTS
     </h2>
 
-    <!-- EMPTY STATE -->
-    <div
-      v-if="achievements.length === 0"
-      class="text-center text-gray-500 dark:text-gray-400 text-lg"
-    >
-      You haven't completed any achievements yet.
-    </div>
+    <AchievementGrid
+      :achievements="paginatedAchievements"
+      :is-loading="isLoading"
+      :show-completion-indicators="true"
+      :clickable="false"
+      empty-message="You haven't completed any achievements yet."
+    />
 
-    <!-- ACHIEVEMENTS GRID -->
-    <div
-      v-else
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-             gap-x-6 gap-y-6
-             sm:gap-x-10 sm:gap-y-10
-             lg:gap-x-14 lg:gap-y-12"
-    >
-      <div
-        v-for="a in paginatedAchievements"
-        :key="a.id"
-        class="relative border border-gray-200 dark:border-gray-700
-               rounded-2xl px-7 py-6 bg-white dark:bg-gray-800
-               flex gap-5 transition-colors"
-      >
-        <!-- COMPLETION INDICATOR -->
-        <div class="absolute top-3 right-3">
-          <template v-if="a.achievement?.repeatable">
-            <span
-              class="w-7 h-7 rounded-full bg-blue-600 text-white
-                     flex items-center justify-center text-sm font-semibold"
-            >
-              {{ a.completions }}
-            </span>
-          </template>
-          <template v-else>
-            <div
-              class="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center"
-            >
-              ✓
-            </div>
-          </template>
-        </div>
-
-        <div class="w-16 h-16 rounded-full flex items-center justify-center">
-          <img
-            v-if="a.achievement?.category?.icon"
-            :src="a.achievement.category.icon"
-            class="w-14 h-14 object-contain"
-          />
-        </div>
-
-        <!-- TEXT -->
-        <div>
-          <h3 class="font-semibold text-lg mb-1">
-            {{ a.achievement.name }}
-          </h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 leading-snug">
-            {{ a.achievement.description }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGINATION -->
-    <div
-      v-if="totalPages > 1"
-      class="flex justify-center gap-4 mt-16"
-    >
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        @click="goToPage(page)"
-        class="w-10 h-10 rounded-full
-               flex items-center justify-center
-               font-semibold transition"
-        :class="page === currentPage
-          ? 'bg-blue-700 text-white'
-          : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600'"
-      >
-        {{ page }}
-      </button>
-    </div>
+    <PaginationButtons
+      :total-pages="totalPages"
+      :current-page="currentPage"
+      @page-change="goToPage"
+    />
 
   </div>
 </template>

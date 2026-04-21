@@ -4,6 +4,8 @@ import { useRoute } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
 import { useRouter } from "vue-router"
+import { fetchUser } from "@/utils/api/user.js"
+import { fetchFriends, fetchFriendRequests, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend } from "@/utils/api/friends.js"
 
 const router = useRouter()
 
@@ -20,16 +22,11 @@ const token = localStorage.getItem("token")
 const currentUserId = Number(localStorage.getItem("userId"))
 
 async function loadUser() {
-  const res = await fetch(
-    `http://backend.vm1.test/api/users/${route.params.id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  )
-
-  user.value = await res.json()
+  try {
+    user.value = await fetchUser(route.params.id)
+  } catch (error) {
+    console.error("Failed to load user:", error)
+  }
 }
 
 async function loadFriendList() {
@@ -38,40 +35,35 @@ async function loadFriendList() {
     return
   }
 
-  const res = await fetch("http://backend.vm1.test/api/friends", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  const json = await res.json().catch(() => ({}))
-  friendList.value = json.data ?? []
-  
-  const profileUserId = user.value.id
-  const profileUserIdNum = Number(profileUserId)
-  
-  if (friendList.value.length === 0) {
-    isFriend.value = false
-  } else {
-    const matchedFriend = friendList.value.find(f => f.id == profileUserId || Number(f.id) === profileUserIdNum)
-    isFriend.value = !!matchedFriend
+  try {
+    friendList.value = await fetchFriends()
+    
+    const profileUserId = user.value.id
+    const profileUserIdNum = Number(profileUserId)
+    
+    if (friendList.value.length === 0) {
+      isFriend.value = false
+    } else {
+      const matchedFriend = friendList.value.find(f => f.id == profileUserId || Number(f.id) === profileUserIdNum)
+      isFriend.value = !!matchedFriend
+    }
+  } catch (error) {
+    console.error("Failed to load friend list:", error)
   }
 }
 
 async function loadFriendRequests() {
   if (!token || !user.value?.id) return
 
-  const res = await fetch("http://backend.vm1.test/api/friend-requests", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  const json = await res.json().catch(() => ({}))
-  const sent = json.sent || []
-  requestSent.value = sent.some(
-    (r) => r.receiver?.id === user.value.id || r.receiver?.name === user.value.name
-  )
+  try {
+    const json = await fetchFriendRequests()
+    const sent = json.sent || []
+    requestSent.value = sent.some(
+      (r) => r.receiver?.id === user.value.id || r.receiver?.name === user.value.name
+    )
+  } catch (error) {
+    console.error("Failed to load friend requests:", error)
+  }
 }
 
 onMounted(async () => {

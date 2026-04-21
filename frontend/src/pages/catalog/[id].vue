@@ -271,19 +271,6 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
 })
 </script>
-  
-  if (isLoggedIn()) {
-    loadGoals()
-  }
-  tryOpenFromQuery()
-
-  const handleResize = () => {
-    windowWidth.value = window.innerWidth
-    currentPage.value = 1
-  }
-  window.addEventListener('resize', handleResize)
-})
-</script>
 
 <template>
   <MainNavbar />

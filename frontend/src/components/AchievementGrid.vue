@@ -1,4 +1,6 @@
 <script setup>
+import AchievementCard from './AchievementCard.vue';
+
 defineProps({
   achievements: {
     type: Array,
@@ -69,13 +71,3 @@ defineEmits(['achievement-click']);
     </div>
   </div>
 </template>
-
-<script>
-import AchievementCard from './AchievementCard.vue';
-
-export default {
-  components: {
-    AchievementCard
-  }
-};
-</script>

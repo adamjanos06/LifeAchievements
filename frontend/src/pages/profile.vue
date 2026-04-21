@@ -5,7 +5,7 @@ import MainNavbar from "@/components/layout/MainNavbar.vue"
 import ProfileRecentActivity from "@/components/profile/ProfileRecentActivity.vue"
 import ProfileBadges from "@/components/profile/ProfileBadges.vue"
 import ProfileHeader from "@/components/profile/ProfileHeader.vue"
-import axios from "axios"
+import ProfileEditModal from "@/components/profile/ProfileEditModal.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
 import { fetchCurrentUser, checkProfileBadge, fetchUserBadges } from "@/utils/api/user.js"
 import { fetchMyAchievements } from "@/utils/api/achievements.js"
@@ -91,75 +91,20 @@ function logout() {
   router.push("/")
 }
 
-
 const showEditModal = ref(false)
-const saving = ref(false)
-const errorMsg = ref("")
-
-const editName = ref("")
-const editBio = ref("")
-const editImage = ref(null)
-const imagePreview = ref(null)
 
 function openEditModal() {
-  editName.value = user.value?.name ?? ""
-  editBio.value = user.value?.bio ?? ""
-  editImage.value = null
-  imagePreview.value = imageUrl.value ?? null
-  errorMsg.value = ""
   showEditModal.value = true
 }
 
-function onImageChange(e) {
-  const file = e.target.files[0]
-  if (!file) return
-
-  editImage.value = file
-  imagePreview.value = URL.createObjectURL(file)
+function handleModalClose() {
+  showEditModal.value = false
 }
 
-async function saveProfile() {
-  if (!editName.value.trim()) return
-
-  saving.value = true
-  errorMsg.value = ""
-
-  const form = new FormData()
-  form.append("_method", "PUT")
-  form.append("name", editName.value)
-  form.append("bio", editBio.value)
-
-  if (editImage.value) {
-    form.append("image", editImage.value)
-  }
-
-  try {
-    const res = await axios.post(
-      "http://backend.vm1.test/api/me",
-      form,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    )
-
-    user.value = res.data.user || res.data
-
-    if (user.value?.image) {
-      const filename = user.value.image.split("/").pop()
-      imageUrl.value = `http://backend.vm1.test/api/avatar/${filename}`
-    } else {
-      imageUrl.value = null
-    }
-
-    showEditModal.value = false
-  } catch (err) {
-    errorMsg.value =
-      err.response?.data?.message ?? "Failed to update profile."
-  } finally {
-    saving.value = false
-  }
+function handleModalSave(data) {
+  user.value = data.user
+  imageUrl.value = data.imageUrl
+  showEditModal.value = false
 }
 </script>
 
@@ -219,73 +164,13 @@ async function saveProfile() {
           </div>
         </div>
         <!-- EDIT MODAL -->
-        <div
-          v-if="showEditModal"
-          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-        >
-          <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 w-full max-w-md space-y-4"
-          >
-            <h3 class="text-xl font-bold">Edit Profile</h3>
-
-            <div class="flex justify-center">
-              <img
-                v-if="imagePreview"
-                :src="imagePreview"
-                class="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-
-            <input
-              ref="fileInput"
-              type="file"
-              class="hidden"
-              accept="image/*"
-              @change="onImageChange"
-            />
-
-            <div
-              @click="$refs.fileInput.click()"
-              class="cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 text-center hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-            >
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                Click to upload a profile picture
-              </p>
-
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                PNG or JPG up to 5MB
-              </p>
-            </div>
-
-            <input
-              v-model="editName"
-              placeholder="Name"
-              class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
-            />
-
-            <textarea
-              v-model="editBio"
-              placeholder="Bio"
-              class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
-            ></textarea>
-
-            <p v-if="errorMsg" class="text-red-500 text-sm">
-              {{ errorMsg }}
-            </p>
-
-            <div class="flex justify-end gap-2">
-              <button @click="showEditModal = false">Cancel</button>
-
-              <button
-                @click="saveProfile"
-                :disabled="saving || !editName.trim()"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProfileEditModal
+          :show="showEditModal"
+          :user="user"
+          :imageUrl="imageUrl"
+          @close="handleModalClose"
+          @save="handleModalSave"
+        />
         <div class="md:col-span-2">
           <ProfileRecentActivity
             :completedAchievements="completedAchievements"

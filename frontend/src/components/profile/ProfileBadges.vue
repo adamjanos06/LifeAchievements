@@ -23,7 +23,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-center gap-4 flex-wrap">
+  <div class="flex justify-center gap-8 flex-wrap">
 
     <div
       v-for="badge in badges"
@@ -31,7 +31,7 @@ onMounted(async () => {
       class="flex flex-col items-center w-16"
     >
 
-      <div class="w-24 h-24 flex items-center justify-center">
+      <div class="w-32 h-32 flex items-center justify-center">
 
         <img
           v-if="badge.icon"

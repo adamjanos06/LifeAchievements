@@ -1,4 +1,5 @@
 <script setup>
+import { Check } from '@lucide/vue';
 defineProps({
   achievement: {
     type: Object,
@@ -43,17 +44,17 @@ defineEmits(['click']);
     <div v-if="showCompletionIndicator" class="absolute top-3 right-3">
       <template v-if="repeatable">
         <span
-          class="w-7 h-7 rounded-full bg-blue-600 text-white
-                 flex items-center justify-center text-sm font-semibold"
+          class="w-8 h-8 rounded-full bg-blue-600 text-white
+                 flex items-center justify-center text-lg font-bold text-center"
         >
           {{ completions }}
         </span>
       </template>
       <template v-else>
         <div
-          class="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center"
+          class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center"
         >
-          ✓
+          <Check :strokeWidth="4" />  
         </div>
       </template>
     </div>

@@ -6,15 +6,15 @@
        dark:bg-gray-900 dark:text-white dark:border-gray-700
        rounded-xl shadow-lg p-4 w-64"
     >
-      <div class="text-sm text-gray-900">
-        🏅 Badge Unlocked
+      <div class="text-sm text-gray-900 dark:text-gray-300">
+        Badge Unlocked
       </div>
 
-      <div class="text-lg font-semibold mt-1">
+      <div class="text-lg font-semibold mt-1 dark:text-gray-300">
         {{ badge.name }}
       </div>
 
-      <div class="text-sm text-gray-800 mt-1">
+      <div class="text-sm text-gray-800 mt-1 dark:text-gray-300">
         {{ badge.description }}
       </div>
     </div>

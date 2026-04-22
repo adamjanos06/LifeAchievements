@@ -11,6 +11,7 @@ import { fetchAchievements, completeAchievement } from "@/utils/api/achievements
 import { fetchGoals, addGoal, removeGoal } from "@/utils/api/goals.js"
 import { loadConfetti, fireConfetti } from "@/utils/confetti.js"
 import { getSafeColor, markAchievementCompleted } from "@/utils/catalog.js"
+import { CircleX } from "@lucide/vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -398,8 +399,8 @@ onMounted(async () => {
              transition-colors
              dark:shadow-[0_0_40px_rgba(255,255,255,0.25)]"
     >
-      <button @click="closeModal" class="absolute top-4 right-4 text-2xl">
-        ×
+      <button @click="closeModal" class="absolute top-4 right-4 text-2xl w-8 h-8">
+        <CircleX />  
       </button>
 
       <div v-if="!isLoggedIn()" class="text-center space-y-4">

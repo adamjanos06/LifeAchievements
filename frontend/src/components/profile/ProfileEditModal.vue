@@ -127,16 +127,18 @@ function closeModal() {
           PNG or JPG up to 5MB
         </p>
       </div>
-
+      <label class="w-full px-3" for="nameinput">Name</label>
       <input
+        id="nameinput"
         v-model="editName"
-        placeholder="Name"
+        placeholder="John Doe"
         class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
       />
-
+      <label class="w-full px-3" for="aboutmetextarea">About Me</label>
       <textarea
+        id="aboutmetextarea"
         v-model="editBio"
-        placeholder="Bio"
+        placeholder="Something fun about yourself"
         class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
       ></textarea>
 

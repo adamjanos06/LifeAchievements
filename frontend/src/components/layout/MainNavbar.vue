@@ -207,11 +207,11 @@ onMounted(() => {
         </RouterLink>
 
         <RouterLink to="/leaderboard" @click="isOpen = false">
-          🏆 Leaderboard
+          Leaderboard
         </RouterLink>
 
         <RouterLink to="/goals" @click="isOpen = false">
-          🎯 Goals
+          Goals
         </RouterLink>
 
         <RouterLink to="/profile" @click="isOpen = false">
@@ -223,9 +223,8 @@ onMounted(() => {
           v-if="isAdmin"
           to="/dashboard" 
           @click="isOpen = false"
-          class="text-blue-600 dark:text-blue-400 font-semibold"
         >
-          📊 Dashboard
+          Dashboard
         </RouterLink>
 
         <button

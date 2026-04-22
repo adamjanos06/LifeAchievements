@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
+import { SquarePen, SquareX, CirclePlus, SquareXIcon, Trash2 } from "@lucide/vue"
 
 const router = useRouter()
 const tables = ref([])
@@ -330,9 +331,9 @@ onMounted(async () => {
                 </h2>
                 <button
                   @click="openCreateModal"
-                  class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded transition text-sm flex-shrink-0"
+                  class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition text-sm font-bold flex flex-row items-center gap-1"
                 >
-                  ➕ Add
+                  <CirclePlus class="" />Add
                 </button>
               </div>
 
@@ -399,13 +400,13 @@ onMounted(async () => {
                           @click="openEditModal(record)"
                           class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition"
                         >
-                          ✏️
+                          <SquarePen />  
                         </button>
                         <button
                           @click="deleteRecord(record.id)"
                           class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded transition"
                         >
-                          🗑️
+                          <Trash2 />
                         </button>
                       </td>
                     </tr>
@@ -449,7 +450,7 @@ onMounted(async () => {
                 </button>
               </div>
 
-              <div class="flex-shrink-0 text-xs text-gray-500 dark:text-gray-400 mt-2 px-2">
+              <div class="flex-shrink-0 text-xs text-gray-500 dark:text-gray-400 mt-2 px-2" v-else-if="totalRecords != 0">
                 {{ (currentPage - 1) * perPage + 1 }}-{{ Math.min(currentPage * perPage, totalRecords) }} of {{ totalRecords }}
               </div>
             </div>

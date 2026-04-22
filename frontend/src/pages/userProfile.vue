@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { useRoute } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
-import { useRouter } from "vue-router"
+import { useRouter,useRoute } from "vue-router"
 import { fetchUser } from "@/utils/api/user.js"
 import { fetchFriends, fetchFriendRequests, sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend } from "@/utils/api/friends.js"
 
@@ -118,29 +117,6 @@ async function sendRequest() {
     }
   }
 }
-
-async function removeFriend() {
-  if (!isFriend.value || !user.value?.id) return
-
-  removingFriend.value = true
-
-  const res = await fetch(`http://backend.vm1.test/api/friends/${user.value.id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  if (!res.ok) {
-    console.error("remove friend failed", await res.text())
-  } else {
-    isFriend.value = false
-    requestSent.value = false
-    await Promise.all([loadFriendRequests(), loadFriendList()])
-  }
-
-  removingFriend.value = false
-}
 </script>
 
 <template>
@@ -197,7 +173,7 @@ async function removeFriend() {
                 <button
                   v-if="user.id !== currentUserId"
                   type="button"
-                  @click="isFriend ? removeFriend() : sendRequest()"
+                  @click="isFriend ? removeFriend(user.id) : sendRequest()"
                   :disabled="(requestSent && !isFriend) || removingFriend"
                   :class="[
                     'text-sm font-semibold px-5 py-2 rounded-xl transition',

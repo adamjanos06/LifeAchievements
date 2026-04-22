@@ -109,7 +109,7 @@ export async function rejectFriendRequest(userId) {
  */
 export async function removeFriend(userId) {
   try {
-    const res = await fetch(`${API_BASE}/friends/${userId}`, {
+    const res = await fetch(`http://backend.vm1.test/api/friends/${userId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -122,3 +122,26 @@ export async function removeFriend(userId) {
     throw error;
   }
 }
+
+// async function removeFriend() {
+//   if (!isFriend.value || !user.value?.id) return
+
+//   removingFriend.value = true
+
+//   const res = await fetch(`http://backend.vm1.test/api/friends/${user.value.id}`, {
+//     method: "DELETE",
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//     },
+//   })
+
+//   if (!res.ok) {
+//     console.error("remove friend failed", await res.text())
+//   } else {
+//     isFriend.value = false
+//     requestSent.value = false
+//     await Promise.all([loadFriendRequests(), loadFriendList()])
+//   }
+
+//   removingFriend.value = false
+// }

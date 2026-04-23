@@ -23,9 +23,7 @@ function calculateLevel(xp) {
 
   while (true) {
     const needed = xpRequiredForLevel(level)
-
     if (remainingXp < needed) break
-
     remainingXp -= needed
     level++
   }
@@ -33,43 +31,54 @@ function calculateLevel(xp) {
   return level
 }
 
-function parseDate(value) {
-  const date = new Date(value)
+function parseSafeDate(raw) {
+  if (!raw) return null
+
+  // Laravel fix: " " -> "T"
+  const fixed = typeof raw === "string" ? raw.replace(" ", "T") : raw
+
+  const date = new Date(fixed)
   return Number.isNaN(date.getTime()) ? null : date
 }
 
 const events = computed(() => {
+  // -------- ACHIEVEMENTS --------
   const achievementEvents = [...props.completedAchievements]
     .map((achievement) => {
-      const date = parseDate(achievement.completion_date)
-      return date
-        ? {
-            type: "achievement",
-            name: achievement.achievement?.name,
-            xp: achievement.achievement?.xp ?? 0,
-            date,
-            timestamp: date.getTime(),
-          }
-        : null
+      const raw = achievement.completion_date
+      const date = parseSafeDate(raw) || new Date()
+
+      return {
+        type: "achievement",
+        name: achievement.achievement?.name,
+        xp: achievement.achievement?.xp ?? 0,
+        date,
+        timestamp: date.getTime(),
+      }
     })
-    .filter((event) => event)
     .sort((a, b) => a.timestamp - b.timestamp)
 
+  // -------- BADGES --------
   const badgeEvents = [...props.earnedBadges]
     .map((badge) => {
-      const date = parseDate(badge.pivot?.earned_at || badge.pivot?.created_at || badge.earned_at || badge.created_at)
-      return date
-        ? {
-            type: "badge",
-            name: badge.name,
-            date,
-            timestamp: date.getTime(),
-          }
-        : null
+      const raw =
+        badge.pivot?.earned_at ||
+        badge.pivot?.created_at ||
+        badge.earned_at ||
+        badge.created_at
+
+      const date = parseSafeDate(raw) || new Date()
+
+      return {
+        type: "badge",
+        name: badge.name,
+        date,
+        timestamp: date.getTime(),
+      }
     })
-    .filter((event) => event)
     .sort((a, b) => a.timestamp - b.timestamp)
 
+  // -------- LEVEL CALC --------
   const result = []
   let accumulatedXp = 0
   let currentLevel = 1
@@ -94,13 +103,8 @@ const events = computed(() => {
   const allEvents = [...result, ...badgeEvents]
 
   return allEvents
-    .sort((a, b) => {
-      if (a.timestamp === b.timestamp) {
-        return 0
-      }
-      return b.timestamp - a.timestamp
-    })
-    .slice(0, 3)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 5) // tesztre nagyobb
 })
 </script>
 
@@ -109,20 +113,22 @@ const events = computed(() => {
     <h3 class="font-semibold text-lg">Recent Activity</h3>
 
     <div
-      v-for="event in events"
-      :key="event.type + '-' + event.timestamp"
+      v-for="(event, index) in events"
+      :key="event.type + '-' + event.timestamp + '-' + (event.name || index)"
       class="border dark:border-gray-700 rounded-xl px-4 py-3
              flex justify-between items-center"
     >
+      <!-- ACHIEVEMENT -->
       <div v-if="event.type === 'achievement'">
         <p class="font-medium">
           Completed: {{ event.name }}
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ new Date(event.date).toLocaleDateString() }}
+          {{ event.date.toLocaleDateString() }}
         </p>
       </div>
 
+      <!-- BADGE -->
       <div v-else-if="event.type === 'badge'">
         <p class="font-medium text-yellow-600 dark:text-amber-300">
           🏅 Badge Unlocked
@@ -131,22 +137,11 @@ const events = computed(() => {
           {{ event.name }}
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ new Date(event.date).toLocaleDateString() }}
+          {{ event.date.toLocaleDateString() }}
         </p>
       </div>
 
-      <div v-else-if="event.type === 'friend'">
-        <p class="font-medium text-pink-600 dark:text-pink-400">
-          👥 New Friend
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Added {{ event.name }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ new Date(event.date).toLocaleDateString() }}
-        </p>
-      </div>
-
+      <!-- LEVEL -->
       <div v-else-if="event.type === 'level'">
         <p class="font-medium text-blue-600 dark:text-cyan-400">
           🎉 Level Up!
@@ -155,10 +150,11 @@ const events = computed(() => {
           Reached Level {{ event.level }}
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ new Date(event.date).toLocaleDateString() }}
+          {{ event.date.toLocaleDateString() }}
         </p>
       </div>
 
+      <!-- XP -->
       <span
         v-if="event.type === 'achievement'"
         class="text-green-600 font-semibold"

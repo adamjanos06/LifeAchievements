@@ -11,7 +11,9 @@ class BadgeUserController extends Controller
     public function index(Request $request)
     {
         return response()->json([
-            'data' => $request->user()->badges()->get()
+            'data' => $request->user()->badges()
+                ->withPivot('earned_at')
+                ->get()
         ]);
     }
 

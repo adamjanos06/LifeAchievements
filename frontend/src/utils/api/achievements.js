@@ -56,6 +56,9 @@ export async function fetchMyAchievements() {
       completions: Number(a.completions) || 0,
       xp: a.achievement?.xp || a.xp,
       difficulty: a.achievement?.difficulty || a.difficulty,
+      completion_date: a.completion_date,
+      created_at: a.created_at,
+      updated_at: a.updated_at,
       // Keep original nested structure for backward compatibility
       achievement: a.achievement || {
         id: a.id,

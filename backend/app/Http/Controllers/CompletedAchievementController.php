@@ -28,6 +28,8 @@ class CompletedAchievementController extends Controller
 
             if (!$completed->wasRecentlyCreated) {
                 $completed->increment('completions');
+                $completed->completion_date = now();
+                $completed->save();
             }
         } else {
             CompletedAchievement::firstOrCreate(
@@ -74,17 +76,12 @@ class CompletedAchievementController extends Controller
             $badge = BadgeService::checkCategoryBadges($user);
         }
 
-        // pull all completion rows for the user and aggregate by achievement id
+        // pull all completion rows for the user and preserve completion timestamps
         $completed = CompletedAchievement::with('achievement.category')
             ->where('user_id', $user->id)
-            ->get()
-            ->groupBy('achievement_id')
-            ->map(function ($group) {
-                $first = $group->first();
-                $first->completions = (int) $group->sum('completions');
-                return $first;
-            })
-            ->values();
+            ->orderByDesc('completion_date')
+            ->orderByDesc('created_at')
+            ->get();
 
         return response()->json([
             'data' => $completed

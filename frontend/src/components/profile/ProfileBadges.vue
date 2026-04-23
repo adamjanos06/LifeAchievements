@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue"
 
+const emit = defineEmits(["open"])
 const badges = ref([])
 
 async function loadBadges() {
-
   const res = await fetch("http://backend.vm1.test/api/my-badges", {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -16,6 +16,10 @@ async function loadBadges() {
   badges.value = (json.data ?? []).slice(0, 3)
 }
 
+function openBadges() {
+  emit("open")
+}
+
 onMounted(async () => {
   await new Promise(resolve => setTimeout(resolve, 300))
   loadBadges()
@@ -23,7 +27,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-3">
+  <div class="flex flex-col items-center gap-3 cursor-pointer" @click="openBadges">
 
     <!-- TITLE -->
     <p class="font-medium text-gray-700 dark:text-gray-300">

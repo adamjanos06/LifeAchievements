@@ -104,7 +104,7 @@ const events = computed(() => {
 
   return allEvents
     .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 5) // tesztre nagyobb
+    .slice(0, 3)
 })
 </script>
 

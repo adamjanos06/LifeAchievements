@@ -16,13 +16,13 @@ defineProps({
   }
 })
 
-defineEmits(['achievements-click'])
+defineEmits(['achievements-click', 'badges-click'])
 </script>
 
 <template>
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4 min-h-[300px]">
     <h3 class="font-semibold text-lg">Stats</h3>
-    <ProfileBadges />
+    <ProfileBadges @open="$emit('badges-click')" />
     <div
       @click="$emit('achievements-click')"
       class="flex justify-between hover:text-blue-600 dark:hover:text-cyan-400 cursor-pointer transition"

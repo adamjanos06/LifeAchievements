@@ -7,6 +7,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader.vue"
 import ProfileEditModal from "@/components/profile/ProfileEditModal.vue"
 import ProfileStats from "@/components/profile/ProfileStats.vue"
 import ProfileBio from "@/components/profile/ProfileBio.vue"
+import ProfileBadgeModal from "@/components/profile/ProfileBadgeModal.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
 import { useProfile } from "@/utils/composables/useProfile.js"
 
@@ -25,6 +26,15 @@ const {
 } = useProfile()
 
 const showEditModal = ref(false)
+const showBadgeModal = ref(false)
+
+function openBadgeModal() {
+  showBadgeModal.value = true
+}
+
+function closeBadgeModal() {
+  showBadgeModal.value = false
+}
 
 function goToMyAchievements() {
   router.push("/achievements")
@@ -84,6 +94,7 @@ onMounted(() => {
           :achievementsUnlocked="achievementsUnlocked"
           :totalXp="totalXp"
           @achievements-click="goToMyAchievements"
+          @badges-click="openBadgeModal"
         />
         <!-- EDIT MODAL -->
         <ProfileEditModal
@@ -100,6 +111,7 @@ onMounted(() => {
           />
         </div>
       </div>
+      <ProfileBadgeModal v-if="showBadgeModal" @close="closeBadgeModal" />
     </div>
   </div>
   <BadgePopup v-if="unlockedBadge" :badge="unlockedBadge" @close="unlockedBadge = null" />

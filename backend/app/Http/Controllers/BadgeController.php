@@ -9,9 +9,20 @@ use App\Services\BadgeService;
 
 class BadgeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return BadgeResource::collection(Badge::all());
+        $user = $request->user('sanctum');
+        $badges = Badge::all();
+
+        if ($user) {
+            $earnedBadgeIds = $user->badges()->pluck('badge_id')->toArray();
+            $badges->transform(function ($badge) use ($earnedBadgeIds) {
+                $badge->earned = in_array($badge->id, $earnedBadgeIds, true);
+                return $badge;
+            });
+        }
+
+        return BadgeResource::collection($badges);
     }
 
     public function show(Badge $badge)

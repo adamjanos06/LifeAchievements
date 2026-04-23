@@ -13,6 +13,8 @@ class BadgeResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'requirement_text' => $this->requirement_text,
+            'icon' => $this->icon,
+            'earned' => $this->earned ?? false,
             'id' => $this->id,
         ];
     }

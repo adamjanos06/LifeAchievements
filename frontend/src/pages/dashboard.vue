@@ -331,7 +331,7 @@ onMounted(async () => {
                 </h2>
                 <button
                   @click="openCreateModal"
-                  class="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition text-sm font-bold flex flex-row items-center gap-1"
+                  class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition text-sm font-bold flex flex-row items-center gap-1"
                 >
                   <CirclePlus class="" />Add
                 </button>

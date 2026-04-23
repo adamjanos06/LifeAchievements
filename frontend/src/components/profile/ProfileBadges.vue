@@ -23,35 +23,39 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex justify-center gap-8 flex-wrap">
+  <div class="flex flex-col items-center gap-3">
 
-    <div
-      v-for="badge in badges"
-      :key="badge.id"
-      class="flex flex-col items-center w-16"
-    >
+    <!-- TITLE -->
+    <p class="font-medium text-gray-700 dark:text-gray-300">
+      Recent Badges
+    </p>
 
-      <div class="w-32 h-32 flex items-center justify-center">
+    <!-- BADGES -->
+    <div class="flex justify-center gap-6 flex-wrap">
+      <div
+        v-for="badge in badges"
+        :key="badge.id"
+        class="flex flex-col items-center"
+      >
+        <div class="w-24 h-24 flex items-center justify-center">
+          <img
+            v-if="badge.icon"
+            :src="badge.icon"
+            class="max-w-full max-h-full object-contain"
+            @error="badge.icon = null"
+          />
 
-        <img
-          v-if="badge.icon"
-          :src="badge.icon"
-          class="max-w-full max-h-full object-contain"
-          @error="badge.icon = null"
-        />
-
-        <div
-          v-else
-          class="w-12 h-12 rounded-full
-                bg-blue-600 text-white
-                flex items-center justify-center
-                font-bold text-sm"
-        >
-          {{ badge.name.charAt(0).toUpperCase() }}
+          <div
+            v-else
+            class="w-12 h-12 rounded-full
+                   bg-blue-600 text-white
+                   flex items-center justify-center
+                   font-bold text-sm"
+          >
+            {{ badge.name.charAt(0).toUpperCase() }}
+          </div>
         </div>
-
       </div>
-
     </div>
 
   </div>

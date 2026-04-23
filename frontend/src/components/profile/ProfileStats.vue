@@ -20,7 +20,7 @@ defineEmits(['achievements-click'])
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4 min-h-[300px]">
     <h3 class="font-semibold text-lg">Stats</h3>
     <ProfileBadges />
     <div

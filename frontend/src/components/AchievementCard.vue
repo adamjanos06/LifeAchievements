@@ -73,7 +73,7 @@ defineEmits(['click']);
       <h3 class="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">
         {{ achievement.name }}
       </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 leading-snug">
+      <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug">
         {{ achievement.description }}
       </p>
     </div>

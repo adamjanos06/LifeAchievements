@@ -52,7 +52,7 @@ defineEmits(['click']);
       </template>
       <template v-else>
         <div
-          class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center"
+          class="w-8 h-8 rounded-full bg-green-500 dark:bg-green-600 text-white flex items-center justify-center"
         >
           <Check :strokeWidth="4" />  
         </div>
@@ -73,7 +73,7 @@ defineEmits(['click']);
       <h3 class="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">
         {{ achievement.name }}
       </h3>
-      <p class="text-sm text-gray-800 dark:text-gray-200 leading-snug">
+      <p class="text-md text-gray-800 dark:text-gray-200 leading-snug">
         {{ achievement.description }}
       </p>
     </div>

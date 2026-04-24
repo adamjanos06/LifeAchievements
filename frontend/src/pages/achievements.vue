@@ -1,34 +1,17 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { useAchievementsPage } from "@/utils/composables/useAchievementsPage.js";
 import MainNavbar from "@/components/layout/MainNavbar.vue";
 import AchievementBrowserSection from "@/components/achievements/AchievementBrowserSection.vue";
 import AchievementDetailsModal from "@/components/achievements/AchievementDetailsModal.vue";
-import { fetchMyAchievements } from "@/utils/api/achievements.js";
 
-const achievements = ref([]);
-const isLoading = ref(false);
-const selectedAchievement = ref(null)
-const showModal = ref(false)
-
-async function loadMyAchievements() {
-  try {
-    isLoading.value = true;
-    achievements.value = await fetchMyAchievements();
-  } catch (error) {
-    console.error("Failed to load achievements:", error);
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function openAchievement(achievement) {
-  selectedAchievement.value = achievement
-  showModal.value = true
-}
-
-onMounted(loadMyAchievements);
-
-const selectedIcon = computed(() => selectedAchievement.value?.category?.icon || selectedAchievement.value?.category_icon || "")
+const {
+  achievements,
+  isLoading,
+  selectedAchievement,
+  showModal,
+  selectedIcon,
+  openAchievement,
+} = useAchievementsPage()
 </script>
 
 <template>

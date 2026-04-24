@@ -56,6 +56,8 @@ defineEmits(['achievement-click']);
     <div
       v-for="achievement in achievements"
       :key="achievement.id"
+      :class="clickable ? 'cursor-pointer' : ''"
+      @click="clickable && $emit('achievement-click', achievement)"
     >
       <slot name="achievement-card" :achievement="achievement">
         <AchievementCard
@@ -65,7 +67,7 @@ defineEmits(['achievement-click']);
           :repeatable="achievement.repeatable || false"
           :category-icon="achievement.category?.icon || achievement.category_icon"
           :clickable="clickable"
-          @click="$emit('achievement-click', achievement)"
+          :emit-click="false"
         />
       </slot>
     </div>

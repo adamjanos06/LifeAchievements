@@ -25,6 +25,10 @@ defineProps({
   clickable: {
     type: Boolean,
     default: true
+  },
+  emitClick: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -33,10 +37,10 @@ defineEmits(['click']);
 
 <template>
   <div
-    @click="clickable && $emit('click')"
+    @click="clickable && emitClick && $emit('click')"
     :class="[
-      'relative border border-gray-200 dark:border-gray-700 rounded-2xl px-7 py-6',
-      'bg-white dark:bg-gray-800 flex gap-5 transition-colors',
+      'relative border border-gray-200 dark:border-gray-700 rounded-2xl px-7 py-7 min-h-[160px]',
+      'bg-white dark:bg-gray-800 flex items-center gap-5 transition-colors',
       clickable ? 'cursor-pointer hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]' : ''
     ]"
   >
@@ -60,20 +64,20 @@ defineEmits(['click']);
     </div>
 
     <!-- ICON -->
-    <div v-if="categoryIcon" class="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0">
+    <div v-if="categoryIcon" class="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0">
       <img
         :src="categoryIcon"
         :alt="`${achievement.name} Icon`"
-        class="w-14 h-14 object-contain"
+        class="w-22 h-22 object-contain"
       />
     </div>
 
     <!-- TEXT CONTENT -->
     <div class="flex-1">
-      <h3 class="font-semibold text-lg mb-1 text-gray-900 dark:text-gray-100">
+      <h3 class="font-semibold text-xl mb-1 text-gray-900 dark:text-gray-100">
         {{ achievement.name }}
       </h3>
-      <p class="text-md text-gray-800 dark:text-gray-200 leading-snug">
+      <p class="text-lg text-gray-800 dark:text-gray-200 leading-snug">
         {{ achievement.description }}
       </p>
     </div>

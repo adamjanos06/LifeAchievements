@@ -1,13 +1,14 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import AchievementGrid from "@/components/AchievementGrid.vue"
+import AchievementCard from "@/components/AchievementCard.vue"
 import PaginationButtons from "@/components/PaginationButtons.vue"
 import { isDark } from "@/utils/theme"
 import BadgePopup from "@/components/BadgePopup.vue"
 import { fetchCategories } from "@/utils/api/categories.js"
-import { fetchAchievements, completeAchievement } from "@/utils/api/achievements.js"
+import { fetchAchievements } from "@/utils/api/achievements.js"
 import { fetchGoals, addGoal, removeGoal } from "@/utils/api/goals.js"
 import { loadConfetti, fireConfetti } from "@/utils/confetti.js"
 import { getSafeColor, markAchievementCompleted } from "@/utils/catalog.js"
@@ -28,30 +29,29 @@ const showModal = ref(false)
 
 const currentPage = ref(1)
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+let handleResize = null
 
 const searchQuery = ref("")
 
 const perPage = computed(() => {
-  if (windowWidth.value >= 1024) return 9    // lg: 3 columns
-  if (windowWidth.value >= 640) return 6     // md: 2 columns
-  return 3                                   // sm/xs: 1 column
+  if (windowWidth.value >= 1024) return 9
+  if (windowWidth.value >= 640) return 6
+  return 3
 })
 
 let confettiFunc = null
 
 function isLoggedIn() {
-  return !!localStorage.getItem("token");
+  return !!localStorage.getItem("token")
 }
 
 function isGoal(achievementId) {
-  return goals.value.some(g => g.id === achievementId)
+  return goals.value.some(g => Number(g.id) === Number(achievementId))
 }
 
 function goBackToCategories() {
   router.push("/catalog")
 }
-
-/* ---------------- DATA LOAD ---------------- */
 
 async function loadCategoriesData() {
   try {
@@ -71,6 +71,7 @@ async function loadAchievementsData() {
 
 async function loadGoalsData() {
   if (!isLoggedIn()) return
+
   try {
     goals.value = await fetchGoals()
   } catch (error) {
@@ -78,13 +79,11 @@ async function loadGoalsData() {
   }
 }
 
+const category = computed(() => categories.value.find(c => c.id === categoryId) ?? null)
+
 /* ---------------- FILTER & SEARCH ---------------- */
 
-const filtered = computed(() =>
-  achievements.value.filter(
-    a => Number(a.category_id) === categoryId
-  )
-)
+const filtered = computed(() => achievements.value.filter(a => Number(a.category_id) === categoryId))
 
 const searched = computed(() => {
   if (!searchQuery.value.trim()) return filtered.value
@@ -97,29 +96,21 @@ const searched = computed(() => {
   )
 })
 
-/* ---------------- UI HELPERS ---------------- */
-
 const categoryName = computed(() => {
-  const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.name.toUpperCase() : ""
+  return category.value ? category.value.name.toUpperCase() : ""
 })
 
 const icon = computed(() => {
-  const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.icon : ""
+  return category.value ? category.value.icon : ""
 })
 
 const categoryColor = computed(() => {
-  const cat = categories.value.find(c => c.id === categoryId)
-
   if (isDark.value && categoryId === 8) return "#3b82f6"
 
-  return getSafeColor(cat?.color)
+  return getSafeColor(category.value?.color)
 })
 
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(searched.value.length / perPage.value))
-)
+const totalPages = computed(() => Math.max(1, Math.ceil(searched.value.length / perPage.value)))
 
 const paginatedAchievements = computed(() => {
   const start = (currentPage.value - 1) * perPage.value
@@ -127,11 +118,12 @@ const paginatedAchievements = computed(() => {
 })
 
 const completionButtonText = computed(() => {
-  if (!selected.value) return 'MARK AS COMPLETED'
+  if (!selected.value) return "MARK AS COMPLETED"
+
   if (selected.value.completed) {
-    return selected.value.repeatable ? 'COMPLETE AGAIN' : 'COMPLETED'
+    return selected.value.repeatable ? "COMPLETE AGAIN" : "COMPLETED"
   }
-  return 'MARK AS COMPLETED'
+  return "MARK AS COMPLETED"
 })
 
 const completionButtonDisabled = computed(() => {
@@ -139,11 +131,13 @@ const completionButtonDisabled = computed(() => {
   return selected.value.completed && !selected.value.repeatable
 })
 
+function showCompletionIndicator(achievement) {
+  return achievement.completed || Number(achievement.completions) > 0
+}
+
 function goToPage(page) {
   currentPage.value = page
 }
-
-/* ---------------- MODAL ---------------- */
 
 function openModal(a) {
   selected.value = a
@@ -154,8 +148,6 @@ function closeModal() {
   selected.value = null
   showModal.value = false
 }
-
-/* ---------------- GOALS ---------------- */
 
 async function saveGoalData() {
   if (!selected.value) return
@@ -170,7 +162,6 @@ async function saveGoalData() {
     console.error("Failed to save goal:", error)
   }
 }
-
 async function removeGoalData() {
   if (!selected.value) return
 
@@ -205,11 +196,10 @@ function tryOpenFromQuery() {
   }
 }
 
-/* ---------------- ACTIONS ---------------- */
-
 async function markAsCompleted() {
+  if (!selected.value) return
+
   const wasCompleted = selected.value.completed
-  if (!selected.value) return;
 
   if (!selected.value.repeatable && selected.value.completed) return;
 
@@ -217,32 +207,30 @@ async function markAsCompleted() {
     const data = await markAchievementCompleted(selected.value.id)
 
     if (data.badge) {
-      unlockedBadge.value = data.badge;
+      unlockedBadge.value = data.badge
     }
 
     if (selected.value.repeatable) {
-      selected.value.completed = true;
-      selected.value.completions = (Number(selected.value.completions) || 0) + 1;
+      selected.value.completed = true
+      selected.value.completions = (Number(selected.value.completions) || 0) + 1
     }
 
-    const idx = achievements.value.findIndex(
-      a => a.id === selected.value.id
-    );
+    const idx = achievements.value.findIndex(a => a.id === selected.value.id)
 
     if (idx !== -1) {
       if (selected.value.repeatable) {
-        achievements.value[idx].completions = selected.value.completions;
-        achievements.value[idx].completed = true;
+        achievements.value[idx].completions = selected.value.completions
+        achievements.value[idx].completed = true
       } else {
-        achievements.value[idx].completed = true;
+        achievements.value[idx].completed = true
       }
     }
 
     if (isGoal(selected.value.id)) {
-      await removeGoalData();
+      await removeGoalData()
     }
 
-    await loadAchievementsData();
+    await loadAchievementsData()
 
     if (!wasCompleted && confettiFunc) {
       fireConfetti(confettiFunc)
@@ -252,24 +240,29 @@ async function markAsCompleted() {
   }
 }
 
-/* ---------------- LIFECYCLE ---------------- */
-
 onMounted(async () => {
-  await loadCategoriesData()
-  await loadAchievementsData()
-  
-  confettiFunc = await loadConfetti()
-  
-  if (isLoggedIn()) {
-    loadGoalsData()
-  }
-  tryOpenFromQuery()
-
-  const handleResize = () => {
+  handleResize = () => {
     windowWidth.value = window.innerWidth
     currentPage.value = 1
   }
-  window.addEventListener('resize', handleResize)
+
+  window.addEventListener("resize", handleResize)
+
+  await Promise.all([loadCategoriesData(), loadAchievementsData()])
+
+  confettiFunc = await loadConfetti()
+
+  if (isLoggedIn()) {
+    await loadGoalsData()
+  }
+
+  tryOpenFromQuery()
+})
+
+onBeforeUnmount(() => {
+  if (handleResize) {
+    window.removeEventListener("resize", handleResize)
+  }
 })
 </script>
 
@@ -300,76 +293,37 @@ onMounted(async () => {
       />
     </div>
 
-    <!-- ACHIEVEMENT GRID -->
-    <div
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-             gap-3
-             sm:gap-5
-             lg:gap-6
-             min-h-[420px]"
-    >
-      <div
-        v-for="a in paginatedAchievements"
-        :key="a.id"
-        @click="openModal(a)"
-        class="relative flex gap-5 cursor-pointer
-               border border-gray-200 dark:border-gray-700
-               rounded-2xl px-7 py-5
-               bg-white dark:bg-gray-800
-               transition
-               hover:shadow-lg
-               dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]
-               h-30"
+    <div class="min-h-[420px]">
+      <AchievementGrid
+        :achievements="paginatedAchievements"
+        grid-gap="gap-3 sm:gap-5 lg:gap-6"
+        empty-message="No achievements found in this category."
+        @achievement-click="openModal"
       >
-        <!-- COMPLETED CHECK -->
-        <div
-          v-if="a.completed"
-          class="absolute top-3 right-3
-                 w-7 h-7 rounded-full
-                 bg-green-500 text-white
-                 flex items-center justify-center"
-        >
-          ✓
-        </div>
-
-        <div class="w-16 h-16 rounded-full flex items-center justify-center">
-          <img v-if="icon" :src="icon" class="w-20 h-20 object-contain" />
-        </div>
-
-        <div>
-          <h3 class="font-semibold text-lg mb-1">
-            {{ a.name }}
-          </h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ a.description }}
-          </p>
-        </div>
-      </div>
+        <template #achievement-card="{ achievement }">
+          <AchievementCard
+            :achievement="achievement"
+            :show-completion-indicator="showCompletionIndicator(achievement)"
+            :repeatable="achievement.repeatable"
+            :completions="achievement.completions"
+            :category-icon="icon"
+            :emit-click="false"
+          />
+        </template>
+      </AchievementGrid>
     </div>
 
     <!-- PAGINATION -->
-    <div v-if="totalPages > 1" class="flex justify-center gap-4 mt-8">
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        @click="goToPage(page)"
-        class="w-10 h-10 rounded-full
-               flex items-center justify-center
-               font-semibold transition
-               hover:scale-110"
-        :style="page === currentPage
-          ? {
-              backgroundColor: categoryColor,
-              color: 'white'
-            }
-          : {}"
-        :class="page === currentPage
-          ? ''
-          : 'bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-400 dark:hover:bg-gray-600'"
-      >
-        {{ page }}
-      </button>
-    </div>
+    <PaginationButtons
+      :total-pages="totalPages"
+      :current-page="currentPage"
+      container-class="flex justify-center gap-4 mt-8"
+      :active-button-style="{
+        backgroundColor: categoryColor,
+        boxShadow: `0 0 20px ${categoryColor}66`
+      }"
+      @page-change="goToPage"
+    />
 
     <!-- BACK BUTTON -->
     <div class="flex justify-center mt-8">
@@ -482,8 +436,8 @@ onMounted(async () => {
     </div>
   </div>
   <BadgePopup
-  v-if="unlockedBadge"
-  :badge="unlockedBadge"
-  @close="unlockedBadge = null"
-/>
+    v-if="unlockedBadge"
+    :badge="unlockedBadge"
+    @close="unlockedBadge = null"
+  />
 </template>

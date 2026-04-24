@@ -1,7 +1,7 @@
 import { onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { fetchUser } from "@/utils/api/user.js"
-import { fetchFriends, fetchFriendRequests } from "@/utils/api/friends.js"
+import { fetchFriends, fetchFriendRequests, removeFriend } from "@/utils/api/friends.js"
 
 export function useUserProfilePage() {
   const router = useRouter()
@@ -84,6 +84,25 @@ export function useUserProfilePage() {
     }
   }
 
+  async function removeCurrentFriend() {
+    if (!isFriend.value || !user.value?.id || removingFriend.value) return
+
+    removingFriend.value = true
+    const previousIsFriend = isFriend.value
+    isFriend.value = false
+    requestSent.value = false
+
+    try {
+      await removeFriend(user.value.id)
+      await Promise.all([loadFriendRequests(), loadFriendList()])
+    } catch (error) {
+      isFriend.value = previousIsFriend
+      console.error("Failed to remove friend:", error)
+    } finally {
+      removingFriend.value = false
+    }
+  }
+
   function getAvatarUrl(image) {
     if (!image) return null
     const filename = image.split("/").pop()
@@ -114,6 +133,7 @@ export function useUserProfilePage() {
     removingFriend,
     currentUserId,
     sendRequest,
+    removeCurrentFriend,
     getAvatarUrl,
     goBack,
   }

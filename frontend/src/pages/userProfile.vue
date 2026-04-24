@@ -1,7 +1,6 @@
 <script setup>
 import MainNavbar from "@/components/layout/MainNavbar.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
-import { removeFriend } from "@/utils/api/friends.js"
 import { useUserProfilePage } from "@/utils/composables/useUserProfilePage.js"
 
 const {
@@ -13,6 +12,7 @@ const {
   removingFriend,
   currentUserId,
   sendRequest,
+  removeCurrentFriend,
   getAvatarUrl,
   goBack,
 } = useUserProfilePage()
@@ -71,7 +71,7 @@ const {
                 <button
                   v-if="user.id !== currentUserId"
                   type="button"
-                  @click="isFriend ? removeFriend(user.id) : sendRequest()"
+                  @click="isFriend ? removeCurrentFriend() : sendRequest()"
                   :disabled="(requestSent && !isFriend) || removingFriend"
                   :class="[
                     'text-sm font-semibold px-5 py-2 rounded-xl transition',

@@ -67,7 +67,6 @@ async function loadFriendRequests() {
 
 onMounted(async () => {
   await loadUser()
-  // Ensure user is loaded before checking friends
   if (!user.value?.id) {
     loading.value = false
     return
@@ -140,7 +139,6 @@ async function sendRequest() {
       >
         ← Back
       </button>
-      <!-- HEADER -->
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
         <div class="flex items-center gap-6">
 
@@ -189,7 +187,6 @@ async function sendRequest() {
               </div>
             </div>
 
-            <!-- PROGRESS -->
             <div>
               <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                 <div
@@ -209,16 +206,14 @@ async function sendRequest() {
         </div>
       </div>
 
-      <!-- BIO -->
       <div v-if="user.bio"
            class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
-        <h3 class="text-lg font-semibold mb-2">About</h3>
+        <h3 class="text-lg font-semibold mb-2">About Me</h3>
         <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">
           {{ user.bio }}
         </p>
       </div>
 
-      <!-- STATS -->
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
         <h3 class="font-semibold text-lg">Stats</h3>
 

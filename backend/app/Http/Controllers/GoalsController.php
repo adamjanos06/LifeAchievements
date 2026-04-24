@@ -9,7 +9,6 @@ use App\Services\BadgeService;
 
 class GoalsController extends Controller
 {
-    // List current user's goals (as achievements)
     public function index(Request $request)
     {
         $achievementIds = Goal::where('user_id', $request->user()->id)
@@ -24,7 +23,6 @@ class GoalsController extends Controller
         ]);
     }
 
-    // Add a goal
     public function store(Request $request, Achievement $achievement)
     {
         $goal = Goal::firstOrCreate([
@@ -32,7 +30,6 @@ class GoalsController extends Controller
             'achievement_id' => $achievement->id,
         ]);
 
-        // Badge check
         $badge = BadgeService::checkGoalSetter($request->user());
 
         return response()->json([
@@ -41,7 +38,6 @@ class GoalsController extends Controller
         ], 201);
     }
 
-    // Remove goal
     public function destroy(Request $request, Achievement $achievement)
     {
         Goal::where([

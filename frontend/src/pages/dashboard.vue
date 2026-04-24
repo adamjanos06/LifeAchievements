@@ -21,7 +21,6 @@ const totalRecords = ref(0)
 
 const token = localStorage.getItem("token")
 
-// Modal states
 const showEditModal = ref(false)
 const showCreateModal = ref(false)
 const editingRecord = ref(null)
@@ -394,7 +393,6 @@ function openCreateModal() {
 }
 
 function isBooleanField(field) {
-  // Check if the field name suggests it's a boolean
   const booleanKeywords = ['is', 'has', 'admin', 'repeatable', 'verified']
   return booleanKeywords.some(keyword => field.toLowerCase().includes(keyword))
 }
@@ -426,7 +424,6 @@ async function saveRecord() {
   try {
     let response
     if (editingRecord.value) {
-      // Update existing record
       response = await fetch(
         `http://backend.vm1.test/api/admin/tables/${selectedTable.value}/records/${editingRecord.value.id}`,
         {
@@ -439,7 +436,6 @@ async function saveRecord() {
         }
       )
     } else {
-      // Create new record
       response = await fetch(
         `http://backend.vm1.test/api/admin/tables/${selectedTable.value}/records`,
         {
@@ -497,7 +493,6 @@ function goToPage(page) {
 }
 
 const visibleColumns = computed(() => {
-  // Hide sensitive columns
   return columns.value.filter(col => !['password', 'remember_token'].includes(col))
 })
 
@@ -537,17 +532,14 @@ onMounted(async () => {
   <MainNavbar class="relative z-50" />
   
   <div class="fixed inset-0 top-24 z-10 bg-gray-50 dark:bg-gray-800 overflow-hidden flex flex-col">
-    <!-- Header Section -->
     <div class="px-4 sm:px-6 lg:px-8 py-3 border-b border-gray-200 dark:border-gray-600 flex-shrink-0">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
         Admin Dashboard
       </h1>
     </div>
 
-    <!-- Main Content Area - Takes remaining height -->
     <div class="flex-1 overflow-hidden">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-3 h-full px-3 sm:px-4 lg:px-6 py-3">
-        <!-- SIDEBAR: Table List - Scrollable -->
         <div class="lg:col-span-1 flex flex-col overflow-hidden">
           <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-3 flex flex-col h-full">
             <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex-shrink-0">
@@ -579,11 +571,8 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- MAIN: Table Records - Scrollable -->
         <div class="lg:col-span-3 flex flex-col overflow-hidden">
           <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-3 flex flex-col h-full">
-            
-            <!-- Header - Fixed -->
             <div v-if="selectedTable" class="flex-shrink-0 mb-3">
               <div class="flex justify-between items-center mb-2 gap-2">
                 <h2 class="text-lg font-bold text-gray-900 dark:text-white truncate">
@@ -597,7 +586,6 @@ onMounted(async () => {
                 </button>
               </div>
 
-              <!-- Search -->
               <div class="mb-2">
                 <input
                   v-model="searchQuery"
@@ -609,7 +597,6 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- Records Table Container - Scrollable -->
             <div class="flex-1 overflow-hidden flex flex-col">
               <div v-if="recordsLoading" class="text-center text-gray-500 dark:text-gray-400 py-3 text-sm">
                 Loading records...
@@ -674,7 +661,6 @@ onMounted(async () => {
                 </table>
               </div>
 
-              <!-- Pagination - Sticky -->
               <div v-if="totalPages > 1" class="flex-shrink-0 border-t border-gray-200 dark:border-gray-600 mt-2 pt-2 flex justify-center items-center gap-1">
                 <button
                   v-if="currentPage > 1"
@@ -723,7 +709,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Edit/Create Modal -->
     <div
       v-if="showEditModal || showCreateModal"
       class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4"
@@ -743,7 +728,6 @@ onMounted(async () => {
             :key="field"
             :class="['flex', isBooleanField(field) ? 'flex-row items-center gap-2' : 'flex-col']"
           >
-            <!-- Boolean fields: Checkbox -->
             <template v-if="isBooleanField(field)">
               <input
                 :id="`field-${field}`"
@@ -759,7 +743,6 @@ onMounted(async () => {
               </label>
             </template>
 
-            <!-- Non-boolean fields: Text input -->
             <template v-else-if="isForeignKeyField(field)">
               <label class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ field }}

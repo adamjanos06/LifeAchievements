@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class BadgeUserController extends Controller
 {
-    // List earned badges
     public function index(Request $request)
     {
         return response()->json([
@@ -17,7 +16,6 @@ class BadgeUserController extends Controller
         ]);
     }
 
-    // Earn badge
     public function store(Request $request, Badge $badge)
     {
         $request->user()->badges()->syncWithoutDetaching([

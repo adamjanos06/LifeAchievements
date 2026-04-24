@@ -139,7 +139,6 @@ class BadgeService
 
         if ($alreadyEarned) return null;
 
-        // Check if this is their first friend connection
         $friendRequestCount = $user->sentFriendRequests()->count() + 
                              $user->receivedFriendRequests()->count() +
                              $user->friends()->count();

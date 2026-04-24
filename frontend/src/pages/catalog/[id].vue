@@ -223,12 +223,12 @@ onMounted(async () => {
       :category-icon="icon"
       card-height-class="h-[8.75rem] max-h-[8.75rem] sm:h-[9.5rem] sm:max-h-[9.5rem] lg:h-[9.5rem] lg:max-h-[9.5rem]"
       grid-gap="gap-3 sm:gap-5 lg:gap-6"
-      pagination-container-class="flex justify-center gap-4 mt-2"
+      pagination-container-class="flex justify-center gap-4 mt-7"
       :pagination-active-button-style="{
         backgroundColor: categoryColor,
         boxShadow: `0 0 20px ${categoryColor}66`
       }"
-      content-min-height-class="min-h-[32rem] sm:min-h-[35.25rem] lg:min-h-[35.75rem]"
+      content-min-height-class="min-h-[28rem] sm:min-h-[31rem] lg:min-h-[33rem]"
       searchable
       search-placeholder="Search achievements..."
       responsive-page-size
@@ -236,8 +236,7 @@ onMounted(async () => {
       @select="openModal"
     />
 
-    <!-- BACK BUTTON -->
-    <div class="flex justify-center mt-2">
+    <div class="flex justify-center mt-8">
       <button
         @click="goBackToCategories"
         class="px-8 py-3 text-white font-semibold rounded-xl

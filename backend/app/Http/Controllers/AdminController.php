@@ -16,7 +16,7 @@ class AdminController extends Controller
         'completed_achievements' => \App\Models\CompletedAchievement::class,
         'goals' => \App\Models\Goal::class,
         'friend_requests' => \App\Models\friend_request::class,
-        'badge_user' => null, // pivot table, handled differently
+        'badge_user' => null,
     ];
 
     public function getTables()
@@ -40,7 +40,6 @@ class AdminController extends Controller
 
     public function getTableRecords(Request $request, string $table)
     {
-        // Validate table name exists
         if (!isset(self::$tableModels[$table])) {
             return response()->json([
                 'error' => 'Table not found'

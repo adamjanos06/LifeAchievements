@@ -11,7 +11,6 @@ class CompletedAchievement extends Model
         'achievement_id',
         'completion_date',
         'notes',
-        // tracking number of times a repeatable achievement was done
         'completions',
     ];
 

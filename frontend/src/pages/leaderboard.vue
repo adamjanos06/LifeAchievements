@@ -82,7 +82,6 @@ function goToProfile(id) {
   }
 }
 
-/* XP animation */
 function animateXpValues() {
   animatedXp.value = {}
 
@@ -106,7 +105,6 @@ function animateXpValues() {
   })
 }
 
-/* Top 3 badge */
 function getMedal(index) {
   if (index === 0) return "🥇"
   if (index === 1) return "🥈"
@@ -120,7 +118,6 @@ function getAvatarUrl(image) {
   return `http://backend.vm1.test/api/avatar/${filename}`
 }
 
-/* watch mode change */
 watch(mode, async () => {
   loading.value = true
   await loadLeaderboard()
@@ -153,7 +150,6 @@ onMounted(async () => {
       />
     </div>
 
-    <!-- TOGGLE -->
     <div class="flex justify-center mt-3">
 
       <div class="bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex">
@@ -182,7 +178,6 @@ onMounted(async () => {
 
     </div>
 
-    <!-- LABEL -->
     <p class="text-center text-sm text-gray-500 dark:text-gray-400">
       {{ mode === 'friends' ? 'Friends leaderboard' : 'Global leaderboard' }}
     </p>
@@ -210,7 +205,6 @@ onMounted(async () => {
       >
         <div class="flex items-center gap-4">
 
-          <!-- Rank -->
           <span class="text-lg font-bold w-8 text-center">
             <span v-if="getMedal(index)">
               {{ getMedal(index) }}
@@ -220,7 +214,6 @@ onMounted(async () => {
             </span>
           </span>
 
-          <!-- Avatar -->
           <div
             :class="[
               'w-12 h-12 rounded-full flex items-center justify-center text-white font-bold overflow-hidden',
@@ -239,7 +232,6 @@ onMounted(async () => {
             </span>
           </div>
 
-          <!-- Name + Level -->
           <div>
             <p class="font-semibold">
               {{ user.name }}
@@ -250,7 +242,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- XP -->
         <div class="text-right">
           <p
             :class="[

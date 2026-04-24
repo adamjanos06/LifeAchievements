@@ -15,9 +15,6 @@ use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 
-// ----------------------
-// Public Routes
-// ----------------------
 Route::get('/avatar/{filename}', function ($filename) {
 
     $path = storage_path('app/public/pfp/' . $filename);
@@ -48,71 +45,49 @@ Route::get('/leaderboard', function () {
         ->get();
 });
 
-
-// ----------------------
-// Authenticated Routes
-// ----------------------
-
 Route::middleware('auth:sanctum')->group(function () {
-    // AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // profile and updating profile
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/me', [UserController::class, 'update']);
     Route::post('/profile-visited', [UserController::class, 'profileVisited']);
-   
 
-    // --- Categories (admin) ---
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
-    // --- Achievements (admin + catalog logic) ---
     Route::post('/achievements', [AchievementController::class, 'store']);
     Route::put('/achievements/{achievement}', [AchievementController::class, 'update']);
     Route::delete('/achievements/{achievement}', [AchievementController::class, 'destroy']);
 
-    // --- Catalog: mark achievement as completed ---
     Route::post(
         '/achievements/{achievement}/complete',
         [CompletedAchievementController::class, 'store']
     );
 
-    // --- My Achievements (only logged-in user) ---
     Route::get(
         '/my-achievements',
         [CompletedAchievementController::class, 'userCompleted']
     );
 
-    // --- Friends stuff
     Route::get('/friends', [FriendController::class, 'index']);
-    // the same endpoint now returns both incoming and sent pending requests
     Route::get('/friend-requests', [FriendController::class, 'incoming']);
     Route::post('/friends', [FriendController::class, 'send']);
     Route::delete('/friends/{user}', [FriendController::class, 'remove']);
     Route::post('/friend-requests/{friendRequest}/accept', [FriendController::class, 'accept']);
-    // allow cancelling an outgoing request
     Route::delete('/friend-requests/{friendRequest}', [FriendController::class, 'cancel']);
 
-    // --- Goals (user ↔ achievement) ---
     Route::get('/goals', [GoalsController::class, 'index']);
     Route::post('/goals/{achievement}', [GoalsController::class, 'store']);
     Route::delete('/goals/{achievement}', [GoalsController::class, 'destroy']);
 
-    // --- Earned Badges (user ↔ badge) ---
     Route::get('/my-badges', [BadgeUserController::class, 'index']);
     Route::post('/badges/{badge}/earn', [BadgeUserController::class, 'store']);
     Route::post('/badges/dark-side', [BadgeController::class, 'darkSide']);
-    
-    // get other user's profile
+
     Route::get('/users/{user}', [UserController::class, 'show']);
 
-    // ----------------------
-    // Admin Routes
-    // ----------------------
     Route::middleware('is_admin')->prefix('/admin')->group(function () {
-        // Table Management (phpMyAdmin-like)
         Route::get('/tables', [AdminController::class, 'getTables']);
         Route::get('/tables/{table}/structure', [AdminController::class, 'getTableStructure']);
         Route::get('/tables/{table}/records', [AdminController::class, 'getTableRecords']);

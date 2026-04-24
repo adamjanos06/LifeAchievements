@@ -82,7 +82,6 @@ async function markSelectedAsCompleted() {
       selectedGoal.value.completed = true
     }
 
-    // Keep goals in sync with catalog behavior: completed goals are removed.
     await removeSelectedGoal()
   } catch (error) {
     console.error("Failed to mark achievement as completed:", error)

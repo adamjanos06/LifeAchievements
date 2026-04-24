@@ -5,9 +5,7 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
 <template>
   <LandingNavbar />
   
-  <!-- HERO SECTION -->
   <section class="max-w-7xl mx-auto px-10 pt-10 pb-28 flex flex-col-reverse lg:flex-row items-center justify-between gap-20">
-    <!-- LEFT SIDE -->
     <div class="w-full lg:w-[620px] text-center lg:text-left flex flex-col items-center lg:items-start">
       
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-8">
@@ -42,7 +40,6 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
 
     </div>
       
-    <!-- RIGHT SIDE – CHECKMARK (desktop only) -->
     <div class="hidden lg:flex w-[360px] justify-end">
       <div class="w-56 h-56 bg-blue-700 rounded-full flex items-center justify-center shadow-2xl">
         <svg
@@ -59,14 +56,12 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
     </div>
   </section>
 
-  <!-- INTRODUCTION SECTION -->
   <section class="max-w-6xl xl:max-w-7xl mx-auto px-8 lg:px-12 pt-16 pb-24">
     <h1 class="text-center text-4xl md:text-5xl font-extrabold tracking-wide mb-16">
       HOW IT WORKS
     </h1>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-20 xl:gap-32 items-stretch">
-      <!-- WHAT IS LIFE ACHIEVEMENTS -->
       <div class="flex flex-col justify-between h-full">
         <div class="space-y-6">
           <h3 class="text-2xl font-bold">
@@ -100,7 +95,6 @@ import LandingNavbar from '@/components/layout/LandingNavbar.vue'
         </div>
       </div>
 
-      <!-- HOW IT WORKS -->
       <div class="flex flex-col justify-between h-full">
         <div class="space-y-6">
           <h3 class="text-2xl font-bold">

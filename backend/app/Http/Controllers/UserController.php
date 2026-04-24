@@ -11,10 +11,6 @@ use App\Services\BadgeService;
 
 class UserController extends Controller
 {
-    /**
-     * Get current user's profile
-     */
-
     public function me(Request $request)
     {
         $user = $request->user();
@@ -24,9 +20,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Mark profile as visited (for badge awarding)
-     */
     public function profileVisited(Request $request)
     {
         $user = $request->user();
@@ -55,9 +48,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update logged-in user's profile
-     */
     public function update(Request $request)
     {
         $user = $request->user();

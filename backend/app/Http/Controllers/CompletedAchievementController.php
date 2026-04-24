@@ -44,7 +44,6 @@ class CompletedAchievementController extends Controller
             );
         }
 
-        // Remove from goals if exists
         Goal::where([
             'user_id' => $user->id,
             'achievement_id' => $achievement->id
@@ -76,7 +75,6 @@ class CompletedAchievementController extends Controller
             $badge = BadgeService::checkCategoryBadges($user);
         }
 
-        // pull all completion rows for the user and preserve completion timestamps
         $completed = CompletedAchievement::with('achievement.category')
             ->where('user_id', $user->id)
             ->orderByDesc('completion_date')

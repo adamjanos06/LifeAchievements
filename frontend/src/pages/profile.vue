@@ -59,7 +59,6 @@ function handleModalSave(data) {
   showEditModal.value = false
 }
 
-// Initialize profile on mount
 import { onMounted } from "vue"
 
 onMounted(() => {
@@ -87,7 +86,6 @@ onMounted(() => {
 
       <ProfileBio :bio="user.bio" />
 
-      <!-- STATS + ACTIVITY -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <ProfileStats
           :user="user"
@@ -96,7 +94,6 @@ onMounted(() => {
           @achievements-click="goToMyAchievements"
           @badges-click="openBadgeModal"
         />
-        <!-- EDIT MODAL -->
         <ProfileEditModal
           :show="showEditModal"
           :user="user"

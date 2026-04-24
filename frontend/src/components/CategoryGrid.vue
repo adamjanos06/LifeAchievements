@@ -1,7 +1,8 @@
 <script setup>
 import CategoryCard from './CategoryCard.vue';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   categories: {
     type: Array,
     required: true
@@ -13,7 +14,15 @@ defineProps({
   emptyMessage: {
     type: String,
     default: "No categories found"
+  },
+  fillToCount: {
+    type: Number,
+    default: 0
   }
+});
+
+const fillerCount = computed(() => {
+  return Math.max(0, props.fillToCount - props.categories.length);
 });
 
 defineEmits(['category-click']);
@@ -50,5 +59,20 @@ defineEmits(['category-click']);
       :category="category"
       @click="$emit('category-click', category.id)"
     />
+
+    <div
+      v-for="n in fillerCount"
+      :key="`filler-${n}`"
+      class="invisible pointer-events-none"
+    >
+      <div
+        class="flex items-center gap-5
+               border border-gray-200 dark:border-gray-700
+               rounded-2xl px-7 py-6"
+      >
+        <div class="w-16 h-16 rounded-full flex-shrink-0"></div>
+        <span class="text-lg font-semibold">placeholder</span>
+      </div>
+    </div>
   </div>
 </template>

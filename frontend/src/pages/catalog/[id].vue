@@ -1,10 +1,9 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import MainNavbar from "@/components/layout/MainNavbar.vue"
-import AchievementGrid from "@/components/AchievementGrid.vue"
-import AchievementCard from "@/components/AchievementCard.vue"
-import PaginationButtons from "@/components/PaginationButtons.vue"
+import AchievementBrowserSection from "@/components/achievements/AchievementBrowserSection.vue"
+import AchievementDetailsModal from "@/components/achievements/AchievementDetailsModal.vue"
 import { isDark } from "@/utils/theme"
 import BadgePopup from "@/components/BadgePopup.vue"
 import { fetchCategories } from "@/utils/api/categories.js"
@@ -12,7 +11,6 @@ import { fetchAchievements } from "@/utils/api/achievements.js"
 import { fetchGoals, addGoal, removeGoal } from "@/utils/api/goals.js"
 import { loadConfetti, fireConfetti } from "@/utils/confetti.js"
 import { getSafeColor, markAchievementCompleted } from "@/utils/catalog.js"
-import { CircleX } from "@lucide/vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -26,18 +24,7 @@ const goals = ref([])
 
 const selected = ref(null)
 const showModal = ref(false)
-
-const currentPage = ref(1)
-const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
-let handleResize = null
-
-const searchQuery = ref("")
-
-const perPage = computed(() => {
-  if (windowWidth.value >= 1024) return 9
-  if (windowWidth.value >= 640) return 6
-  return 3
-})
+const isLoading = ref(true)
 
 let confettiFunc = null
 
@@ -81,20 +68,7 @@ async function loadGoalsData() {
 
 const category = computed(() => categories.value.find(c => c.id === categoryId) ?? null)
 
-/* ---------------- FILTER & SEARCH ---------------- */
-
-const filtered = computed(() => achievements.value.filter(a => Number(a.category_id) === categoryId))
-
-const searched = computed(() => {
-  if (!searchQuery.value.trim()) return filtered.value
-
-  const q = searchQuery.value.toLowerCase()
-
-  return filtered.value.filter(a =>
-    a.name.toLowerCase().includes(q) ||
-    a.description.toLowerCase().includes(q)
-  )
-})
+const filteredAchievements = computed(() => achievements.value.filter(a => Number(a.category_id) === categoryId))
 
 const categoryName = computed(() => {
   return category.value ? category.value.name.toUpperCase() : ""
@@ -110,13 +84,6 @@ const categoryColor = computed(() => {
   return getSafeColor(category.value?.color)
 })
 
-const totalPages = computed(() => Math.max(1, Math.ceil(searched.value.length / perPage.value)))
-
-const paginatedAchievements = computed(() => {
-  const start = (currentPage.value - 1) * perPage.value
-  return searched.value.slice(start, start + perPage.value)
-})
-
 const completionButtonText = computed(() => {
   if (!selected.value) return "MARK AS COMPLETED"
 
@@ -130,14 +97,6 @@ const completionButtonDisabled = computed(() => {
   if (!selected.value) return false
   return selected.value.completed && !selected.value.repeatable
 })
-
-function showCompletionIndicator(achievement) {
-  return achievement.completed || Number(achievement.completions) > 0
-}
-
-function goToPage(page) {
-  currentPage.value = page
-}
 
 function openModal(a) {
   selected.value = a
@@ -181,18 +140,6 @@ async function toggleGoalData() {
   }
   else {
     await saveGoalData()
-  }
-}
-
-function tryOpenFromQuery() {
-  const openId = Number(route.query.open)
-
-  if (!openId) return
-
-  const found = achievements.value.find(a => a.id === openId)
-
-  if (found) {
-    openModal(found)
   }
 }
 
@@ -241,27 +188,16 @@ async function markAsCompleted() {
 }
 
 onMounted(async () => {
-  handleResize = () => {
-    windowWidth.value = window.innerWidth
-    currentPage.value = 1
-  }
+  try {
+    await Promise.all([loadCategoriesData(), loadAchievementsData()])
 
-  window.addEventListener("resize", handleResize)
+    confettiFunc = await loadConfetti()
 
-  await Promise.all([loadCategoriesData(), loadAchievementsData()])
-
-  confettiFunc = await loadConfetti()
-
-  if (isLoggedIn()) {
-    await loadGoalsData()
-  }
-
-  tryOpenFromQuery()
-})
-
-onBeforeUnmount(() => {
-  if (handleResize) {
-    window.removeEventListener("resize", handleResize)
+    if (isLoggedIn()) {
+      await loadGoalsData()
+    }
+  } finally {
+    isLoading.value = false
   }
 })
 </script>
@@ -278,55 +214,30 @@ onBeforeUnmount(() => {
       {{ categoryName }}
     </h2>
 
-    <div class="flex justify-center mb-4">
-      <input
-        v-model="searchQuery"
-        @input="currentPage = 1"
-        type="text"
-        placeholder="Search achievements..."
-        class="w-full max-w-md px-4 py-2
-              rounded-xl border
-              border-gray-300 dark:border-gray-600
-              bg-white dark:bg-gray-800
-              text-gray-900 dark:text-gray-100
-              focus:outline-none focus:ring-2 focus:ring-blue-600"
-      />
-    </div>
-
-    <div class="min-h-[420px]">
-      <AchievementGrid
-        :achievements="paginatedAchievements"
-        grid-gap="gap-3 sm:gap-5 lg:gap-6"
-        empty-message="No achievements found in this category."
-        @achievement-click="openModal"
-      >
-        <template #achievement-card="{ achievement }">
-          <AchievementCard
-            :achievement="achievement"
-            :show-completion-indicator="showCompletionIndicator(achievement)"
-            :repeatable="achievement.repeatable"
-            :completions="achievement.completions"
-            :category-icon="icon"
-            :emit-click="false"
-          />
-        </template>
-      </AchievementGrid>
-    </div>
-
-    <!-- PAGINATION -->
-    <PaginationButtons
-      :total-pages="totalPages"
-      :current-page="currentPage"
-      container-class="flex justify-center gap-4 mt-8"
-      :active-button-style="{
+    <AchievementBrowserSection
+      :achievements="filteredAchievements"
+      :is-loading="isLoading"
+      :show-completion-indicators="true"
+      :clickable="true"
+      :large-text="true"
+      :category-icon="icon"
+      card-height-class="h-[8.75rem] max-h-[8.75rem] sm:h-[9.5rem] sm:max-h-[9.5rem] lg:h-[9.5rem] lg:max-h-[9.5rem]"
+      grid-gap="gap-3 sm:gap-5 lg:gap-6"
+      pagination-container-class="flex justify-center gap-4 mt-2"
+      :pagination-active-button-style="{
         backgroundColor: categoryColor,
         boxShadow: `0 0 20px ${categoryColor}66`
       }"
-      @page-change="goToPage"
+      content-min-height-class="min-h-[32rem] sm:min-h-[35.25rem] lg:min-h-[35.75rem]"
+      searchable
+      search-placeholder="Search achievements..."
+      responsive-page-size
+      empty-message="No achievements found in this category."
+      @select="openModal"
     />
 
     <!-- BACK BUTTON -->
-    <div class="flex justify-center mt-8">
+    <div class="flex justify-center mt-2">
       <button
         @click="goBackToCategories"
         class="px-8 py-3 text-white font-semibold rounded-xl
@@ -342,99 +253,65 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- MODAL -->
-  <div
-    v-if="showModal"
-    class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+  <AchievementDetailsModal
+    :open="showModal"
+    :achievement="selected"
+    :icon="isLoggedIn() ? icon : ''"
+    :show-details="isLoggedIn()"
+    @close="closeModal"
   >
-    <div
-      class="bg-white dark:bg-gray-800
-             rounded-2xl p-8 w-full max-w-md relative mx-4
-             text-gray-900 dark:text-gray-100
-             transition-colors
-             dark:shadow-[0_0_40px_rgba(255,255,255,0.25)]"
-    >
-      <button @click="closeModal" class="absolute top-4 right-4 text-2xl w-8 h-8">
-        <CircleX />  
-      </button>
-
-      <div v-if="!isLoggedIn()" class="text-center space-y-4">
+    <template v-if="!isLoggedIn()">
+      <div class="text-center space-y-4">
         <h2 class="text-xl font-bold">
           You must be logged in
         </h2>
 
         <RouterLink
           to="/login"
-          class="inline-block bg-blue-600 hover:bg-blue-700
-                 text-white px-4 py-2 rounded-lg font-semibold"
+          class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold"
         >
           Go to Login
         </RouterLink>
       </div>
+    </template>
 
-      <div v-else class="flex flex-col items-center text-center gap-4">
-        <img v-if="icon" :src="icon" class="w-20 h-20 object-contain" />
-
-        <h2 class="text-2xl font-bold">
-          {{ selected?.name }}
-        </h2>
-
-        <p class="text-gray-600 dark:text-gray-400">
-          {{ selected?.description }}
-        </p>
-        <p
-          v-if="selected?.repeatable && selected?.completions"
-          class="text-sm text-gray-500 dark:text-gray-400 mt-1"
+    <template v-else>
+      <div class="w-full mt-3">
+        <button
+          v-if="selected?.completed && !selected?.repeatable"
+          disabled
+          class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold cursor-default border-2 border-green-400 dark:border-green-300 shadow-md dark:shadow-[0_0_15px_rgba(34,197,94,0.6)]"
         >
-          Completed {{ selected.completions }} time<span v-if="selected.completions > 1">s</span>.
-        </p>
+          COMPLETED
+        </button>
 
-        <div class="w-full mt-3">
-          <!-- show disabled completed badge only for non-repeatable items -->
-          <button
-            v-if="selected?.completed && !selected?.repeatable"
-            disabled
-            class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold cursor-default
-            border-2 border-green-400 dark:border-green-300 shadow-md dark:shadow-[0_0_15px_rgba(34,197,94,0.6)]"
-          >
-            COMPLETED
-          </button>
+        <button
+          v-else
+          @click="markAsCompleted"
+          :disabled="completionButtonDisabled"
+          class="w-full bg-blue-600 hover:bg-blue-800 text-white py-2 rounded-lg font-semibold transition cursor-pointer border-2 border-blue-400 dark:border-blue-300 shadow-md dark:shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+        >
+          {{ completionButtonText }}
+        </button>
 
-          <!-- allow clicking for first-time or repeatable completions -->
-          <button
-            v-else
-            @click="markAsCompleted"
-            :disabled="completionButtonDisabled"
-            class="w-full bg-blue-600 hover:bg-blue-800 text-white
-            py-2 rounded-lg font-semibold transition cursor-pointer
-            border-2 border-blue-400 dark:border-blue-300
-            shadow-md dark:shadow-[0_0_15px_rgba(59,130,246,0.6)]"
-          >
-            {{ completionButtonText }}
-          </button>
-
-          <button
-            v-if="!selected?.completed"
-            @click="toggleGoalData"
-            :class="isGoal(selected.id)
-              ? 'bg-transparent text-amber-600 border-2 border-amber-500'
-              : 'bg-amber-600 hover:bg-amber-800 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_15px_rgba(251,191,36,0.6)]'
-            "
-            class="w-full my-5 py-2 rounded-lg font-semibold cursor-pointer transition"
-          >
-            {{ isGoal(selected.id)
-                ? "REMOVE FROM GOALS"
-                : "SAVE TO GOALS"
-            }}
-          </button>
-        </div>
+        <button
+          v-if="!selected?.completed"
+          @click="toggleGoalData"
+          :class="isGoal(selected.id)
+            ? 'bg-transparent text-amber-600 border-2 border-amber-500'
+            : 'bg-amber-600 hover:bg-amber-800 text-white border-2 border-amber-400 shadow-md dark:shadow-[0_0_15px_rgba(251,191,36,0.6)]'"
+          class="w-full mt-3 py-2 rounded-lg font-semibold transition cursor-pointer"
+        >
+          {{ isGoal(selected.id) ? "REMOVE GOAL" : "MARK AS GOAL" }}
+        </button>
 
         <div class="text-left w-full mt-3">
           <p class="font-semibold">Reward:</p>
           <p>{{ selected?.xp }} XP</p>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </AchievementDetailsModal>
   <BadgePopup
     v-if="unlockedBadge"
     :badge="unlockedBadge"

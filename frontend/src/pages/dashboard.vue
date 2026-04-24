@@ -27,6 +27,8 @@ const showCreateModal = ref(false)
 const editingRecord = ref(null)
 const editFormData = ref({})
 const fillable = ref([])
+const foreignKeyOptions = ref({})
+const tableStructureCache = ref({})
 
 async function getTables() {
   try {
@@ -104,31 +106,267 @@ async function loadTableStructure() {
     
     const data = await response.json()
     fillable.value = data.fillable || []
+    await loadForeignKeyOptionsForFields(fillable.value)
   } catch (err) {
     console.error("Error loading structure:", err)
   }
+}
+
+function singularizeTableName(tableName) {
+  if (tableName.endsWith("ies")) return `${tableName.slice(0, -3)}y`
+  if (tableName.endsWith("s")) return tableName.slice(0, -1)
+  return tableName
+}
+
+function getForeignKeyCandidatesForTable(tableName) {
+  const singular = singularizeTableName(tableName)
+  return [`${singular}_id`, `${tableName}_id`]
+}
+
+async function getTableStructure(tableName) {
+  if (tableStructureCache.value[tableName]) {
+    return tableStructureCache.value[tableName]
+  }
+
+  const response = await fetch(
+    `http://backend.vm1.test/api/admin/tables/${tableName}/structure`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  if (!response.ok) throw new Error(`Failed to fetch structure for ${tableName}`)
+
+  const data = await response.json()
+  const structure = {
+    fillable: data.fillable || [],
+  }
+  tableStructureCache.value[tableName] = structure
+  return structure
+}
+
+async function fetchAllRecordsForTable(tableName) {
+  const all = []
+  let page = 1
+  let lastPage = 1
+
+  do {
+    const params = new URLSearchParams({
+      per_page: "200",
+      page: String(page),
+      search: "",
+      sort_by: "id",
+      sort_order: "asc",
+    })
+
+    const response = await fetch(
+      `http://backend.vm1.test/api/admin/tables/${tableName}/records?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (!response.ok) throw new Error(`Failed to fetch records from ${tableName}`)
+
+    const data = await response.json()
+    all.push(...(data.data || []))
+    lastPage = data.pagination?.last_page || 1
+    page += 1
+  } while (page <= lastPage)
+
+  return all
+}
+
+async function deleteRecordDirect(tableName, recordId) {
+  const response = await fetch(
+    `http://backend.vm1.test/api/admin/tables/${tableName}/records/${recordId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete record ${recordId} from ${tableName}`)
+  }
+}
+
+async function getDependentTables(parentTableName) {
+  const parentFkCandidates = getForeignKeyCandidatesForTable(parentTableName)
+  const dependentTables = []
+
+  for (const table of tables.value) {
+    const tableName = table.name
+    if (tableName === parentTableName) continue
+
+    try {
+      const structure = await getTableStructure(tableName)
+      const matchedField = structure.fillable.find((field) => parentFkCandidates.includes(field))
+
+      if (matchedField) {
+        dependentTables.push({
+          tableName,
+          foreignKeyField: matchedField,
+        })
+      }
+    } catch (err) {
+      console.error(`Skipping dependency check for ${tableName}:`, err)
+    }
+  }
+
+  return dependentTables
+}
+
+async function cascadeDeleteRecord(tableName, recordId, visited = new Set()) {
+  const visitKey = `${tableName}:${recordId}`
+  if (visited.has(visitKey)) return
+  visited.add(visitKey)
+
+  const dependents = await getDependentTables(tableName)
+
+  for (const dependent of dependents) {
+    const rows = await fetchAllRecordsForTable(dependent.tableName)
+    const linkedRows = rows.filter((row) => Number(row[dependent.foreignKeyField]) === Number(recordId))
+
+    for (const linkedRow of linkedRows) {
+      await cascadeDeleteRecord(dependent.tableName, linkedRow.id, visited)
+    }
+  }
+
+  await deleteRecordDirect(tableName, recordId)
+}
+
+function isForeignKeyField(field) {
+  return field.endsWith("_id") && field !== "id"
+}
+
+function getReferencedTableCandidates(field) {
+  const base = field.replace(/_id$/, "")
+  const candidates = [base, `${base}s`]
+
+  if (base.endsWith("y")) {
+    candidates.push(`${base.slice(0, -1)}ies`)
+  }
+
+  return candidates
+}
+
+function resolveReferencedTable(field) {
+  const candidates = getReferencedTableCandidates(field)
+  const available = new Set(tables.value.map((t) => t.name))
+
+  for (const candidate of candidates) {
+    if (available.has(candidate)) return candidate
+  }
+
+  return candidates[0]
+}
+
+function getBestLabel(record) {
+  const preferred = [
+    "name",
+    "username",
+    "title",
+    "full_name",
+    "display_name",
+    "email",
+    "slug",
+  ]
+
+  for (const key of preferred) {
+    if (record[key] !== undefined && record[key] !== null && String(record[key]).trim() !== "") {
+      return String(record[key])
+    }
+  }
+
+  const fallbackKey = Object.keys(record).find((key) => {
+    if (["id", "created_at", "updated_at", "deleted_at"].includes(key)) return false
+    const value = record[key]
+    return typeof value === "string" && value.trim() !== ""
+  })
+
+  if (fallbackKey) return String(record[fallbackKey])
+  return `ID ${record.id}`
+}
+
+async function loadForeignKeyOptions(field) {
+  if (!isForeignKeyField(field)) return
+
+  const sourceTable = resolveReferencedTable(field)
+  foreignKeyOptions.value[field] = {
+    loading: true,
+    sourceTable,
+    options: [],
+  }
+
+  try {
+    const params = new URLSearchParams({
+      per_page: "200",
+      page: "1",
+      search: "",
+      sort_by: "id",
+      sort_order: "asc",
+    })
+
+    const response = await fetch(
+      `http://backend.vm1.test/api/admin/tables/${sourceTable}/records?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (!response.ok) throw new Error(`Failed to fetch options for ${field}`)
+
+    const data = await response.json()
+    const rows = data.data || []
+
+    foreignKeyOptions.value[field] = {
+      loading: false,
+      sourceTable,
+      options: rows
+        .filter((row) => row.id !== undefined && row.id !== null)
+        .map((row) => ({
+          value: row.id,
+          label: getBestLabel(row),
+        })),
+    }
+  } catch (err) {
+    console.error(`Error loading foreign key options for ${field}:`, err)
+    foreignKeyOptions.value[field] = {
+      loading: false,
+      sourceTable,
+      options: [],
+    }
+  }
+}
+
+async function loadForeignKeyOptionsForFields(fields) {
+  const fkFields = fields.filter((field) => isForeignKeyField(field))
+  await Promise.all(fkFields.map((field) => loadForeignKeyOptions(field)))
 }
 
 async function deleteRecord(recordId) {
   if (!confirm("Are you sure you want to delete this record?")) return
   
   try {
-    const response = await fetch(
-      `http://backend.vm1.test/api/admin/tables/${selectedTable.value}/records/${recordId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-    if (!response.ok) throw new Error("Failed to delete record")
+    recordsLoading.value = true
+    await cascadeDeleteRecord(selectedTable.value, recordId)
     
     alert("Record deleted successfully")
     await loadTableRecords()
   } catch (err) {
     console.error("Error deleting record:", err)
-    alert("Failed to delete record")
+    alert("Failed to delete record. It may still be referenced by another record.")
+  } finally {
+    recordsLoading.value = false
   }
 }
 
@@ -143,7 +381,13 @@ function openCreateModal() {
   editFormData.value = {}
   fillable.value.forEach(field => {
     if (!editFormData.value.hasOwnProperty(field)) {
-      editFormData.value[field] = isBooleanField(field) ? false : ""
+      if (isBooleanField(field)) {
+        editFormData.value[field] = false
+      } else if (isForeignKeyField(field)) {
+        editFormData.value[field] = ""
+      } else {
+        editFormData.value[field] = ""
+      }
     }
   })
   showCreateModal.value = true
@@ -155,11 +399,27 @@ function isBooleanField(field) {
   return booleanKeywords.some(keyword => field.toLowerCase().includes(keyword))
 }
 
+function getForeignKeyOptions(field) {
+  return foreignKeyOptions.value[field]?.options || []
+}
+
+function isForeignKeyLoading(field) {
+  return foreignKeyOptions.value[field]?.loading === true
+}
+
+function getForeignKeySourceTable(field) {
+  return foreignKeyOptions.value[field]?.sourceTable || resolveReferencedTable(field)
+}
+
 async function saveRecord() {
   const payload = {}
   fillable.value.forEach(field => {
     if (editFormData.value.hasOwnProperty(field)) {
-      payload[field] = editFormData.value[field]
+      if (isForeignKeyField(field)) {
+        payload[field] = editFormData.value[field] === "" ? null : Number(editFormData.value[field])
+      } else {
+        payload[field] = editFormData.value[field]
+      }
     }
   })
 
@@ -274,9 +534,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <MainNavbar />
+  <MainNavbar class="relative z-50" />
   
-  <div class="fixed inset-0 top-24 bg-gray-50 dark:bg-gray-800 overflow-hidden flex flex-col">
+  <div class="fixed inset-0 top-24 z-10 bg-gray-50 dark:bg-gray-800 overflow-hidden flex flex-col">
     <!-- Header Section -->
     <div class="px-4 sm:px-6 lg:px-8 py-3 border-b border-gray-200 dark:border-gray-600 flex-shrink-0">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -500,6 +760,34 @@ onMounted(async () => {
             </template>
 
             <!-- Non-boolean fields: Text input -->
+            <template v-else-if="isForeignKeyField(field)">
+              <label class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ field }}
+              </label>
+              <select
+                v-model="editFormData[field]"
+                class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
+              >
+                <option value="">
+                  Select {{ getForeignKeySourceTable(field) }}
+                </option>
+                <option
+                  v-if="isForeignKeyLoading(field)"
+                  disabled
+                  value=""
+                >
+                  Loading options...
+                </option>
+                <option
+                  v-for="option in getForeignKeyOptions(field)"
+                  :key="`${field}-${option.value}`"
+                  :value="option.value"
+                >
+                  {{ option.label }} ({{ option.value }})
+                </option>
+              </select>
+            </template>
+
             <template v-else>
               <label class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ field }}

@@ -45,7 +45,8 @@ onMounted(() => {
 <template>
   <header
     class="w-full border-b border-black/20 dark:border-white/10
-           bg-white dark:bg-gray-900 transition-colors"
+           bg-white dark:bg-gray-900 transition-colors
+           relative z-[120]"
   >
   <FriendsPanel />
     <nav
@@ -191,7 +192,8 @@ onMounted(() => {
     <div
       v-if="isOpen"
       class="lg:hidden border-t border-black/10 dark:border-white/10
-             bg-white dark:bg-gray-900 transition-colors"
+             bg-white dark:bg-gray-900 transition-colors
+             absolute left-0 right-0 top-full z-[130] shadow-lg"
     >
       <div
         class="flex flex-col items-center gap-5 py-6

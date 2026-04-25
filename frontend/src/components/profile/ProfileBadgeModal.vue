@@ -33,7 +33,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- POPUP -->
   <div
     v-if="props.show"
     class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
@@ -44,13 +43,11 @@ onMounted(() => {
              text-gray-900 dark:text-gray-100
              max-h-[80vh] overflow-y-auto"
     >
-      <!-- HEADER -->
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold">Badges</h2>
         <button @click="handleClose" class="text-xl">×</button>
       </div>
 
-      <!-- GRID -->
       <div
         class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
       >
@@ -59,7 +56,6 @@ onMounted(() => {
           :key="badge.id"
           class="flex flex-col items-center group relative"
         >
-          <!-- ICON -->
           <div
             class="w-20 h-20 flex items-center justify-center transition"
           >
@@ -73,12 +69,9 @@ onMounted(() => {
             />
           </div>
 
-          <!-- NAME -->
           <p class="text-sm mt-2 text-center">
             {{ badge.name }}
           </p>
-
-          <!-- TOOLTIP -->
           <div
             class="absolute bottom-full mb-2 w-48 p-2 rounded-lg
                    bg-black text-white text-xs text-center

@@ -116,7 +116,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- FLOATING BUTTON -->
   <div class="fixed bottom-6 right-6 z-60">
     <button
       @click="toggle"
@@ -136,7 +135,6 @@ onMounted(() => {
     </button>
   </div>
 
-  <!-- MODAL -->
   <div
     v-if="show"
     class="fixed inset-0 bg-black/60 flex items-center justify-center z-65"
@@ -152,7 +150,6 @@ onMounted(() => {
              flex flex-col"
     >
 
-      <!-- HEADER -->
       <div class="flex items-center justify-between mb-6 shrink-0">
         <div class="flex gap-2 bg-gray-200 dark:bg-gray-700 p-1.5 rounded-2xl">
 
@@ -196,16 +193,13 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- CONTENT -->
       <div class="flex-1 overflow-hidden">
 
-        <!-- FRIENDS -->
         <div
           v-if="activeTab==='friends'"
           class="space-y-4 overflow-y-auto h-full"
         >
 
-          <!-- EMPTY STATE -->
           <div
             v-if="friends.length === 0"
             class="h-full flex items-center justify-center text-center px-6"
@@ -216,7 +210,6 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- LIST -->
           <template v-else>
             <div
               v-for="f in friends"
@@ -247,13 +240,11 @@ onMounted(() => {
           </template>
         </div>
 
-        <!-- REQUESTS -->
         <div
           v-if="activeTab==='requests'"
           class="space-y-4 overflow-y-auto h-full"
         >
 
-          <!-- EMPTY STATE -->
           <div
             v-if="requests.length === 0 && sentRequests.length === 0"
             class="h-full flex items-center justify-center text-center px-6"
@@ -264,7 +255,6 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- CONTENT -->
           <template v-else>
 
             <div
@@ -308,13 +298,11 @@ onMounted(() => {
           </template>
         </div>
 
-        <!-- ADD -->
         <div
           v-if="activeTab==='add'"
           class="flex flex-col h-full justify-between"
         >
 
-          <!-- CENTER TEXT -->
           <div class="flex-1 flex items-center justify-center text-center px-6">
             <p class="text-gray-500 dark:text-gray-400 text-lg">
               You can add friends by entering their username.<br />
@@ -322,7 +310,6 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- BOTTOM -->
           <div class="space-y-4">
             <input
               v-model="username"

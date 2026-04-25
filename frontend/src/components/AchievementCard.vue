@@ -53,7 +53,7 @@ defineEmits(['click']);
       clickable ? 'cursor-pointer hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]' : ''
     ]"
   >
-    <!-- COMPLETION INDICATOR -->
+
     <div v-if="showCompletionIndicator" class="absolute top-3 right-3">
       <template v-if="repeatable">
         <span
@@ -72,7 +72,7 @@ defineEmits(['click']);
       </template>
     </div>
 
-    <!-- ICON -->
+
     <div v-if="categoryIcon" class="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0">
       <img
         :src="categoryIcon"
@@ -81,7 +81,7 @@ defineEmits(['click']);
       />
     </div>
 
-    <!-- TEXT CONTENT -->
+
     <div class="flex-1">
       <h3
         :class="[

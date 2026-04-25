@@ -34,7 +34,6 @@ function calculateLevel(xp) {
 function parseSafeDate(raw) {
   if (!raw) return null
 
-  // Laravel fix: " " -> "T"
   const fixed = typeof raw === "string" ? raw.replace(" ", "T") : raw
 
   const date = new Date(fixed)
@@ -42,7 +41,6 @@ function parseSafeDate(raw) {
 }
 
 const events = computed(() => {
-  // -------- ACHIEVEMENTS --------
   const achievementEvents = [...props.completedAchievements]
     .map((achievement) => {
       const raw = achievement.completion_date
@@ -58,7 +56,6 @@ const events = computed(() => {
     })
     .sort((a, b) => a.timestamp - b.timestamp)
 
-  // -------- BADGES --------
   const badgeEvents = [...props.earnedBadges]
     .map((badge) => {
       const raw =
@@ -78,7 +75,6 @@ const events = computed(() => {
     })
     .sort((a, b) => a.timestamp - b.timestamp)
 
-  // -------- LEVEL CALC --------
   const result = []
   let accumulatedXp = 0
   let currentLevel = 1
@@ -118,7 +114,6 @@ const events = computed(() => {
       class="border dark:border-gray-700 rounded-xl px-4 py-3
              flex justify-between items-center"
     >
-      <!-- ACHIEVEMENT -->
       <div v-if="event.type === 'achievement'">
         <p class="font-medium">
           Completed: {{ event.name }}
@@ -128,7 +123,6 @@ const events = computed(() => {
         </p>
       </div>
 
-      <!-- BADGE -->
       <div v-else-if="event.type === 'badge'">
         <p class="font-medium text-yellow-600 dark:text-amber-300">
           🏅 Badge Unlocked
@@ -141,7 +135,6 @@ const events = computed(() => {
         </p>
       </div>
 
-      <!-- LEVEL -->
       <div v-else-if="event.type === 'level'">
         <p class="font-medium text-blue-600 dark:text-cyan-400">
           🎉 Level Up!
@@ -154,7 +147,6 @@ const events = computed(() => {
         </p>
       </div>
 
-      <!-- XP -->
       <span
         v-if="event.type === 'achievement'"
         class="text-green-600 font-semibold"

@@ -32,7 +32,6 @@ defineEmits(['achievement-click']);
 </script>
 
 <template>
-  <!-- Empty State -->
   <div
     v-if="achievements.length === 0 && !isLoading"
     class="text-center text-gray-500 dark:text-gray-400 text-lg py-20"
@@ -40,7 +39,6 @@ defineEmits(['achievement-click']);
     {{ emptyMessage }}
   </div>
 
-  <!-- Loading State -->
   <div
     v-if="isLoading"
     class="text-center text-gray-500 dark:text-gray-400 text-lg py-20"
@@ -48,7 +46,7 @@ defineEmits(['achievement-click']);
     Loading achievements...
   </div>
 
-  <!-- Achievements Grid -->
+
   <div
     v-else-if="achievements.length > 0"
     :class="['grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3', gridGap]"

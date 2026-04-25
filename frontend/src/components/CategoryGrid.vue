@@ -29,7 +29,6 @@ defineEmits(['category-click']);
 </script>
 
 <template>
-  <!-- Empty State -->
   <div
     v-if="categories.length === 0 && !isLoading"
     class="text-center text-gray-500 dark:text-gray-400 text-lg py-20"
@@ -37,7 +36,6 @@ defineEmits(['category-click']);
     {{ emptyMessage }}
   </div>
 
-  <!-- Loading State -->
   <div
     v-if="isLoading"
     class="text-center text-gray-500 dark:text-gray-400 text-lg py-20"
@@ -45,7 +43,6 @@ defineEmits(['category-click']);
     Loading categories...
   </div>
 
-  <!-- Categories Grid -->
   <div
     v-else-if="categories.length > 0"
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3

@@ -17,7 +17,6 @@ const isOpen = ref(false);
              text-gray-900 dark:text-gray-100 transition-colors"
     >
 
-      <!-- LOGO -->
       <div
         class="flex items-center gap-4 cursor-pointer select-none"
         
@@ -34,7 +33,6 @@ const isOpen = ref(false);
         </span>
       </div>
 
-      <!-- DESKTOP MENU -->
       <div class="hidden md:flex items-center gap-8">
 
         <RouterLink
@@ -53,7 +51,6 @@ const isOpen = ref(false);
           Sign Up
         </RouterLink>
 
-        <!-- THEME TOGGLE -->
         <button
           @click="toggleTheme"
           class="ml-2 p-2 rounded-full
@@ -61,7 +58,6 @@ const isOpen = ref(false);
                  transition"
           aria-label="Toggle theme"
         >
-          <!-- 🌙 HOLD – ha LIGHT módban vagyunk -->
           <svg
             v-if="!isDark"
             xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +75,6 @@ const isOpen = ref(false);
             />
           </svg>
         
-          <!-- ☀️ NAP – ha DARK módban vagyunk -->
           <svg
             v-else
             xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +108,6 @@ const isOpen = ref(false);
 
       </div>
 
-      <!-- MOBILE TOGGLE -->
       <button
         class="md:hidden text-gray-900 dark:text-gray-100"
         @click="isOpen = !isOpen"
@@ -128,7 +122,6 @@ const isOpen = ref(false);
 
     </nav>
 
-    <!-- MOBILE MENU -->
     <div
       v-if="isOpen"
       class="md:hidden border-t border-black/10 dark:border-white/10
@@ -156,7 +149,6 @@ const isOpen = ref(false);
           Sign Up
         </RouterLink>
 
-        <!-- MOBILE THEME TOGGLE -->
         <button
           @click="toggleTheme"
           class="mt-4 flex items-center gap-2 font-semibold"

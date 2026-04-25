@@ -25,7 +25,6 @@ defineEmits(['edit', 'logout'])
         </span>
       </div>
 
-      <!-- Main Stuff -->
       <div class="flex-1 space-y-3">
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-2"
@@ -43,7 +42,6 @@ defineEmits(['edit', 'logout'])
           </span>
         </div>
 
-        <!-- PROGRESS BAR -->
         <div>
           <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
             <div
@@ -59,7 +57,6 @@ defineEmits(['edit', 'logout'])
         </div>
       </div>
 
-      <!-- Buttons -->
       <div class="flex md:flex-col gap-2">
         <button
           @click="$emit('edit')"

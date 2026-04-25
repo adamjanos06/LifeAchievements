@@ -21,7 +21,6 @@ defineEmits(['click']);
            hover:shadow-lg
            dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.18)]"
   >
-    <!-- Icon / First Letter -->
     <div class="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0">
       <img
         v-if="category.icon"
@@ -38,7 +37,6 @@ defineEmits(['click']);
       </span>
     </div>
 
-    <!-- Category Name -->
     <span class="text-lg font-semibold text-gray-900 dark:text-gray-100">
       {{ category.name }}
     </span>

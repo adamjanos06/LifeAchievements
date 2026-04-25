@@ -35,6 +35,9 @@ export function useProfile() {
 
       if (data.badge && !badgeShown.value) {
         badgeShown.value = true
+        
+        earnedBadges.value.push(data.badge)
+        
         setTimeout(() => {
           unlockedBadge.value = data.badge
         }, 300)

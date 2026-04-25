@@ -83,7 +83,6 @@ onMounted(() => {
         @edit="openEditModal"
         @logout="logout"
       />
-
       <ProfileBio :bio="user.bio" />
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

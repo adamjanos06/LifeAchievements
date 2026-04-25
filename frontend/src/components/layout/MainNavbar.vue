@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { toggleTheme, isDark } from "@/utils/theme"
+import { useBadgeStore } from "@/stores/BadgeStore.mjs"
 import FriendsPanel from "@/components/FriendsPanel.vue"
 import BadgePopup from "@/components/BadgePopup.vue"
 
@@ -8,6 +9,7 @@ const unlockedBadge = ref(null)
 const isOpen = ref(false)
 const user = ref(null)
 const isAdmin = ref(false)
+const badgeStore = useBadgeStore()
 
 async function loadUser() {
   const token = localStorage.getItem("token")
@@ -34,6 +36,7 @@ async function toggleThemeWithBadge() {
 
   if (data?.badge) {
     unlockedBadge.value = data.badge
+    badgeStore.addRecentBadge(data.badge)
   }
 }
 
@@ -56,7 +59,6 @@ onMounted(() => {
              text-gray-900 dark:text-gray-100 transition-colors"
     >
 
-      <!-- LOGO -->
       <div class="flex items-center gap-4 select-none">
 
         <div
@@ -75,7 +77,6 @@ onMounted(() => {
         </RouterLink>
       </div>
 
-      <!-- DESKTOP MENU -->
       <div class="hidden lg:flex items-center gap-10">
 
         <FriendsPanel />
@@ -100,7 +101,6 @@ onMounted(() => {
           Profile
         </RouterLink>
 
-        <!-- ADMIN DASHBOARD (only for admins) -->
         <RouterLink 
           v-if="isAdmin"
           to="/dashboard" 
@@ -109,7 +109,6 @@ onMounted(() => {
           Dashboard
         </RouterLink>
 
-        <!-- THEME TOGGLE -->
         <button
           @click="toggleThemeWithBadge"
           class="ml-2 p-2 rounded-full
@@ -117,7 +116,6 @@ onMounted(() => {
                  transition"
           aria-label="Toggle theme"
         >
-          <!-- 🌙 HOLD – ha LIGHT módban vagyunk -->
           <svg
             v-if="!isDark"
             xmlns="http://www.w3.org/2000/svg"
@@ -134,8 +132,7 @@ onMounted(() => {
                  7 7 0 0021 12.79z"
             />
           </svg>
-        
-          <!-- ☀️ NAP – ha DARK módban vagyunk -->
+
           <svg
             v-else
             xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +166,6 @@ onMounted(() => {
 
       </div>
 
-      <!-- MOBILE TOGGLE -->
       <button
         class="lg:hidden text-gray-900 dark:text-gray-100"
         @click="isOpen = !isOpen"
@@ -188,7 +184,6 @@ onMounted(() => {
 
     </nav>
 
-    <!-- MOBILE MENU -->
     <div
       v-if="isOpen"
       class="lg:hidden border-t border-black/10 dark:border-white/10
@@ -220,7 +215,6 @@ onMounted(() => {
           Profile
         </RouterLink>
 
-        <!-- ADMIN DASHBOARD (only for admins) -->
         <RouterLink 
           v-if="isAdmin"
           to="/dashboard" 

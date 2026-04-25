@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
+import { useBadgeStore } from "@/stores/BadgeStore.mjs"
 
 const emit = defineEmits(["open"])
 const badges = ref([])
+const badgeStore = useBadgeStore()
 
 async function loadBadges() {
   const res = await fetch("http://backend.vm1.test/api/my-badges", {
@@ -15,6 +17,15 @@ async function loadBadges() {
 
   badges.value = (json.data ?? []).slice(0, 3)
 }
+
+watch(() => badgeStore.recentlyEarnedBadges, (newBadges) => {
+  for (const badge of newBadges) {
+    if (!badges.value.some(b => b.id === badge.id)) {
+      badges.value.unshift(badge)
+      badges.value = badges.value.slice(0, 3)
+    }
+  }
+}, { deep: true })
 
 function openBadges() {
   emit("open")
@@ -29,12 +40,10 @@ onMounted(async () => {
 <template>
   <div class="flex flex-col items-center gap-3 cursor-pointer" @click="openBadges">
 
-    <!-- TITLE -->
     <p class="font-medium text-gray-700 dark:text-gray-300">
       Recent Badges
     </p>
 
-    <!-- BADGES -->
     <div class="flex justify-center gap-6 flex-wrap">
       <div
         v-for="badge in badges"

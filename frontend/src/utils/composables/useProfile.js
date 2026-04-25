@@ -1,6 +1,7 @@
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import { fetchCurrentUser, checkProfileBadge, fetchUserBadges } from "@/utils/api/user.js"
 import { fetchMyAchievements } from "@/utils/api/achievements.js"
+import { useBadgeStore } from "@/stores/BadgeStore.mjs"
 
 export function useProfile() {
   const unlockedBadge = ref(null)
@@ -10,12 +11,20 @@ export function useProfile() {
   const earnedBadges = ref([])
   const loading = ref(true)
   const badgeShown = ref(false)
+  const badgeStore = useBadgeStore()
+
+  watch(() => badgeStore.recentlyEarnedBadges, (newBadges) => {
+    for (const badge of newBadges) {
+      if (!earnedBadges.value.some(b => b.id === badge.id)) {
+        earnedBadges.value.push(badge)
+      }
+    }
+  }, { deep: true })
 
   async function loadUser() {
     try {
       user.value = await fetchCurrentUser()
 
-      // Check for profile visited badge
       await checkProfileBadgeVisited()
 
       if (user.value?.image) {
@@ -79,7 +88,6 @@ export function useProfile() {
   const totalXp = computed(() => user.value?.xp ?? 0)
 
   return {
-    // State
     unlockedBadge,
     user,
     imageUrl,
@@ -88,10 +96,8 @@ export function useProfile() {
     loading,
     badgeShown,
 
-    // Methods
     initializeProfile,
 
-    // Computed
     achievementsUnlocked,
     totalXp
   }

@@ -39,7 +39,7 @@ onMounted(() => {
   >
     <div
       class="bg-white dark:bg-gray-800
-             w-full max-w-4xl mx-4 p-6 rounded-2xl
+             w-full max-w-5xl mx-4 p-6 rounded-2xl
              text-gray-900 dark:text-gray-100
              max-h-[80vh] overflow-y-auto"
     >

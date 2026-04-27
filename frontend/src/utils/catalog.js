@@ -10,7 +10,6 @@ export function getSafeColor(hex) {
 
   const clean = hex.replace("#", "").toLowerCase()
 
-  // short hexes
   const full = clean.length === 3
     ? clean.split("").map(c => c + c).join("")
     : clean
@@ -19,10 +18,8 @@ export function getSafeColor(hex) {
   const g = parseInt(full.substring(2, 4), 16)
   const b = parseInt(full.substring(4, 6), 16)
 
-  // brightness
   const brightness = (r * 299 + g * 587 + b * 114) / 1000
 
-  // extreme colors
   if (brightness > 220 || brightness < 40) {
     return "#3b82f6"
   }

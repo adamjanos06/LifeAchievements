@@ -44,7 +44,7 @@ onMounted(async () => {
       Recent Badges
     </p>
 
-    <div class="flex justify-center gap-6 flex-wrap">
+    <div class="flex justify-center gap-2 flex-wrap">
       <div
         v-for="badge in badges"
         :key="badge.id"

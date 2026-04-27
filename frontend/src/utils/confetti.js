@@ -5,7 +5,6 @@
 export function loadConfetti() {
   return new Promise((resolve) => {
     
-    // When already loaded
     if (window.confetti) {
       return resolve(window.confetti)
     }
@@ -30,7 +29,6 @@ export function fireConfetti(confetti) {
 
   const colors = ['#ef4444', '#3b82f6', '#22c55e', '#eab308']
 
-  // Left
   confetti({
     particleCount: 80,
     angle: 60,
@@ -39,7 +37,6 @@ export function fireConfetti(confetti) {
     colors
   })
 
-  // Right
   confetti({
     particleCount: 80,
     angle: 120,

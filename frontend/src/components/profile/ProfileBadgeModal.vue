@@ -57,7 +57,7 @@ onMounted(() => {
           class="flex flex-col items-center group relative"
         >
           <div
-            class="w-20 h-20 flex items-center justify-center transition"
+            class="w-50 h-50 flex items-center justify-center transition"
           >
             <img
               v-if="badge.icon"

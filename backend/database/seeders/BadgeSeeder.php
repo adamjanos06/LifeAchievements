@@ -8,15 +8,10 @@ use Illuminate\Database\Seeder;
 
 class BadgeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $badges = [
             
-            // CATEGORY BADGES
-
             [
                 'name' => 'Language Learning Master',
                 'description' => 'You are making real progress in language learning.',
@@ -91,7 +86,6 @@ class BadgeSeeder extends Seeder
             ],
 
 
-            // GENERAL FEATURE BADGES
 
             [
                 'name' => 'First Step',

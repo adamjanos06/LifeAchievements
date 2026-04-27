@@ -30,12 +30,6 @@ if (config.timestamps) {
         next()
     })
 }
-/*
-router.render = (req, res) => {
-    
-    
-}
-*/
 
 router.render = (req, res) => {
     let data = res.locals.data

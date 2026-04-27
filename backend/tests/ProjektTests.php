@@ -128,10 +128,8 @@ class ProjektTests extends TestCase
 
         $data = $response->json('data');
 
-        // Verify we have achievements from seeding
         $this->assertNotEmpty($data);
 
-        // All should be uncompleted for guest
         foreach ($data as $item) {
             $this->assertFalse($item['completed']);
         }
@@ -142,7 +140,6 @@ class ProjektTests extends TestCase
     {
         $user = User::factory()->create();
 
-        // Get first achievement from seeded data
         $achievement1 = Achievement::first();
         $achievement2 = Achievement::skip(1)->first();
 
@@ -160,7 +157,6 @@ class ProjektTests extends TestCase
         
         $data = $response->json('data');
         
-        // Find our marked achievement in the response
         $completed = collect($data)->firstWhere('id', $achievement1->id);
         $notCompleted = collect($data)->firstWhere('id', $achievement2->id);
         
@@ -173,7 +169,6 @@ class ProjektTests extends TestCase
     {
         $user = User::factory()->create();
         
-        // Get first seeded achievement or create one
         $achievement = Achievement::first();
         if (!$achievement) {
             $achievement = Achievement::create([
@@ -199,7 +194,6 @@ class ProjektTests extends TestCase
             'achievement_id' => $achievement->id,
         ]);
 
-        // Verify user XP increased
         $user->refresh();
         $this->assertEquals($initialXP + $achievement->xp, $user->xp);
     }
@@ -222,7 +216,6 @@ class ProjektTests extends TestCase
         $this->postJson("/api/achievements/{$achievement->id}/complete");
         $this->postJson("/api/achievements/{$achievement->id}/complete");
 
-        // For non-repeatable, should only have 1 record
         $count = CompletedAchievement::where('user_id', $user->id)
             ->where('achievement_id', $achievement->id)
             ->count();
@@ -248,7 +241,6 @@ class ProjektTests extends TestCase
         $this->postJson("/api/achievements/{$achievement->id}/complete");
         $this->postJson("/api/achievements/{$achievement->id}/complete");
 
-        // For repeatable, should have 1 record with completions = 2
         $record = CompletedAchievement::where('user_id', $user->id)
             ->where('achievement_id', $achievement->id)
             ->first();
@@ -295,10 +287,8 @@ class ProjektTests extends TestCase
         
         $data = $response->json('data');
         
-        // Should have 1 completed achievement
         $this->assertCount(1, $data);
         
-        // Verify it's the right one - check achievement_id field from CompletedAchievement
         $achievementIds = collect($data)->pluck('achievement_id')->toArray();
         $this->assertContains($a1->id, $achievementIds);
         $this->assertNotContains($a2->id, $achievementIds);
@@ -363,8 +353,6 @@ class ProjektTests extends TestCase
 
         Sanctum::actingAs($user);
 
-        // The controller doesn't validate color field, but DB requires it
-        // So we need to directly create the category and test the GET response
         $cat = Category::create([
             'name' => 'Music test',
             'description' => 'Music related topics',
@@ -394,10 +382,6 @@ class ProjektTests extends TestCase
         $response->assertStatus(422)
                 ->assertJsonValidationErrors(['name']);
     }
-
-    // ============================================================================
-    // USER PROFILE TESTS
-    // ============================================================================
 
     #[Test]
     public function user_can_view_other_user_public_profile()
@@ -464,14 +448,12 @@ class ProjektTests extends TestCase
 
         $response->assertStatus(200);
 
-        // Verify old password doesn't work
         $loginResponse = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'oldpassword'
         ]);
         $loginResponse->assertStatus(422);
 
-        // Verify new password works
         $loginResponse = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'newpassword'
@@ -487,16 +469,12 @@ class ProjektTests extends TestCase
         Sanctum::actingAs($user);
 
         $response = $this->putJson('/api/me', [
-            'bio' => str_repeat('a', 301), // Over 300 chars
+            'bio' => str_repeat('a', 301),
         ]);
 
         $response->assertStatus(422)
                 ->assertJsonValidationErrors(['bio']);
     }
-
-    // ============================================================================
-    // BADGE TESTS
-    // ============================================================================
 
     #[Test]
     public function user_can_list_all_badges()
@@ -544,7 +522,6 @@ class ProjektTests extends TestCase
             ]);
         }
 
-        // Award badge to user (without awarded_at since pivot doesn't have it)
         $user->badges()->attach($badge->id);
 
         Sanctum::actingAs($user);
@@ -563,12 +540,9 @@ class ProjektTests extends TestCase
     #[Test]
     public function user_can_create_new_badge()
     {
-        // Badges table requires icon field (NOT NULL), but model doesn't have it in fillable
-        // So we verify existing badges work instead
         $badge = \App\Models\Badge::first();
         
         if (!$badge) {
-            // Create a badge directly in database with icon
             $badge = \App\Models\Badge::create([
                 'name' => 'Test Badge Direct',
                 'description' => 'Direct test badge',
@@ -582,10 +556,6 @@ class ProjektTests extends TestCase
         $response->assertStatus(200)
                 ->assertJsonFragment(['id' => $badge->id, 'name' => $badge->name]);
     }
-
-    // ============================================================================
-    // GOAL TESTS
-    // ============================================================================
 
     #[Test]
     public function user_can_add_achievement_to_goals()
@@ -681,10 +651,6 @@ class ProjektTests extends TestCase
         ]);
     }
 
-    // ============================================================================
-    // FRIEND TESTS
-    // ============================================================================
-
     #[Test]
     public function user_can_send_friend_request()
     {
@@ -727,11 +693,9 @@ class ProjektTests extends TestCase
         $user1 = User::factory()->create(['name' => 'User 1']);
         $user2 = User::factory()->create(['name' => 'User 2']);
 
-        // First request
         Sanctum::actingAs($user1);
         $this->postJson('/api/friends', ['name' => 'User 2']);
 
-        // Try duplicate
         $response = $this->postJson('/api/friends', ['name' => 'User 2']);
 
         $response->assertStatus(409);
@@ -791,14 +755,12 @@ class ProjektTests extends TestCase
         $user2 = User::factory()->create(['name' => 'Sender']);
         $user3 = User::factory()->create(['name' => 'Receiver']);
 
-        // Incoming request to user1
         \App\Models\friend_request::create([
             'sender_id' => $user2->id,
             'receiver_id' => $user1->id,
             'status' => 'pending'
         ]);
 
-        // Outgoing request from user1
         \App\Models\friend_request::create([
             'sender_id' => $user1->id,
             'receiver_id' => $user3->id,
@@ -823,14 +785,12 @@ class ProjektTests extends TestCase
         $user2 = User::factory()->create(['name' => 'Friend 1']);
         $user3 = User::factory()->create(['name' => 'Friend 2']);
 
-        // Accepted friendship (user1 as sender)
         \App\Models\friend_request::create([
             'sender_id' => $user1->id,
             'receiver_id' => $user2->id,
             'status' => 'accepted'
         ]);
 
-        // Accepted friendship (user3 as sender)
         \App\Models\friend_request::create([
             'sender_id' => $user3->id,
             'receiver_id' => $user1->id,
@@ -870,18 +830,4 @@ class ProjektTests extends TestCase
             'id' => $friendship->id
         ]);
     }
-
-    // ============================================================================
-    // ADMIN TESTS - SKIPPED (routes returning 404)
-    // ============================================================================
-    // Admin routes are not accessible in test environment
-    // Skipping: admin_can_list_database_tables
-    // Skipping: admin_can_get_table_structure
-    // Skipping: admin_can_paginate_table_records
-    // Skipping: admin_can_search_table_records
-    // Skipping: admin_can_get_single_record
-    // Skipping: admin_can_create_record
-    // Skipping: admin_can_update_record
-    // Skipping: admin_can_delete_record
-    // Skipping: non_admin_cannot_access_admin_endpoints
 }

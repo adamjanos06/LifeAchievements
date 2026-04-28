@@ -9,7 +9,7 @@ Welcome! This repository contains documentation and resources for the **Life Ach
 ### 🇬🇧 English
 - 📘 [User documentation](docs/content/UserDocEN.md)
 - 🛠️ [Developer documentation](docs/content/DevDocEN.md)
-- 🧪 [Test Report](docs/content/TestEN.md)
+- 🧪 [Test report](docs/content/TestEN.md)
 
 ---
 

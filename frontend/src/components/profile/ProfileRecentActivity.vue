@@ -100,59 +100,60 @@ const events = computed(() => {
 
   return allEvents
     .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 3)
 })
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4 h-[26rem] flex flex-col">
     <h3 class="font-semibold text-lg">Recent Activity</h3>
 
-    <div
-      v-for="(event, index) in events"
-      :key="event.type + '-' + event.timestamp + '-' + (event.name || index)"
-      class="border dark:border-gray-700 rounded-xl px-4 py-3
-             flex justify-between items-center"
-    >
-      <div v-if="event.type === 'achievement'">
-        <p class="font-medium">
-          Completed: {{ event.name }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ event.date.toLocaleDateString() }}
-        </p>
-      </div>
-
-      <div v-else-if="event.type === 'badge'">
-        <p class="font-medium text-yellow-600 dark:text-amber-300">
-          🏅 Badge Unlocked
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ event.name }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ event.date.toLocaleDateString() }}
-        </p>
-      </div>
-
-      <div v-else-if="event.type === 'level'">
-        <p class="font-medium text-blue-600 dark:text-cyan-400">
-          🎉 Level Up!
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Reached Level {{ event.level }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ event.date.toLocaleDateString() }}
-        </p>
-      </div>
-
-      <span
-        v-if="event.type === 'achievement'"
-        class="text-green-600 font-semibold"
+    <div class="flex-1 overflow-y-auto pr-1 space-y-3">
+      <div
+        v-for="(event, index) in events"
+        :key="event.type + '-' + event.timestamp + '-' + (event.name || index)"
+        class="border dark:border-gray-700 rounded-xl px-4 py-3
+               flex justify-between items-center"
       >
-        +{{ event.xp }} XP
-      </span>
+        <div v-if="event.type === 'achievement'">
+          <p class="font-medium">
+            Completed: {{ event.name }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ event.date.toLocaleDateString() }}
+          </p>
+        </div>
+
+        <div v-else-if="event.type === 'badge'">
+          <p class="font-medium text-yellow-600 dark:text-amber-300">
+            🏅 Badge Unlocked
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ event.name }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ event.date.toLocaleDateString() }}
+          </p>
+        </div>
+
+        <div v-else-if="event.type === 'level'">
+          <p class="font-medium text-blue-600 dark:text-cyan-400">
+            🎉 Level Up!
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Reached Level {{ event.level }}
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ event.date.toLocaleDateString() }}
+          </p>
+        </div>
+
+        <span
+          v-if="event.type === 'achievement'"
+          class="text-green-600 font-semibold"
+        >
+          +{{ event.xp }} XP
+        </span>
+      </div>
     </div>
   </div>
 </template>

@@ -10,8 +10,9 @@ php artisan migrate:fresh --seed
 
 ## 4. Log in with either one of the existing users or register a new account
 Admin user: 
-    email: admin@example.com
-    password: admin
+- email: admin@example.com
+- password: admin
+
 Test user:
-    email: test@test.com
-    password: password
+- email: test@test.com
+- password: password

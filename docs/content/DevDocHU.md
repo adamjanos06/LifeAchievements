@@ -1,4 +1,4 @@
-# LifeAchievements™ – Fejlesztői dokumentáció
+# 🌟 LifeAchievements™ – Fejlesztői dokumentáció
 
 ## Tartalomjegyzék
 1. [Bevezetés](#bevezetés)
@@ -9,23 +9,25 @@
 6. [Adatbázis](#adatbázis)
 7. [Seederek és gyári adatok](#seederek-és-gyári-adatok)
 8. [Frontend – Vue.js alkalmazás](#frontend--vuejs-alkalmazás)
-9. [Hitelesítés és token kezelés](#hitelesítés-és-token-kezelés)
-10. [Stílusok és témaváltás](#stílusok-és-témaváltás)
+9. [Állapotkezelés és logika](#állapotkezelés)
+10. [Hitelesítés és token kezelés](#hitelesítés)
+11. [Új rendszerek](#új-rendszerek)
+12. [UI/UX és témaváltás](#ui-ux-és-témaváltás)
 
 ---
 
 ## Bevezetés
 
-A **LifeAchievements™** egy teljes stack webalkalmazás, amely a játékosított célkövetést támogatja. A rendszer két fő részből áll:
+A **LifeAchievements™** egy full-stack webalkalmazás, amely a játékosított célkövetést támogatja.
 
-- **Backend** – REST API Laravel keretrendszerben
-- **Frontend** – Vue.js alapú többoldalas alkalmazás (routinggal)
+A rendszer célja:
+- életcélok nyomonkövetése
+- motiváció növelése
+- közösségi funkciók biztosítása
 
-A projekt célja egy olyan felület biztosítása, ahol a felhasználók:
-- regisztrálhatnak / bejelentkezhetnek,
-- böngészhetik a kategóriákat és achievementeket,
-- saját teljesítéseket rögzíthetnek,
-- megtekinthetik személyes eredményeiket.
+A projektnek két fő része van:
+- **Backend** – Laravel REST API
+- **Frontend** – Vue.js SPA
 
 ---
 
@@ -33,7 +35,10 @@ A projekt célja egy olyan felület biztosítása, ahol a felhasználók:
 
 A rendszer klasszikus kliens–szerver architektúrát használ:
 
-Frontend (Vue.js) → REST API → Backend (Laravel) → ORM → Adatbázis (MySQL)
+Frontend (Vue 3) --> REST API (Laravel) --> Eloquent ORM --> MySQL adatbázis
+
+- JSOn alapú komunikáció
+- Bearer token autentikáció
 
 ---
 
@@ -43,14 +48,14 @@ Frontend (Vue.js) → REST API → Backend (Laravel) → ORM → Adatbázis (MyS
 - Laravel 10+
 - PHP 8.1+
 - MySQL / MariaDB
-- Sanctum – token alapú autentikáció
+- Laravel Sanctum
 
 ### Frontend
 - Vue.js 3 (Composition API)
 - Vue Router
-- Pinia
 - Tailwind CSS
-- Axios
+- Fetch API
+- localStorage
 
 ---
 
@@ -61,13 +66,12 @@ Frontend (Vue.js) → REST API → Backend (Laravel) → ORM → Adatbázis (MyS
 ```
 backend/
  ├── app/
- │   ├── Http/
+ │   ├── Http/Controllers/
  │   ├── Models/
  │   └── Resources/
  ├── database/
  │   ├── migrations/
  │   ├── seeders/
- │   └── factories/
  ├── routes/api.php
  └── composer.json
 ```
@@ -77,11 +81,12 @@ backend/
 ```
 frontend/
  ├── src/
-     ├── components/
-     ├── layouts/
-     ├── pages/
-     ├── router/
-     └── App.vue
+ ├── components/
+ ├── layouts/
+ ├── pages/
+ ├── router/
+ ├── utils/
+ └── App.vue
 ```
 
 ---
@@ -90,15 +95,24 @@ frontend/
 
 ### Fontosabb végpontok
 
-| Metódus | URL | Leírás | Auth |
-|--------|-----|--------|------|
+| Method | Endpoint | Leírás | Auth |
+|--------|--------|--------|------|
 | POST | /register | Regisztráció | ❌ |
-| POST | /login | Bejelentkezés | ❌ |
-| GET | /categories | Kategóriák listája | ❌ |
+| POST | /login | Login | ❌ |
+| GET | /categories | Kategóriák | ❌ |
 | GET | /achievements | Achievement lista | ❌ |
 | POST | /achievements/{id}/complete | Teljesítés | ✔️ |
-| GET | /my-achievements | User teljesítései | ✔️ |
-| GET | /me | Aktív felhasználó | ✔️ |
+| GET | /my-achievements | Saját achievementek | ✔️ |
+| GET | /goals | Goals lista | ✔️ |
+| POST | /goals/{achievement} | Mentés | ✔️ |
+| DELETE | /goals/{achievement} | Törlés | ✔️ |
+| GET | /friends | Barátok | ✔️ |
+| GET | /friend-requests | Kérések | ✔️ |
+| POST | /friends | Request küldés | ✔️ |
+| POST | /friend-requests/{id}/accept | Elfogadás | ✔️ |
+| DELETE | /friend-requests/{id} | Törlés | ✔️ |
+| GET | /leaderboard | Ranglista | ❌ |
+| GET | /me | Aktív user | ✔️ |
 
 ---
 
@@ -109,6 +123,10 @@ frontend/
 - categories
 - achievements
 - completed_achievements
+- goals
+- friend_requests
+- badges
+- badge_user
 
 `completed_achievements` mezők:
 - id
@@ -122,9 +140,9 @@ frontend/
 ## Seederek és gyári adatok
 
 A `DatabaseSeeder.php` meghívja:
-- kategória seedert
-- achievement seedert
-- optional: tesztfelhasználó
+- CategorySeeder (színek + ikonok)
+- AchievementSeeder
+- teszt felhasználók
 
 ---
 
@@ -132,36 +150,105 @@ A `DatabaseSeeder.php` meghívja:
 
 Az app oldalszerkezete:
 - Landing
-- Introduction
 - Login / Signup
 - Catalog
 - Catalog/[id] - ez felel az achievement-ekért kategóriánként
 - My Achievements
+- Goals
+- Leaderboard
 - Profile
 
 ---
 
-## Hitelesítés és token kezelés
+## Állapotkezelés
+
+- `ref()` és `computed()`
+- komponens alapú state
+- localStorage
+
+---
+
+## Hitelesítés
 
 Laravel Sanctum kezeli a login után kapott tokent.
 
-Frontend tárolás:
+Token tárolás:
 
 localStorage.setItem("token", token)
-axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-![tokenstore](https://cdn.imgchest.com/files/1e6ec7a58c8b.png)
+
+Header:
+
+Authorization: Bearer {token}
 
 ---
 
-## Stílusok és témaváltás
+## Új rendszerek
 
-A logóra kattintva vált:
-- Light Theme <-> Dark Theme
-
-A Tailwind `dark:` prefix kezeli a sötét módot.
+### 🎯 Goals
+- achievement mentés
+- remove funkció
+- auto törlés completionkor
 
 ---
 
+### 👥 Friends
+- request rendszer
+- incoming / outgoing
+- accept / cancel
+
+---
+
+### 🏆 Leaderboard
+- XP alapú rangsor
+- top felhasználók
+
+---
+
+### 🏅 Badge rendszer
+- backend trigger
+- frontend popup
+- esemény alapú
+
+---
+
+## UI-UX és témaváltás
+
+### Dark mode
+- `html.dark`
+- Tailwind `dark:` prefix
+
+---
+
+### UI jellemzők
+- modal alapú működés
+- dinamikus színek
+- hover effektek
+- scroll panelek
+
+---
+
+### UX
+- empty state-ek
+- visszajelzések
+- animációk
+
+---
+
+## Összegzés
+
+✔ full-stack rendszer
+✔ REST API + SPA
+✔ gamification
+✔ social feature-ök
+✔ skálázható architektúra
+
+---
+
+## 👨‍💻 Fejlesztők
+
+- Szabó András
+- Nagy Bernát
+- Ádám János
 ---
 
 *A LifeAchievements™ projekt fejlesztéséért és megvalósításáért felelős, Szabó András és Ádám János IKT csapata.*

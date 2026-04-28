@@ -4,6 +4,7 @@ import axios from "axios"
 
 export function useSignupPage() {
   const router = useRouter()
+  const usernamePattern = /^[A-Za-z0-9]+$/
   const name = ref("")
   const email = ref("")
   const password = ref("")
@@ -13,6 +14,13 @@ export function useSignupPage() {
   async function register() {
     error.value = ""
 
+    const normalizedName = name.value.trim()
+
+    if (!usernamePattern.test(normalizedName)) {
+      error.value = "No symbols or special characters allowed in name."
+      return
+    }
+
     if (password.value !== password_confirmation.value) {
       error.value = "Passwords do not match"
       return
@@ -20,7 +28,7 @@ export function useSignupPage() {
 
     try {
       const res = await axios.post("http://backend.vm1.test/api/register", {
-        name: name.value,
+        name: normalizedName,
         email: email.value,
         password: password.value,
         password_confirmation: password_confirmation.value,
@@ -30,7 +38,11 @@ export function useSignupPage() {
       axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`
       router.push("/catalog")
     } catch (err) {
-      error.value = err.response?.data?.message || "Registration failed."
+      if (err.response?.data?.errors) {
+        error.value = Object.values(err.response.data.errors).flat().join(" ")
+      } else {
+        error.value = err.response?.data?.message || "Registration failed."
+      }
     }
   }
 

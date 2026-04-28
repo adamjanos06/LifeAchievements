@@ -53,10 +53,23 @@ class UserController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:32',
+            'name' => ['required', 'string', 'max:32', 'regex:/^[A-Za-z0-9]+$/'],
             'bio' => 'nullable|string|max:300',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'password' => 'nullable|min:6|confirmed',
+            'current_password' => [
+                'nullable',
+                'required_with:password',
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!empty($value) && !Hash::check($value, $user->password)) {
+                        $fail('Current password is incorrect.');
+                    }
+                },
+            ],
+            'password' => 'nullable|required_with:current_password|min:6|confirmed',
+        ], [
+            'name.regex' => 'No symbols or special characters allowed in name.',
+            'current_password.required_with' => 'Current password is required to set a new password.',
+            'password.required_with' => 'New password is required when current password is provided.',
         ]);
 
         $user->name = $validated['name'];

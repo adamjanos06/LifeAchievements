@@ -8,7 +8,12 @@ const { email, password, error, loading, login } = useLoginPage()
 <template>
   <AuthCardLayout title="Log In">
     <form @submit.prevent="login" class="space-y-5">
-      <div v-if="error" class="text-red-600 text-sm text-center">
+      <div
+        v-if="error"
+        class="text-red-700 dark:text-red-300 text-base text-center
+               bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800
+               rounded-lg px-3 py-2"
+      >
         {{ error }}
       </div>
 

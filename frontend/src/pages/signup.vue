@@ -15,7 +15,12 @@ const {
 <template>
   <AuthCardLayout title="Sign Up">
     <form @submit.prevent="register" class="space-y-5">
-      <div v-if="error" class="text-red-600 text-sm text-center">
+      <div
+        v-if="error"
+        class="text-red-700 dark:text-red-300 text-base text-center
+               bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800
+               rounded-lg px-3 py-2"
+      >
         {{ error }}
       </div>
 
@@ -27,6 +32,9 @@ const {
           v-model="name"
           type="text"
           placeholder="Your name"
+          pattern="[A-Za-z0-9]+"
+          title="Only letters and numbers are allowed."
+          maxlength="32"
           class="w-full rounded-lg border px-4 py-2
                  bg-white dark:bg-gray-700
                  border-gray-300 dark:border-gray-600

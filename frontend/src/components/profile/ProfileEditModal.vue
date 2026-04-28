@@ -26,6 +26,10 @@ const editName = ref("")
 const editBio = ref("")
 const editImage = ref(null)
 const imagePreview = ref(null)
+const currentPassword = ref("")
+const newPassword = ref("")
+const newPasswordConfirmation = ref("")
+const usernamePattern = /^[A-Za-z0-9]+$/
 
 watch(() => props.show, (newVal) => {
   if (newVal) {
@@ -33,6 +37,9 @@ watch(() => props.show, (newVal) => {
     editBio.value = props.user?.bio ?? ""
     editImage.value = null
     imagePreview.value = props.imageUrl ?? null
+    currentPassword.value = ""
+    newPassword.value = ""
+    newPasswordConfirmation.value = ""
     errorMsg.value = ""
   }
 })
@@ -46,15 +53,43 @@ function onImageChange(e) {
 }
 
 async function saveProfile() {
-  if (!editName.value.trim()) return
+  const trimmedName = editName.value.trim()
+
+  if (!trimmedName) return
+
+  if (!usernamePattern.test(trimmedName)) {
+    errorMsg.value = "No symbols or special characters allowed in name."
+    return
+  }
+
+  const isPasswordChange =
+    currentPassword.value || newPassword.value || newPasswordConfirmation.value
+
+  if (isPasswordChange) {
+    if (!currentPassword.value || !newPassword.value || !newPasswordConfirmation.value) {
+      errorMsg.value = "Please fill current password, new password, and confirm new password."
+      return
+    }
+
+    if (newPassword.value !== newPasswordConfirmation.value) {
+      errorMsg.value = "New password and confirmation do not match."
+      return
+    }
+  }
 
   saving.value = true
   errorMsg.value = ""
 
   const form = new FormData()
   form.append("_method", "PUT")
-  form.append("name", editName.value)
+  form.append("name", trimmedName)
   form.append("bio", editBio.value)
+
+  if (isPasswordChange) {
+    form.append("current_password", currentPassword.value)
+    form.append("password", newPassword.value)
+    form.append("password_confirmation", newPasswordConfirmation.value)
+  }
 
   if (editImage.value) {
     form.append("image", editImage.value)
@@ -80,8 +115,11 @@ async function saveProfile() {
         : null,
     })
   } catch (err) {
-    errorMsg.value =
-      err.response?.data?.message ?? "Failed to update profile."
+    if (err.response?.data?.errors) {
+      errorMsg.value = Object.values(err.response.data.errors).flat().join(" ")
+    } else {
+      errorMsg.value = err.response?.data?.message ?? "Failed to update profile."
+    }
   } finally {
     saving.value = false
   }
@@ -142,7 +180,35 @@ function closeModal() {
         class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
       ></textarea>
 
-      <p v-if="errorMsg" class="text-red-500 text-sm">
+      <div class="pt-2 space-y-3">
+        <p class="text-sm font-semibold">Change Password</p>
+        <input
+          v-model="currentPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Current password"
+          class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+        />
+        <input
+          v-model="newPassword"
+          type="password"
+          autocomplete="new-password"
+          placeholder="New password"
+          class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+        />
+        <input
+          v-model="newPasswordConfirmation"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Confirm new password"
+          class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"
+        />
+      </div>
+
+      <p
+        v-if="errorMsg"
+        class="text-red-700 dark:text-red-300 text-base bg-red-50 dark:bg-red-900/25 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2"
+      >
         {{ errorMsg }}
       </p>
 

@@ -50,11 +50,11 @@ onMounted(async () => {
         :key="badge.id"
         class="flex flex-col items-center"
       >
-        <div class="w-24 h-24 flex items-center justify-center">
+        <div class="w-18 h-20 flex items-center justify-center">
           <img
             v-if="badge.icon"
             :src="badge.icon"
-            class="max-w-full max-h-full object-contain"
+            class="badge-thumb"
             @error="badge.icon = null"
           />
 
@@ -73,3 +73,13 @@ onMounted(async () => {
 
   </div>
 </template>
+
+<style scoped>
+.badge-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  clip-path: inset(0 18% 0 18%);
+}
+</style>

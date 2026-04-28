@@ -1,42 +1,50 @@
-# LifeAchievements – Felhasználói dokumentáció
+# 🌟 LifeAchievements – Felhasználói dokumentáció
 
 ## Áttekintés
 A **LifeAchievements™** egy játékosított célkövető weboldal, amely lehetővé teszi, hogy kategóriákba rendezett életcélokat, feladatokat és kihívásokat teljesíts.
-Minden teljesített achievement jutalmat ad (XP), és megjelenik a „My Achievements” oldalon.
 
-Az alkalmazás célja, hogy segítsen motiváltan haladni személyes fejlődésedben, miközben vizuálisan is látod a megszerzett eredményeidet az élet különböző területein.
+Minden achievement:
+- XP jutalmat ad ⭐
+- fejlődést biztosít 📈
+- megjelenik a profilodban és statisztikáidban
+
+Az alkalmazás célja:
+- Motiváció
+- Fejlődés
+- Vizuális visszajelzés
+- Mindez egy helyen
 
 ---
 
-## Kezdő lépések
+## 🚀 Kezdő lépések
 
 ### Főoldal
-A főoldal bemutatja az alkalmazás funkcióit és célját. Innen két fő irányba tudsz továbblépni:
+A főoldal bemutatja az alkalmazás funkcióit és célját.
 
+Innen:
 - **GET STARTED**
-  - Log In - Meglévő felhasználói fiókkal be tudunk jelentkezni.
-  - Teljesítmények megtekintése - Felhasználói fiók nélkül tudjuk megtekinteni a teljesítményeket.
-- Navigáció a felső menüvel:
-  - Log In - Meglévő felhasználói fiókkal be tudunk jelentkezni.
-  - Sign Up - Új felhasználói fiókot tudunk regisztálni.
+  - Log In – bejelentkezés
+  - Sign Up - regisztráció
+- Ezek a felső navigációs menüből is elérhetőek.
+- Lejjebb tekerve megtekeinthető az oldal beszámolója.
 
 ---
 
-## Regisztráció és bejelentkezés
+## 🔐 Regisztráció és bejelentkezés
 
 ### Regisztráció
-A regisztrációhoz:
-1. Lépj a **Sign Up** oldalra.
-2. Add meg a következő adatokat:
+1. Sign Up
+2. Add meg a kövektező adatokat:
    - felhasználónév
-   - e-mail cím
+   - e-mail
    - jelszó
-   - jelszó megerősítése
-3. Kattints a **Create Account** gombra.
+3. Create Account
 
 ![Sign up](https://cdn.imgchest.com/files/0b43093625c1.png)
 
-Sikeres regisztráció után automatikusan bejelentkezik a rendszer.
+✔ Sikeres regisztráció után automatikus bejelentkezés
+
+---
 
 ### Bejelentkezés
 A bejelentkezéshez:
@@ -53,30 +61,33 @@ A kijelentkezés a **Profile** oldalon lévő vörös **Log Out** gombbal lehets
 
 ---
 
-## Navigáció a felületen
+## 🧭 Navigáció a felületen
 
 A felső navigációs menüben az alábbi elemek érhetők el:
 
 - **LIFE ACHIEVEMENTS** – bal oldalon, visszavisz a főoldalra.
 - **Catalog** – kategóriák böngészése.
 - **My Achievements** – saját teljesített feladatok ömlesztve.
+- **Goals** – Elmentett teljesítmények későbbi teljesítésre
+- **Leaderboard** – Többi felhasználó közti ranglista
 - **Profile** – profilinformációk megtekintése.
 
-Mobilnézetben ezek egy lenyíló menüben jelennek meg.
+Mobilnézetben lenyíló menüben jelenik meg.
 
 ---
 
-## Katalógus (Catalog)
-
-A **Catalog** oldalon a következőket láthatod:
+## 📚 Katalógus (Catalog)
 
 ![Catalog](https://cdn.imgchest.com/files/96309c31267e.png)
 
-### Kategóriák listája
+### Kategóriák
 Minden kategória tartalmaz:
 - ikont
 - nevet
+- szín (dinamikus 🎨)
 - kattintható kártyát
+
+---
 
 ### Kategória kiválasztása
 Egy kategóriára kattintva megjelenik:
@@ -86,7 +97,7 @@ Egy kategóriára kattintva megjelenik:
 ![Achievements](https://cdn.imgchest.com/files/2746ad8f2c5a.png)
 
 ### Achievement megtekintése
-Kattints egy achievement kártyára, hogy megnyíljon a részletes modál:
+Kattints egy achievement kártyára, hogy megnyíljanak a részletek:
 - név
 - leírás
 - XP jutalom
@@ -96,24 +107,45 @@ Kattints egy achievement kártyára, hogy megnyíljon a részletes modál:
 
 ---
 
-## Achievement teljesítése
+## ✅ Achievement rendszer
 
-A modál ablakban található:
-- **MARK AS COMPLETED** gomb (ha még nem teljesítetted)
-- **COMPLETED** gomb szürkére vált, ha már kész
-
-A sikeres teljesítés után:
-- Zöld pipa jelenik meg az achievement jobb felső sarkában
-- A gomb inaktívvá válik
-- Az achievement megjelenik a **My Achievements** oldalon
+### Teljesítés
+- **MARK AS COMPLETED**
+- siker után:
+  - zöld pipa ✔
+  - XP jár ⭐
+  - bekerül a profilba
 
 ![AchievementCompleted](https://cdn.imgchest.com/files/3ab95ac84e79.png)
 
-Az achievement-ek többször nem teljesíthetők, csak egyszer tárolódnak.
+---
+
+### 🔁 Repeatable achievementek 🆕
+- többször teljesíthetők
+- számláló növekszik
 
 ---
 
-## Saját achievementek (My Achievements)
+## 🎯 Goals rendszer
+
+Lehetővé teszi: "Mit szeretnék megcsinálni később?"
+
+### Funkciók:
+- **Save to Goals** – célokba mentés
+- **Remove from Goals** – célokból törlés
+- automatikus törlés ha teljesíted
+
+---
+
+### Goals oldal
+- csak a mentett achievementek
+- kattintás → adott achievement megnyitása
+
+---
+
+## 🏆 Saját achievementek (My Achievements)
+
+![MyAchievements](https://cdn.imgchest.com/files/8036d36699da.png)
 
 Ezen az oldalon:
 - listázva láthatók a korábban teljesített achievementek
@@ -122,32 +154,97 @@ Ezen az oldalon:
 - maximum 9 elem jelenik meg egy oldalon
 - ha több achievemented van, akkor oldalszámozás jelenik meg
 
-![MyAchievements](https://cdn.imgchest.com/files/8036d36699da.png)
 
-Üres lista esetén a rendszer jelzi, hogy:
+Üres lista esetén a rendszer jelez:
 > "You haven’t completed any achievements yet."
 
 ---
 
-## Profil oldal (Profile)
+## 🏅 Badge rendszer
 
-A **Profile** oldal a következő adatokat jeleníti meg:
-- felhasználónév
-- e-mail cím
-- felhasználói azonosító (ID)
+A felhasználó kitűzőket kap:
+- achievement teljesítésért
+- különleges eseményekért (pl. dark mode 🌙)
 
-Ha nem vagy bejelentkezve:
-- figyelmeztető üzenet jelenik meg
-- link a bejelentkezéshez
-
-A profiloldalon található:
-- **Log Out** gomb – mely kijelentkeztet a rendszerből
-
-![Profile](https://cdn.imgchest.com/files/0383dc09c99d.png)
+Megjelenés:
+- popup formában
+- vizuális jutalom 🎉
 
 ---
 
-## Téma váltás (White / Dark mode)
+## 👥 Barát rendszer (Friends)
+
+### Funkciók:
+- barátok listája
+- barátkérelem küldés
+- kérelem elfogadás / visszavonás
+
+### Panel:
+- Bármely oldal jobb alsó sarkából elérhető
+- 3 tab:
+  - Friends
+  - Requests
+  - Add
+
+---
+
+### Friends
+- profilképek
+- kattintás → profil
+
+---
+
+### Requests
+- bejövő + kimenő
+- Accept / Cancel
+
+✔ üres állapot kezelve:
+> "You have no pending requests..."
+
+---
+
+### Add
+- felhasználónév alapú keresés
+- alul input + gomb
+- középen segítő szöveg
+
+---
+
+## 🏆 Ranglista (Leaderboard)
+
+Top felhasználók listája:
+- XP alapján rangsorol
+- profilképpel
+- vizuális rangsor
+- Barátaid ranglistájának megjelenítése
+
+---
+
+## 👤 Profil oldal (Profile)
+
+![Profile](https://cdn.imgchest.com/files/0383dc09c99d.png)
+
+### Tartalom
+- felhasználónév
+- e-mail cím
+- profilkép
+- bio
+- szint és tapasztalati pont csík
+
+A profiloldalon található:
+- **Log Out** gomb – amely kijelentkeztet a rendszerből
+
+---
+
+### 📊 Stats
+- Achievements
+- XP
+- Goals
+- Kedvenc Kategória
+
+---
+
+## 🌗 Téma váltás (Light / Dark mode)
 
 A logo megnyomására:
 - a világos téma **Dark Theme**-re vált
@@ -173,18 +270,20 @@ A rendszer az alábbi visszajelzéseket adhatja:
 - hibás jelszó vagy felhasználó
 - hiányzó mező
 
-### Achievements
-- csak bejelentkezett felhasználók jelölhetnek "completed"-et
-
 ---
 
-## Összegzés
+## 🧠 Összegzés
 A LifeAchievements alkalmazás egyszerű, letisztult és könnyen kezelhető módon segít:
 - célokat kitűzni,
 - fejlődni,
 - visszajelzést kapni,
 - rendszerezni a teljesítményeket.
 
-A vizuális jelzések és a kategória alapú elrendezés intuitívvá teszik a használatát mind kezdők, mind haladó felhasználók számára.
+---
 
-*A LifeAchievements™ projekt teljes fejlesztéséért és megvalósításáért felelős, Szabó András és Ádám János IKT csapata.*
+## 👨‍💻 Fejlesztők
+
+*A LifeAchievements™ projekt fejlesztői:*
+- Szabó András  
+- Nagy Bernát  
+- Ádám János  

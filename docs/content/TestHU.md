@@ -6,7 +6,13 @@
 - **Manuális tesztek:** 10  
 - **Összes teszt:** 47  
 - **Utolsó sikeres futás:** 2026-04-28  
-- **Általános állapot:** ✅ Sikeres  
+- **Általános állapot:** ✅ Sikeres
+
+### Hogyan futtathatóak a tesztek?
+
+Az alábbi parancsokat indítsd el a LifeAchievements mappában miután az applikáció elindult:
+- docker compose exec backend fish
+- php artisan test tests/ProjektTests.php 
 
 ---
 

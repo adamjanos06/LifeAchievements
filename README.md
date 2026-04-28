@@ -9,6 +9,7 @@
 ### 🇭🇺 Magyar
 - 📗 [Felhasználói dokumentáció](docs/content/UserDocHU.md)
 - 🛠️ [Fejlesztői dokumentáció](docs/content/DevDocHU.md)
+- 🧪 [Tesztelési jegyzőkönyv](docs/content/TestHU.md)
 
 ---
 

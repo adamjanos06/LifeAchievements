@@ -78,7 +78,7 @@ Mobilnézetben lenyíló menüben jelenik meg.
 
 ## 📚 Katalógus (Catalog)
 
-![Catalog](https://cdn.imgchest.com/files/96309c31267e.png)
+![Catalog](https://cdn.imgchest.com/files/0044c9864665.png)
 
 ### Kategóriák
 Minden kategória tartalmaz:
@@ -93,8 +93,9 @@ Minden kategória tartalmaz:
 Egy kategóriára kattintva megjelenik:
 - a kategória neve
 - hozzá tartozó achievementek listája
+- kereső név vagy leírás alapján
 
-![Achievements](https://cdn.imgchest.com/files/2746ad8f2c5a.png)
+![Achievements](https://cdn.imgchest.com/files/7b4a403605b2.png)
 
 ### Achievement megtekintése
 Kattints egy achievement kártyára, hogy megnyíljanak a részletek:
@@ -103,7 +104,7 @@ Kattints egy achievement kártyára, hogy megnyíljanak a részletek:
 - XP jutalom
 - kategória ikon
 
-![Achievement](https://cdn.imgchest.com/files/c2859960459c.png)
+![Achievement](https://cdn.imgchest.com/files/53ec27bf69df.png)
 
 ---
 
@@ -116,7 +117,7 @@ Kattints egy achievement kártyára, hogy megnyíljanak a részletek:
   - XP jár ⭐
   - bekerül a profilba
 
-![AchievementCompleted](https://cdn.imgchest.com/files/3ab95ac84e79.png)
+![AchievementCompleted](https://cdn.imgchest.com/files/dd0c7ceddf09.png)
 
 ---
 
@@ -135,7 +136,7 @@ Lehetővé teszi: "Mit szeretnék megcsinálni később?"
 - **Remove from Goals** – célokból törlés
 - automatikus törlés ha teljesíted
 
----
+![Goals](https://cdn.imgchest.com/files/a6d3dfa58b27.png)
 
 ### Goals oldal
 - csak a mentett achievementek
@@ -145,7 +146,7 @@ Lehetővé teszi: "Mit szeretnék megcsinálni később?"
 
 ## 🏆 Saját achievementek (My Achievements)
 
-![MyAchievements](https://cdn.imgchest.com/files/8036d36699da.png)
+![MyAchievements](https://cdn.imgchest.com/files/b1c63f6999b0.png)
 
 Ezen az oldalon:
 - listázva láthatók a korábban teljesített achievementek
@@ -161,6 +162,8 @@ Ezen az oldalon:
 ---
 
 ## 🏅 Badge rendszer
+
+![Badges](https://cdn.imgchest.com/files/f81af4a1b135.png)
 
 A felhasználó kitűzőket kap:
 - achievement teljesítésért
@@ -186,13 +189,13 @@ Megjelenés:
   - Requests
   - Add
 
----
+![Friends](https://cdn.imgchest.com/files/cd7914683fd5.png)
 
 ### Friends
 - profilképek
 - kattintás → profil
 
----
+![Requests](https://cdn.imgchest.com/files/1e07f9f88871.png)
 
 ### Requests
 - bejövő + kimenő
@@ -201,7 +204,7 @@ Megjelenés:
 ✔ üres állapot kezelve:
 > "You have no pending requests..."
 
----
+![Add](https://cdn.imgchest.com/files/d034915d3a05.png)
 
 ### Add
 - felhasználónév alapú keresés
@@ -211,6 +214,8 @@ Megjelenés:
 ---
 
 ## 🏆 Ranglista (Leaderboard)
+
+![Leaderboard](https://cdn.imgchest.com/files/93f5417b41e4.png)
 
 Top felhasználók listája:
 - XP alapján rangsorol
@@ -222,7 +227,7 @@ Top felhasználók listája:
 
 ## 👤 Profil oldal (Profile)
 
-![Profile](https://cdn.imgchest.com/files/0383dc09c99d.png)
+![Profile](https://cdn.imgchest.com/files/46ae6f7e2a63.png)
 
 ### Tartalom
 - felhasználónév

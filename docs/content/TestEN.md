@@ -8,6 +8,12 @@
 - **Last successful run:** 2026-04-28  
 - **Overall status:** ✅ Passed  
 
+### How to run tests?
+
+Execute these commands in the LifeAchievements folder after the application is started:
+- docker compose exec backend fish
+- php artisan test tests/ProjektTests.php 
+
 ---
 
 ## 🤖 Automated Tests

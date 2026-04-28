@@ -1,57 +1,61 @@
-# LifeAchievements™ – Developer Documentation
+# 🌟 LifeAchievements™ – Developer Documentation
 
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [System Architecture](#system-architecture)
-3. [Used Technologies](#used-technologies)
+3. [Technologies Used](#technologies-used)
 4. [Project Structure](#project-structure)
 5. [Backend – Laravel API](#backend--laravel-api)
 6. [Database](#database)
-7. [Seeders and Factory Data](#seeders-and-factory-data)
+7. [Seeders and Initial Data](#seeders-and-initial-data)
 8. [Frontend – Vue.js Application](#frontend--vuejs-application)
-9. [Authentication and Token Handling](#authentication-and-token-handling)
-10. [Styles and Theme Switching](#styles-and-theme-switching)
+9. [State Management and Logic](#state-management)
+10. [Authentication and Token Handling](#authentication)
+11. [New Systems](#new-systems)
+12. [UI/UX and Theme Switching](#ui-ux-and-theme-switching)
 
 ---
 
 ## Introduction
 
-**LifeAchievements™** is a full-stack web application designed to support gamified goal tracking.  
-The system consists of two main parts:
+**LifeAchievements™** is a full-stack web application that supports gamified goal tracking.
 
-- **Backend** – REST API built with the Laravel framework  
-- **Frontend** – multi-page application built with Vue.js (with routing)
+The goal of the system:
+- tracking life goals
+- increasing motivation
+- providing social features
 
-The goal of the project is to provide a platform where users can:
-- register and log in,
-- browse categories and achievements,
-- record completed achievements,
-- view their personal results.
+The project consists of two main parts:
+- **Backend** – Laravel REST API
+- **Frontend** – Vue.js SPA
 
 ---
 
 ## System Architecture
 
-The system uses a classical client–server architecture:
+The system uses a classic client–server architecture:
 
-Frontend (Vue.js) → REST API → Backend (Laravel) → ORM → Database (MySQL)
+Frontend (Vue 3) --> REST API (Laravel) --> Eloquent ORM --> MySQL database
+
+- JSON-based communication
+- Bearer token authentication
 
 ---
 
-## Used Technologies
+## Technologies Used
 
 ### Backend
 - Laravel 10+
 - PHP 8.1+
 - MySQL / MariaDB
-- Sanctum – token-based authentication
+- Laravel Sanctum
 
 ### Frontend
 - Vue.js 3 (Composition API)
 - Vue Router
-- Pinia
 - Tailwind CSS
-- Axios
+- Fetch API
+- localStorage
 
 ---
 
@@ -59,16 +63,17 @@ Frontend (Vue.js) → REST API → Backend (Laravel) → ORM → Database (MySQL
 
 ### Backend
 
+### Backend
+
 ```
 backend/
  ├── app/
- │   ├── Http/
+ │   ├── Http/Controllers/
  │   ├── Models/
  │   └── Resources/
  ├── database/
  │   ├── migrations/
  │   ├── seeders/
- │   └── factories/
  ├── routes/api.php
  └── composer.json
 ```
@@ -78,27 +83,37 @@ backend/
 ```
 frontend/
  ├── src/
-     ├── components/
-     ├── layouts/
-     ├── pages/
-     ├── router/
-     └── App.vue
+ ├── components/
+ ├── layouts/
+ ├── pages/
+ ├── router/
+ ├── utils/
+ └── App.vue
 ```
 
 ---
 
 ## Backend – Laravel API
 
-### Important Endpoints
+### Main Endpoints
 
-| Method | URL | Description | Auth |
-|--------|-----|-------------|------|
+| Method | Endpoint | Description | Auth |
+|--------|--------|--------|------|
 | POST | /register | Registration | ❌ |
 | POST | /login | Login | ❌ |
-| GET | /categories | List of categories | ❌ |
-| GET | /achievements | List of achievements | ❌ |
-| POST | /achievements/{id}/complete | Mark achievement completed | ✔️ |
-| GET | /my-achievements | User’s completed achievements | ✔️ |
+| GET | /categories | Categories | ❌ |
+| GET | /achievements | Achievement list | ❌ |
+| POST | /achievements/{id}/complete | Completion | ✔️ |
+| GET | /my-achievements | User achievements | ✔️ |
+| GET | /goals | Goals list | ✔️ |
+| POST | /goals/{achievement} | Save | ✔️ |
+| DELETE | /goals/{achievement} | Delete | ✔️ |
+| GET | /friends | Friends | ✔️ |
+| GET | /friend-requests | Requests | ✔️ |
+| POST | /friends | Send request | ✔️ |
+| POST | /friend-requests/{id}/accept | Accept | ✔️ |
+| DELETE | /friend-requests/{id} | Delete | ✔️ |
+| GET | /leaderboard | Leaderboard | ❌ |
 | GET | /me | Active user | ✔️ |
 
 ---
@@ -110,6 +125,10 @@ frontend/
 - categories
 - achievements
 - completed_achievements
+- goals
+- friend_requests
+- badges
+- badge_user
 
 `completed_achievements` fields:
 - id
@@ -120,48 +139,118 @@ frontend/
 
 ---
 
-## Seeders and Factory Data
+## Seeders and Initial Data
 
 `DatabaseSeeder.php` calls:
-- category seeder
-- achievement seeder
-- optional: test user seeder
+- CategorySeeder (colors + icons)
+- AchievementSeeder
+- test users
 
 ---
 
 ## Frontend – Vue.js Application
 
-Application page structure:
+Application pages:
 - Landing
-- Introduction
 - Login / Signup
 - Catalog
-- Catalog/[id] – responsible for category-specific achievements
+- Catalog/[id] - responsible for achievements by category
 - My Achievements
+- Goals
+- Leaderboard
 - Profile
 
 ---
 
-## Authentication and Token Handling
+## State Management
 
-Laravel Sanctum manages the token received after login.
+- `ref()` and `computed()`
+- component-based state
+- localStorage
 
-Frontend storage:
+---
 
-```
+## Authentication
+
+Laravel Sanctum handles the token after login.
+
+Token storage:
+
 localStorage.setItem("token", token)
-axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-```
+
+Header:
+
+Authorization: Bearer {token}
 
 ---
 
-## Styles and Theme Switching
+## New Systems
 
-Clicking the logo switches:
-- Light Theme ↔ Dark Theme
-
-Tailwind’s `dark:` prefix controls dark mode styling.
+### 🎯 Goals
+- save achievements
+- remove functionality
+- auto removal on completion
 
 ---
 
-*The LifeAchievements™ project was developed and implemented by the IT team of András Szabó and János Ádám.*
+### 👥 Friends
+- request system
+- incoming / outgoing
+- accept / cancel
+
+---
+
+### 🏆 Leaderboard
+- XP-based ranking
+- top users
+
+---
+
+### 🏅 Badge system
+- backend-triggered
+- frontend popup
+- event-based
+
+---
+
+## UI-UX and Theme Switching
+
+### Dark mode
+- `html.dark`
+- Tailwind `dark:` prefix
+
+---
+
+### UI features
+- modal-based interaction
+- dynamic colors
+- hover effects
+- scroll panels
+
+---
+
+### UX
+- empty states
+- feedback
+- animations
+
+---
+
+## Summary
+
+✔ full-stack system  
+✔ REST API + SPA  
+✔ gamification  
+✔ social features  
+✔ scalable architecture  
+
+---
+
+## 👨‍💻 Developers
+
+- András Szabó
+- Bernát Nagy
+- János Ádám
+---
+
+*A LifeAchievements™ projekt fejlesztéséért és megvalósításáért felelős, Szabó András és Ádám János IKT csapata.*

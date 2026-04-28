@@ -10,8 +10,9 @@ php artisan migrate:fresh --seed
 
 ## 4. Lépj be egy már meglévő fiókkal vagy regisztálj egy új felhasználót
 Admin user: 
-    email: admin@example.com
-    password: admin
+- email: admin@example.com
+- password: admin
+
 Test user:
-    email: test@test.com
-    password: password
+- email: test@test.com
+- password: password

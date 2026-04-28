@@ -26,4 +26,4 @@ Ez a projekt segít az életed során elért eredmények strukturált és átlá
 ## 🚀 Első lépések
 Új vagy itt? Nézd meg a beüzemelési útmutatót, hogy gyorsan elindulhass.
 
-👉 [Beüzemelési útmutató](docs/content/setup.md)
+👉 [Beüzemelési útmutató](docs/content/setupHU.md)

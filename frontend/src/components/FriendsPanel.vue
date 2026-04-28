@@ -12,6 +12,10 @@ const sentRequests = ref([])
 const username = ref("")
 const activeTab = ref("friends")
 const unlockedBadge = ref(null)
+const popupMessage = ref("")
+const popupType = ref("error")
+
+let popupTimer = null
 
 const token = localStorage.getItem("token")
 
@@ -24,6 +28,38 @@ function getAvatarUrl(image) {
 function toggle() {
   show.value = !show.value
   if (show.value && token) loadAll()
+}
+
+function showPopupMessage(message, type = "error") {
+  popupMessage.value = message
+  popupType.value = type
+
+  if (popupTimer) {
+    clearTimeout(popupTimer)
+  }
+
+  popupTimer = setTimeout(() => {
+    popupMessage.value = ""
+  }, 4200)
+}
+
+function normalized(value) {
+  return value.trim().toLowerCase()
+}
+
+function alreadyFriendsByName(name) {
+  const target = normalized(name)
+  return friends.value.some(f => normalized(f.name || "") === target)
+}
+
+function alreadySentByName(name) {
+  const target = normalized(name)
+  return sentRequests.value.some(r => normalized(r.receiver?.name || "") === target)
+}
+
+function hasIncomingByName(name) {
+  const target = normalized(name)
+  return requests.value.some(r => normalized(r.sender?.name || "") === target)
 }
 
 function goToProfile(id) {
@@ -61,9 +97,25 @@ async function loadRequests() {
 }
 
 async function sendRequest() {
-  if (!username.value.trim()) return
+  const targetName = username.value.trim()
+  if (!targetName) return
 
-  const payload = { name: username.value }
+  if (alreadyFriendsByName(targetName)) {
+    showPopupMessage("You are already friends with this user.")
+    return
+  }
+
+  if (alreadySentByName(targetName)) {
+    showPopupMessage("You already sent a friend request to this user.")
+    return
+  }
+
+  if (hasIncomingByName(targetName)) {
+    showPopupMessage("This user has already sent you a friend request.")
+    return
+  }
+
+  const payload = { name: targetName }
   const res = await fetch("http://backend.vm1.test/api/friends", {
     method: "POST",
     headers: {
@@ -74,20 +126,37 @@ async function sendRequest() {
   })
 
   if (!res.ok) {
-    console.error('friend request failed', await res.text())
+    const errorData = await res.json().catch(() => ({}))
+    const backendMessage = errorData?.message
+
+    if (res.status === 400) {
+      showPopupMessage("You cannot send a friend request to yourself.")
+    } else if (res.status === 404) {
+      showPopupMessage("User does not exist.")
+    } else if (res.status === 409) {
+      if (alreadyFriendsByName(targetName)) {
+        showPopupMessage("You are already friends with this user.")
+      } else {
+        showPopupMessage("You already sent a friend request to this user.")
+      }
+    } else {
+      showPopupMessage(backendMessage || "Failed to send friend request.")
+    }
   } else {
     const data = await res.json().catch(() => ({}))
-    if (!sentRequests.value.some(r => r.receiver?.name === username.value)) {
+    if (!alreadySentByName(targetName)) {
 
       sentRequests.value.push({
         id: data.id || Math.random(),
-        receiver: { name: username.value }
+        receiver: { name: targetName }
       })
     }
 
     if (data.badge) {
       unlockedBadge.value = data.badge
     }
+
+    showPopupMessage("Friend request sent.", "success")
   }
 
   username.value = ""
@@ -139,6 +208,16 @@ onMounted(() => {
     v-if="show"
     class="fixed inset-0 bg-black/60 flex items-center justify-center z-65"
   >
+    <div
+      v-if="popupMessage"
+      class="absolute top-14 left-1/2 -translate-x-1/2 px-4 py-3 rounded-xl shadow-lg border text-sm font-semibold z-10"
+      :class="popupType === 'success'
+        ? 'bg-green-50 border-green-300 text-green-800 dark:bg-green-900/25 dark:border-green-700 dark:text-green-200'
+        : 'bg-red-50 border-red-300 text-red-800 dark:bg-red-900/25 dark:border-red-700 dark:text-red-200'"
+    >
+      {{ popupMessage }}
+    </div>
+
     <div
       class="bg-white dark:bg-gray-800
              w-[35vw] min-w-[420px] max-w-[650px]

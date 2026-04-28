@@ -1,9 +1,28 @@
-# Life Achievements
+# 🌟 Life Achievements
 
-## [Dokumentáció magyar nyelven](README_HU.md)
+Welcome! This repository contains documentation and resources for the **Life Achievements** project.
 
-## [User Documentation](docs/content/UserDocEN.md)
+---
 
-## [Developer Documentation](docs/content/DevDocHEN.md)
+## 🌐 Choose your language
 
-## [Setup Guide](docs/content/setup.md)
+### 🇬🇧 English
+- 📘 [User documentation](docs/content/UserDocEN.md)
+- 🛠️ [Developer documentation](docs/content/DevDocEN.md)
+
+---
+
+### 🇭🇺 Magyar
+- 📗 [Dokumentáció magyar nyelven](docs/content/README.md)
+
+---
+
+## 📌 About
+This project helps you track and manage life achievements in a structured and meaningful way.
+
+---
+
+## 🚀 Getting Started
+New here? Check out the setup guide to get up and running quickly.
+
+👉 [Setup Guide](docs/content/setup.md)

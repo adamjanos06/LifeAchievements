@@ -26,4 +26,4 @@ This project helps you track and manage life achievements in a structured and me
 ## 🚀 Getting Started
 New here? Check out the setup guide to get up and running quickly.
 
-👉 [Setup Guide](docs/content/setup.md)
+👉 [Setup Guide](docs/content/setupEN.md)
